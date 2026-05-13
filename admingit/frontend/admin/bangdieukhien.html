@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chị Ơi - Bảng điều khiển quản trị viên</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#fff8f6",
+                        "surface-dim": "#ecd6cc",
+                        "on-surface-variant": "#584238",
+                        "tertiary": "#006780",
+                        "secondary-container": "#ff8849",
+                        "on-primary-fixed": "#351000",
+                        "on-secondary-fixed-variant": "#7a3000",
+                        "on-primary": "#ffffff",
+                        "on-background": "#241914",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#3b2e28",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#dfc0b3",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "tertiary-container": "#00b1da",
+                        "secondary-fixed-dim": "#ffb693",
+                        "on-surface": "#241914",
+                        "primary": "#a04100",
+                        "inverse-primary": "#ffb693",
+                        "on-tertiary-fixed-variant": "#004d61",
+                        "surface": "#fff8f6",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#52d5ff",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-bright": "#fff8f6",
+                        "secondary-fixed": "#ffdbcc",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#a04100",
+                        "outline": "#8b7266",
+                        "surface-container-highest": "#f4ded5",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#ffdbcc",
+                        "tertiary-fixed": "#b8eaff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#003f4f",
+                        "on-secondary-container": "#6b2900",
+                        "surface-container-high": "#fae4da",
+                        "surface-container": "#ffeae1",
+                        "surface-container-low": "#fff1eb",
+                        "secondary": "#a04100",
+                        "on-primary-container": "#642600",
+                        "on-secondary-fixed": "#351000",
+                        "error": "#ba1a1a",
+                        "primary-container": "#ff7e36",
+                        "inverse-on-surface": "#ffede6",
+                        "on-tertiary-fixed": "#001f28",
+                        "surface-variant": "#f4ded5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container_padding": "32px",
+                        "sidebar_width": "240px",
+                        "gutter": "24px",
+                        "stack_lg": "24px",
+                        "stack_sm": "8px",
+                        "stack_md": "16px"
+                    },
+                    "fontFamily": {
+                        "title-sm": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "label-bold": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "headline-md": ["Be Vietnam Pro"],
+                        "display-lg": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "label-bold": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            user-select: none;
+        }
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+    </style>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(160,65,0,0.15); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(160,65,0,0.3); }
+        /* Sidebar active indicator animation */
+        aside nav a { position: relative; border-radius: 8px; }
+        aside nav a:hover { background: rgba(160,65,0,0.06); }
+        /* Card subtle animations */
+        .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(88,66,56,0.08); }
+        /* Table row hover */
+        tbody tr { transition: background-color 0.15s ease; }
+        tbody tr:hover { background-color: rgba(255,126,54,0.04); }
+        /* Button press effect */
+        button:active, a:active { transform: scale(0.97); }
+        /* Smooth page transitions */
+        main { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* Orange accent gradient for header elements */
+        .admin-gradient { background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); }
+        /* Focus ring for inputs */
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(160,65,0,0.2); 
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-dim shadow-md flex flex-col py-stack_lg z-50">
+<div class="px-6 mb-8">
+<h1 class="font-display-lg text-display-lg text-primary">Chị Ơi</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin CMS</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-primary border-l-4 border-primary transition-all duration-200 ease-in-out" href="bangdieukhien.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydonhang.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label-md text-label-md">Đơn hàng</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="canthiepdonhang.html">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-md text-label-md">Can thiệp</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlytasker.html">
+<span class="material-symbols-outlined">engineering</span>
+<span class="font-label-md text-label-md">Tasker</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlycudan.html">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Cư dân</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
+<span class="material-symbols-outlined">inbox</span>
+<span class="font-label-md text-label-md">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="xulykhieunai.html">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-md text-label-md">Khiếu nại</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="baocaodoanhthu.html">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-md text-label-md">Báo cáo</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Admin</p>
+<p class="text-[11px] text-on-surface-variant truncate">Quản trị viên</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors" title="Đăng xuất">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[240px] flex-1 flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 w-full h-16 bg-surface shadow-sm flex items-center justify-between px-container_padding">
+<div class="flex items-center gap-4">
+<nav class="flex text-on-surface-variant/60 font-label-md text-label-md items-center gap-2">
+<span>Admin</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Dashboard</span>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative flex items-center bg-surface-container-low rounded-full px-4 py-2 w-64 group focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant/50 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-full p-0 text-on-surface" placeholder="Tìm kiếm hệ thống..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="relative p-2 rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30">
+<div class="text-right">
+<p class="font-label-bold text-on-surface leading-none">Quản trị viên</p>
+<p class="font-label-md text-on-surface-variant text-[10px] uppercase tracking-wider mt-1">Super Admin</p>
+</div>
+<img alt="Admin User Avatar" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcEQRqbMxtNon5swQmKYyRC9HkIokEpubuigUkkV902Pxuo2aOkmvpVDl1mvgF3UOLGGxwSVOqwwzr9PHyWExQAfFHIKpH-wnZUT133w8ngGt1HmmOaGB0-HusMntmg4yQKp1OqxtKCsJCBQQLtfKw1eClPOJKz2wnWQvWJ4rFeGHISXdZKuzRJdIvbDQk__svxYZQwPVa8TQjogZosLJ-0i3JPErJMupQJPlsO8KZwFM0qNzdImVfpU0IasoWK4seUE7gmsuYdzo"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="p-container_padding space-y-stack_lg">
+<!-- Row 1: Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(88,66,56,0.04)] stat-card flex items-center gap-5">
+<div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface-variant opacity-70">Tổng đơn hôm nay</p>
+<div class="flex items-end gap-2">
+<h3 class="font-title-sm text-[24px]">142</h3>
+<span class="text-[12px] text-tertiary-container font-bold mb-1">+12%</span>
+</div>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(88,66,56,0.04)] stat-card flex items-center gap-5">
+<div class="w-12 h-12 rounded-full bg-secondary-container/10 flex items-center justify-center text-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pending</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface-variant opacity-70">Đang chờ xử lý</p>
+<div class="flex items-center gap-2">
+<h3 class="font-title-sm text-[24px]">18</h3>
+<span class="px-2 py-0.5 bg-secondary-container/20 text-on-secondary-container text-[10px] font-bold rounded-full">GẤP</span>
+</div>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(88,66,56,0.04)] stat-card flex items-center gap-5">
+<div class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">engineering</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface-variant opacity-70">Tasker hoạt động</p>
+<div class="flex items-end gap-2">
+<h3 class="font-title-sm text-[24px]">87</h3>
+<span class="text-[12px] text-tertiary font-bold mb-1">+5%</span>
+</div>
+</div>
+</div>
+<!-- Stat Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(88,66,56,0.04)] stat-card flex items-center gap-5">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface-variant opacity-70">Doanh thu hôm nay</p>
+<h3 class="font-title-sm text-[24px] text-primary">8.4tr <span class="text-body-sm font-normal">đ</span></h3>
+</div>
+</div>
+</div>
+<!-- Row 2: Chart & Critical Orders -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-gutter">
+<!-- Column Chart Mockup -->
+<div class="lg:col-span-3 bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(88,66,56,0.04)] stat-card">
+<div class="flex justify-between items-center mb-8">
+<h4 class="font-title-sm text-on-surface">Đơn hàng 7 ngày qua</h4>
+<select class="bg-surface-container-low border-none rounded-lg text-label-md text-on-surface-variant focus:ring-1 focus:ring-primary">
+<option>Tuần này</option>
+<option>Tuần trước</option>
+</select>
+</div>
+<div class="h-[280px] flex items-end justify-between gap-4 px-4">
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-surface-variant rounded-t-lg" style="height: 60%"></div>
+<span class="text-[10px] text-on-surface-variant/60 font-bold uppercase">Thứ 2</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-surface-variant rounded-t-lg" style="height: 45%"></div>
+<span class="text-[10px] text-on-surface-variant/60 font-bold uppercase">Thứ 3</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-surface-variant rounded-t-lg" style="height: 85%"></div>
+<span class="text-[10px] text-on-surface-variant/60 font-bold uppercase">Thứ 4</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary-container rounded-t-lg" style="height: 100%"></div>
+<span class="text-[10px] text-primary font-bold uppercase">Thứ 5</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-surface-variant rounded-t-lg" style="height: 70%"></div>
+<span class="text-[10px] text-on-surface-variant/60 font-bold uppercase">Thứ 6</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-surface-variant rounded-t-lg" style="height: 40%"></div>
+<span class="text-[10px] text-on-surface-variant/60 font-bold uppercase">Thứ 7</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-surface-variant rounded-t-lg" style="height: 30%"></div>
+<span class="text-[10px] text-on-surface-variant/60 font-bold uppercase">CN</span>
+</div>
+</div>
+</div>
+<!-- Critical Orders Table -->
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(88,66,56,0.04)] stat-card">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-title-sm text-on-surface">Đơn hàng cần xử lý gấp</h4>
+<span class="text-primary font-label-bold cursor-pointer hover:underline">Tất cả</span>
+</div>
+<div class="space-y-4">
+<!-- Order Row -->
+<div class="flex items-center justify-between p-3 rounded-lg bg-background hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-secondary-container/10 rounded-lg flex items-center justify-center text-secondary-container">
+<span class="material-symbols-outlined text-[20px]">cleaning_services</span>
+</div>
+<div>
+<p class="font-label-bold text-on-surface">#ORD-9021</p>
+<p class="text-[11px] text-on-surface-variant/60">Dọn dẹp nhà cửa • 2h</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[11px] font-bold text-error mb-1">Chưa có Tasker</p>
+<button class="px-3 py-1 bg-primary text-white text-[11px] font-bold rounded-full hover:bg-primary/90 transition-all">Xem</button>
+</div>
+</div>
+<!-- Order Row -->
+<div class="flex items-center justify-between p-3 rounded-lg bg-background hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-tertiary/10 rounded-lg flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[20px]">oven_gen</span>
+</div>
+<div>
+<p class="font-label-bold text-on-surface">#ORD-8842</p>
+<p class="text-[11px] text-on-surface-variant/60">Đi chợ hộ • VinMart</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[11px] font-bold text-on-secondary-container mb-1">Hủy bởi khách</p>
+<button class="px-3 py-1 bg-primary text-white text-[11px] font-bold rounded-full hover:bg-primary/90 transition-all">Xem</button>
+</div>
+</div>
+<!-- Order Row -->
+<div class="flex items-center justify-between p-3 rounded-lg bg-background hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-secondary-container/10 rounded-lg flex items-center justify-center text-secondary-container">
+<span class="material-symbols-outlined text-[20px]">stroller</span>
+</div>
+<div>
+<p class="font-label-bold text-on-surface">#ORD-7719</p>
+<p class="text-[11px] text-on-surface-variant/60">Trông trẻ • Theo giờ</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[11px] font-bold text-error mb-1">Quá giờ nhận</p>
+<button class="px-3 py-1 bg-primary text-white text-[11px] font-bold rounded-full hover:bg-primary/90 transition-all">Xem</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 3: New Taskers & Complaints -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Tasker Approval -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(88,66,56,0.04)] stat-card">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-title-sm text-on-surface">Tasker mới chờ duyệt</h4>
+<div id="tasker-pending-count" class="px-2 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold">0 ĐANG CHỜ</div>
+</div>
+<div id="tasker-pending-container" class="space-y-4">
+    <!-- Dữ liệu Tasker chờ duyệt sẽ được render qua JS -->
+    <p class="text-[12px] text-on-surface-variant/60 italic text-center py-4">Đang tải dữ liệu...</p>
+</div>
+</div>
+<!-- Complaints Section -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(88,66,56,0.04)] stat-card">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-title-sm text-on-surface">Khiếu nại chưa xử lý</h4>
+<span class="text-error font-label-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">priority_high</span>
+Quan trọng
+                        </span>
+</div>
+<div id="tickets-pending-container" class="space-y-3">
+    <!-- Dữ liệu Khiếu nại sẽ được render qua JS -->
+    <p class="text-[12px] text-on-surface-variant/60 italic text-center py-4">Đang tải dữ liệu...</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB for quick actions (Contextual suppression applied: only on main dashboards) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary-container text-on-primary rounded-full shadow-lg flex items-center justify-center cursor-pointer active:scale-95 transition-transform z-50">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+
+<div id="toast" class="hidden fixed bottom-8 right-8 z-[9999] bg-on-surface text-surface px-5 py-3 rounded-xl shadow-xl text-sm font-medium">Đang chuyển đến chi tiết đơn hàng...</div>
+<script>
+document.querySelectorAll('[data-view-order], button, a').forEach(function(btn) {
+  var text = btn.textContent.trim();
+  if (text === 'Xem' || text === 'View') {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var toast = document.getElementById('toast');
+      toast.classList.remove('hidden');
+      setTimeout(function(){ toast.classList.add('hidden'); }, 2000);
+    });
+  }
+});
+</script>
+<!-- CHIOI-JS-INJECT -->
+<script>
+(function() {
+
+  // ---- 1. TABS ----
+  document.querySelectorAll('[data-tab-group]').forEach(function(tabGroup) {
+    var groupName = tabGroup.getAttribute('data-tab-group');
+    tabGroup.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-tab]');
+      if (!btn) return;
+      var tabId = btn.getAttribute('data-tab');
+      // Deactivate all tabs in group
+      document.querySelectorAll('[data-tab-group="' + groupName + '"] [data-tab]').forEach(function(t) {
+        t.classList.remove('text-primary', 'border-primary', 'border-b-2', 'font-semibold', 'bg-secondary-container/10');
+        t.classList.add('text-on-surface-variant');
+      });
+      // Activate clicked tab
+      btn.classList.add('text-primary', 'border-primary', 'border-b-2', 'font-semibold');
+      btn.classList.remove('text-on-surface-variant');
+      // Hide all panes
+      document.querySelectorAll('[data-tab-pane]').forEach(function(p) {
+        p.classList.add('hidden');
+      });
+      // Show target pane
+      var pane = document.querySelector('[data-tab-pane="' + tabId + '"]');
+      if (pane) pane.classList.remove('hidden');
+    });
+  });
+
+  // ---- 2. CLOSE ALL MODALS/PANELS ON LOAD ----
+  document.querySelectorAll('[data-modal], [data-panel]').forEach(function(el) {
+    el.classList.add('hidden');
+  });
+  // Also hide any element with class that suggests it's a modal overlay
+  document.querySelectorAll('.fixed.inset-0, [id*="modal"], [id*="overlay"], [id*="detail-panel"], [id*="slide-panel"]').forEach(function(el) {
+    // Only hide if it's a modal/overlay type (has backdrop-like styling or z-50+)
+    if (el.classList.contains('inset-0') || el.id.toLowerCase().includes('modal') || el.id.toLowerCase().includes('overlay') || el.id.toLowerCase().includes('panel')) {
+      el.classList.add('hidden');
+    }
+  });
+
+  // ---- 3. TOGGLE PANELS/MODALS ----
+  // Open: data-open="target-id"
+  document.querySelectorAll('[data-open]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var target = document.getElementById(btn.getAttribute('data-open'));
+      if (target) {
+        target.classList.remove('hidden');
+        // animate slide-in
+        target.style.animation = 'slideIn 0.2s ease';
+      }
+    });
+  });
+
+  // Close: data-close="target-id" OR data-close-self
+  document.querySelectorAll('[data-close]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var target = document.getElementById(btn.getAttribute('data-close'));
+      if (target) target.classList.add('hidden');
+    });
+  });
+  document.querySelectorAll('[data-close-self]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var modal = btn.closest('[data-modal], [data-panel], .fixed.inset-0');
+      if (modal) modal.classList.add('hidden');
+    });
+  });
+
+  // Click backdrop to close
+  document.querySelectorAll('[data-modal]').forEach(function(modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
+  });
+
+  // ---- 4. TABLE SEARCH FILTER ----
+  document.querySelectorAll('[data-search-table]').forEach(function(input) {
+    var tableId = input.getAttribute('data-search-table');
+    input.addEventListener('input', function() {
+      var q = input.value.toLowerCase().trim();
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = q === '' || text.includes(q) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- 5. CONFIRM ACTION BUTTONS ----
+  document.querySelectorAll('[data-confirm]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var msg = btn.getAttribute('data-confirm') || 'Bạn có chắc chắn không?';
+      if (!confirm(msg)) e.preventDefault();
+    });
+  });
+
+  // ---- 6. STATUS BADGE TOGGLE ----
+  document.querySelectorAll('[data-approve]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var row = btn.closest('tr, [data-item]');
+      if (row) {
+        var badge = row.querySelector('[data-status]');
+        if (badge) {
+          badge.textContent = 'Đã duyệt';
+          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-green-100 text-green-700';
+        }
+        btn.disabled = true;
+        btn.textContent = 'Đã duyệt';
+        btn.className = btn.className + ' opacity-50 cursor-not-allowed';
+        var rejectBtn = row.querySelector('[data-reject]');
+        if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.className += ' opacity-50 cursor-not-allowed'; }
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-reject]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (!confirm('Từ chối người dùng này?')) return;
+      var row = btn.closest('tr, [data-item]');
+      if (row) {
+        var badge = row.querySelector('[data-status]');
+        if (badge) {
+          badge.textContent = 'Đã từ chối';
+          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-red-100 text-red-700';
+        }
+        btn.disabled = true;
+        btn.textContent = 'Đã từ chối';
+        btn.className += ' opacity-50 cursor-not-allowed';
+        var approveBtn = row.querySelector('[data-approve]');
+        if (approveBtn) { approveBtn.disabled = true; approveBtn.className += ' opacity-50 cursor-not-allowed'; }
+      }
+    });
+  });
+
+  // ---- 7. DROPDOWN FILTER (visual) ----
+  document.querySelectorAll('[data-filter-col]').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      var col = parseInt(sel.getAttribute('data-filter-col'));
+      var val = sel.value.toLowerCase();
+      var tableId = sel.getAttribute('data-filter-table');
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        var cell = row.cells[col];
+        var text = cell ? cell.textContent.toLowerCase() : '';
+        row.style.display = val === '' || val === 'all' || text.includes(val) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- 8. INBOX: click conversation row to show chat ----
+  document.querySelectorAll('[data-conversation]').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('[data-conversation]').forEach(function(i) {
+        i.classList.remove('bg-primary-container/15', 'border-l-4', 'border-primary');
+      });
+      item.classList.add('bg-primary-container/15', 'border-l-4', 'border-primary');
+      // Remove unread bold
+      item.classList.remove('font-semibold');
+      var chatPanel = document.getElementById('chat-panel');
+      var emptyState = document.getElementById('chat-empty');
+      if (chatPanel) chatPanel.classList.remove('hidden');
+      if (emptyState) emptyState.classList.add('hidden');
+    });
+  });
+
+  // ---- 9. SEND MESSAGE (Inbox) ----
+  var sendBtn = document.getElementById('send-msg-btn');
+  var msgInput = document.getElementById('msg-input');
+  var chatMessages = document.getElementById('chat-messages');
+  if (sendBtn && msgInput && chatMessages) {
+    function sendMessage() {
+      var text = msgInput.value.trim();
+      if (!text) return;
+      var bubble = document.createElement('div');
+      bubble.className = 'flex justify-end';
+      bubble.innerHTML = '<div class="max-w-[70%] bg-primary-container text-on-primary-container rounded-2xl rounded-br-sm px-4 py-2 text-sm">' + text + '<div class="text-[10px] opacity-60 mt-1 text-right">Vừa xong</div></div>';
+      chatMessages.appendChild(bubble);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      msgInput.value = '';
+    }
+    sendBtn.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+  }
+
+  // ---- 10. SLIDE-IN ANIMATION ----
+  var style = document.createElement('style');
+  style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }';
+  document.head.appendChild(style);
+
+})();
+</script><!-- END-CHIOI-JS-INJECT -->
+
+<!-- Admin API Integration -->
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  // ===== 1. Kiểm tra đăng nhập Admin =====
+  if (!ChiOiAuth.requireAuth('../Khachhang/dangnhap.html')) return;
+
+  var user = ChiOiAuth.getUser();
+  if (user && user.role !== 'ADMIN') {
+    showToastMsg('Bạn không có quyền truy cập trang Admin.');
+    ChiOiAuth.logout('../Khachhang/dangnhap.html');
+    return;
+  }
+
+  // ===== 2. Hiển thị tên Admin =====
+  if (user && user.full_name) {
+    var adminNameEl = document.querySelector('.font-label-bold.text-on-surface.leading-none');
+    if (adminNameEl) adminNameEl.textContent = user.full_name;
+  }
+
+  // ===== 3. Load Dashboard Stats =====
+  try {
+    var dashboard = await apiFetch('/api/admin/dashboard');
+    if (dashboard) {
+      // Cập nhật Tổng đơn hôm nay
+      var statCards = document.querySelectorAll('.stat-card h3');
+      if (statCards[0]) statCards[0].innerHTML = dashboard.total_orders || 0;
+      // Cập nhật Doanh thu
+      if (statCards[3]) statCards[3].innerHTML = formatVND(dashboard.total_revenue || 0);
+    }
+  } catch (e) {
+    console.warn('[Admin] Không thể load dashboard:', e.message);
+  }
+
+  // ===== 4. Load danh sách Orders mới nhất =====
+  try {
+    var orders = await apiFetch('/api/admin/orders');
+    if (orders && orders.length > 0) {
+      // Cập nhật số đơn đang chờ xử lý và cần can thiệp (> 8 phút)
+      var now = new Date().getTime();
+      var pendingOrders = orders.filter(function(o) { return o.status === 'PENDING' || o.status === 'SEARCHING'; });
+      var longWaitCount = pendingOrders.filter(function(o) {
+        return (now - new Date(o.created_at).getTime()) > 8 * 60 * 1000;
+      }).length;
+
+      var pendingStatCard = document.querySelectorAll('.stat-card h3');
+      if (pendingStatCard[1]) {
+        pendingStatCard[1].textContent = pendingOrders.length;
+        var labelEl = pendingStatCard[1].parentElement.parentElement.querySelector('p');
+        var badgeEl = pendingStatCard[1].parentElement.querySelector('span');
+        if (labelEl) {
+          if (longWaitCount > 0) {
+            labelEl.innerHTML = 'Đang xử lý <br><span class="text-error font-bold text-[10px]">(' + longWaitCount + ' cần chú ý)</span>';
+            if (badgeEl) { badgeEl.className = 'px-2 py-0.5 bg-error/20 text-error text-[10px] font-bold rounded-full cursor-pointer'; badgeEl.textContent = 'XỬ LÝ'; badgeEl.onclick = function() { window.location.href = 'canthiepdonhang.html'; }; }
+          } else {
+            labelEl.textContent = 'Đang xử lý';
+            if (badgeEl) { badgeEl.className = 'px-2 py-0.5 bg-secondary-container/20 text-on-secondary-container text-[10px] font-bold rounded-full'; badgeEl.textContent = 'GẤP'; }
+          }
+        }
+      }
+
+      // Cập nhật đơn cần xử lý gấp (panel bên phải)
+      var criticalSection = document.querySelector('.lg\\:col-span-2 .space-y-4');
+      if (criticalSection && pendingOrders.length > 0) {
+        criticalSection.innerHTML = '';
+        pendingOrders.slice(0, 3).forEach(function(order) {
+          var statusText = order.status === 'PENDING' ? 'Chưa có Tasker' : order.status;
+          var div = document.createElement('div');
+          div.className = 'flex items-center justify-between p-3 rounded-lg bg-background hover:bg-surface-container-low transition-colors';
+          div.innerHTML = '<div class="flex items-center gap-3">' +
+            '<div class="w-10 h-10 bg-secondary-container/10 rounded-lg flex items-center justify-center text-secondary-container">' +
+            '<span class="material-symbols-outlined text-[20px]">receipt_long</span></div>' +
+            '<div><p class="font-label-bold text-on-surface">#ORD-' + order.order_id + '</p>' +
+            '<p class="text-[11px] text-on-surface-variant/60">' + (order.address || 'N/A') + '</p></div></div>' +
+            '<div class="text-right"><p class="text-[11px] font-bold text-error mb-1">' + statusText + '</p>' +
+            '<span class="text-[11px] font-bold text-primary">' + formatVND(order.total_price) + '</span></div>';
+          criticalSection.appendChild(div);
+        });
+      }
+    }
+  } catch (e) {
+    console.warn('[Admin] Không thể load orders:', e.message);
+  }
+
+  // ===== 5. Load danh sách Users để đếm Tasker hoạt động & Hiện chờ duyệt =====
+  try {
+    var users = await apiFetch('/api/admin/users');
+    if (users) {
+      // Đếm Tasker hoạt động
+      var activeTaskers = users.filter(function(u) { return u.role === 'TASKER' && u.status === 'ACTIVE'; });
+      var taskerStatCard = document.querySelectorAll('.stat-card h3');
+      if (taskerStatCard[2]) taskerStatCard[2].textContent = activeTaskers.length;
+
+      // Render Tasker mới chờ duyệt (KYC pending)
+      var pendingKycTaskers = users.filter(function(u) { 
+        return u.role === 'TASKER' && u.taskers && u.taskers.kyc_status === 'PENDING_APPROVAL'; 
+      });
+      
+      var taskerPendingCount = document.getElementById('tasker-pending-count');
+      if (taskerPendingCount) taskerPendingCount.textContent = pendingKycTaskers.length + ' ĐANG CHỜ';
+
+      var taskerPendingContainer = document.getElementById('tasker-pending-container');
+      if (taskerPendingContainer) {
+        if (pendingKycTaskers.length === 0) {
+          taskerPendingContainer.innerHTML = '<p class="text-[12px] text-on-surface-variant/60 italic text-center py-4">Không có Tasker nào chờ duyệt.</p>';
+        } else {
+          taskerPendingContainer.innerHTML = '';
+          pendingKycTaskers.slice(0, 3).forEach(function(u) {
+            var avatar = u.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.full_name || 'Tasker') + '&background=ffdbcc&color=a04100';
+            var div = document.createElement('div');
+            div.className = 'flex items-center justify-between py-3 border-b border-outline-variant/20 last:border-0';
+            div.innerHTML = 
+              '<div class="flex items-center gap-4">' +
+                '<img class="w-12 h-12 rounded-full object-cover bg-surface-variant" src="' + avatar + '"/>' +
+                '<div>' +
+                  '<p class="font-label-bold text-on-surface">' + (u.full_name || 'Chưa cập nhật') + '</p>' +
+                  '<p class="text-[11px] text-on-surface-variant/60">SĐT: ' + (u.phone || 'N/A') + '</p>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex gap-2">' +
+                '<a href="quanlytasker.html" class="px-4 py-2 bg-primary-container/10 text-primary-container text-[11px] font-bold rounded-lg hover:bg-primary-container/20 transition-all">Xem HS</a>' +
+              '</div>';
+            taskerPendingContainer.appendChild(div);
+          });
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[Admin] Không thể load users:', e.message);
+  }
+
+  // ===== 6. Load danh sách Khiếu nại (Tickets) =====
+  try {
+    var tickets = await apiFetch('/api/admin/tickets');
+    if (tickets) {
+      var pendingTickets = tickets.filter(function(t) { return t.status === 'OPEN'; });
+      var ticketsContainer = document.getElementById('tickets-pending-container');
+      if (ticketsContainer) {
+        if (pendingTickets.length === 0) {
+          ticketsContainer.innerHTML = '<p class="text-[12px] text-on-surface-variant/60 italic text-center py-4">Không có khiếu nại mới.</p>';
+        } else {
+          ticketsContainer.innerHTML = '';
+          pendingTickets.slice(0, 3).forEach(function(t) {
+            var dateStr = new Date(t.created_at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+            var userName = (t.users && t.users.full_name) ? t.users.full_name : 'Khách hàng';
+            var div = document.createElement('div');
+            div.className = 'p-4 rounded-xl border border-error/20 bg-error/5 flex gap-4';
+            div.innerHTML = 
+              '<span class="material-symbols-outlined text-error mt-1">warning</span>' +
+              '<div class="flex-1">' +
+                '<div class="flex justify-between">' +
+                  '<p class="font-label-bold text-on-surface">' + (t.subject || 'Khiếu nại') + '</p>' +
+                  '<span class="text-[10px] text-on-surface-variant/60">' + dateStr + '</span>' +
+                '</div>' +
+                '<p class="text-[12px] text-on-surface-variant mt-1">' + userName + ': ' + (t.description || '') + '</p>' +
+                '<div class="mt-3 flex gap-4">' +
+                  '<a href="xulykhieunai.html" class="text-[11px] font-bold text-primary hover:underline">Xử lý ngay</a>' +
+                '</div>' +
+              '</div>';
+            ticketsContainer.appendChild(div);
+          });
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[Admin] Không thể load tickets:', e.message);
+  }
+
+  // ===== 7. Nút Đăng xuất =====
+  var logoutBtn = document.querySelector('button[title="Đăng xuất"]');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function() {
+      ChiOiAuth.logout('../Khachhang/dangnhap.html');
+    });
+  }
+
+})();
+</script>
+</body></html>

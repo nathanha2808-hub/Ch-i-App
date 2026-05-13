@@ -1,0 +1,535 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chị Ơi CMS - Xử lý khiếu nại</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#ffdbcc",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#3b2e28",
+                    "primary-fixed-dim": "#ffb693",
+                    "on-primary-container": "#642600",
+                    "inverse-primary": "#ffb693",
+                    "surface-container": "#ffeae1",
+                    "on-surface-variant": "#584238",
+                    "secondary-container": "#ff8849",
+                    "surface-bright": "#fff8f6",
+                    "on-secondary-fixed-variant": "#7a3000",
+                    "on-secondary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary": "#006780",
+                    "primary": "#a04100",
+                    "surface-dim": "#ecd6cc",
+                    "tertiary-container": "#00b1da",
+                    "surface-container-high": "#fae4da",
+                    "tertiary-fixed": "#b8eaff",
+                    "error": "#ba1a1a",
+                    "outline": "#8b7266",
+                    "background": "#fff8f6",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#a04100",
+                    "on-surface": "#241914",
+                    "on-secondary-fixed": "#351000",
+                    "secondary-fixed-dim": "#ffb693",
+                    "on-secondary-container": "#6b2900",
+                    "primary-fixed": "#ffdbcc",
+                    "on-background": "#241914",
+                    "inverse-on-surface": "#ffede6",
+                    "surface-container-low": "#fff1eb",
+                    "on-primary-fixed": "#351000",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#004d61",
+                    "primary-container": "#ff7e36",
+                    "surface-tint": "#a04100",
+                    "surface": "#fff8f6",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#003f4f",
+                    "outline-variant": "#dfc0b3",
+                    "on-tertiary-fixed": "#001f28",
+                    "on-primary-fixed-variant": "#7a3000",
+                    "tertiary-fixed-dim": "#52d5ff",
+                    "surface-container-highest": "#f4ded5",
+                    "surface-variant": "#f4ded5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack_sm": "8px",
+                    "stack_lg": "24px",
+                    "gutter": "24px",
+                    "stack_md": "16px",
+                    "container_padding": "32px",
+                    "sidebar_width": "240px"
+            },
+            "fontFamily": {
+                    "label-md": ["Be Vietnam Pro"],
+                    "display-lg": ["Be Vietnam Pro"],
+                    "title-sm": ["Be Vietnam Pro"],
+                    "body-md": ["Be Vietnam Pro"],
+                    "label-bold": ["Be Vietnam Pro"],
+                    "headline-md": ["Be Vietnam Pro"],
+                    "body-sm": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "display-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dfc0b3; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b7266; }
+    </style>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(160,65,0,0.15); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(160,65,0,0.3); }
+        /* Sidebar active indicator animation */
+        aside nav a { position: relative; border-radius: 8px; }
+        aside nav a:hover { background: rgba(160,65,0,0.06); }
+        /* Card subtle animations */
+        .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(88,66,56,0.08); }
+        /* Table row hover */
+        tbody tr { transition: background-color 0.15s ease; }
+        tbody tr:hover { background-color: rgba(255,126,54,0.04); }
+        /* Button press effect */
+        button:active, a:active { transform: scale(0.97); }
+        /* Smooth page transitions */
+        main { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* Orange accent gradient for header elements */
+        .admin-gradient { background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); }
+        /* Focus ring for inputs */
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(160,65,0,0.2); 
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+<!-- Sidebar Left -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-dim shadow-md flex flex-col py-stack_lg z-50">
+<div class="px-6 mb-8">
+<h1 class="font-display-lg text-display-lg text-primary">Chị Ơi</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin CMS</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="bangdieukhien.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydonhang.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label-md text-label-md">Đơn hàng</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="canthiepdonhang.html">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-md text-label-md">Can thiệp</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlytasker.html">
+<span class="material-symbols-outlined">engineering</span>
+<span class="font-label-md text-label-md">Tasker</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlycudan.html">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Cư dân</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
+<span class="material-symbols-outlined">inbox</span>
+<span class="font-label-md text-label-md">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-primary border-l-4 border-primary transition-all duration-200 ease-in-out" href="xulykhieunai.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">report_problem</span>
+<span class="font-label-md text-label-md">Khiếu nại</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="baocaodoanhthu.html">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-md text-label-md">Báo cáo</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Admin</p>
+<p class="text-[11px] text-on-surface-variant truncate">Quản trị viên</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors" title="Đăng xuất">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Top AppBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] h-16 z-30 bg-surface-bright dark:bg-surface-dim border-b border-outline-variant/20 flex justify-between items-center px-gutter ml-[240px]">
+<div class="flex items-center gap-4 flex-1">
+<h2 class="font-headline-md text-headline-md text-primary">Xử lý khiếu nại</h2>
+<div class="relative w-full max-w-md ml-8 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary/20 text-body-sm" placeholder="Tìm kiếm mã khiếu nại, tên khách hàng..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high rounded-full relative">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface-bright"></span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+<div class="flex items-center gap-3 pl-2 border-l border-outline-variant/20">
+<div class="text-right">
+<p class="text-body-sm font-semibold leading-none">Admin Minh Anh</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-1">Super Admin</p>
+</div>
+<img alt="Quản trị viên" class="w-10 h-10 rounded-full border-2 border-primary/20 object-cover" data-alt="A professional portrait of a young adult Vietnamese female administrator with a friendly and confident expression. She has short black hair and is wearing a stylish corporate outfit. The background is a soft, blurred modern office environment with warm morning lighting, consistent with a professional light-mode UI design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAR44EBbXnDpy_y8s-NShe9QHOkg_R6nAwwY5SiLP8Ddkzo1KSKObZ8QK1xI4bTHp1XAN9b2JixtXm-UHxbqZdhHLF5A78SAxN2Y84pg9dCM11Rhe6PxW_fDKWW6ziJ0tHqNt1ftkW6ZDrNbYi8F42sQcN9tMK28IgmLkH4T9NqsPQ6Ei7KHVm4IisJGBgNgpyVtUVjfR_4IB789Kmh_nRBtEwW6fSFjEXVUu0pTYkHCjOFx8UFXG_C_ICiKrXOmiZ18Pa57YTDboU"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-[240px] pt-16 min-h-screen bg-background">
+<div class="p-8 space-y-6">
+
+  <!-- Header row -->
+  <div class="flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 shadow-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-sm text-on-surface-variant">search</span>
+        <input id="complaint-search" class="bg-transparent border-none text-body-sm focus:ring-0 outline-none w-48 placeholder-on-surface-variant/40" placeholder="Tim khieu nai, nguoi dung..."/>
+      </div>
+      <select id="priority-filter" class="bg-white border border-outline-variant/20 rounded-xl px-3 py-2 text-body-sm focus:ring-0 outline-none shadow-sm">
+        <option value="">Tat ca uu tien</option>
+        <option value="HIGH">Khan cap</option>
+        <option value="MEDIUM">Binh thuong</option>
+        <option value="LOW">Thap</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Stat tabs -->
+  <div class="flex gap-3">
+    <button data-status-filter="" class="px-5 py-2 rounded-xl bg-primary text-white font-label-bold text-body-sm flex items-center gap-2">
+      Tat ca <span id="tab-count-all" class="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+    </button>
+    <button data-status-filter="OPEN" class="px-5 py-2 rounded-xl bg-error/10 text-error border border-error/20 font-label-bold text-body-sm flex items-center gap-2">
+      Chua xu ly <span id="tab-count-open" class="bg-error/20 text-error text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+      <span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+    </button>
+    <button data-status-filter="IN_PROGRESS" class="px-5 py-2 rounded-xl bg-surface-container-low text-on-surface-variant font-label-bold text-body-sm flex items-center gap-2">
+      Dang xu ly <span id="tab-count-prog" class="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+    </button>
+    <button data-status-filter="RESOLVED" class="px-5 py-2 rounded-xl bg-surface-container-low text-on-surface-variant font-label-bold text-body-sm flex items-center gap-2">
+      Da giai quyet <span id="tab-count-done" class="bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+    </button>
+  </div>
+
+  <!-- Complaint cards grid -->
+  <div id="complaint-list" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div class="py-16 text-center text-on-surface-variant col-span-2">
+      <span class="material-symbols-outlined text-5xl block mb-3 opacity-20">hourglass_empty</span>
+      Dang tai du lieu...
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- Detail Panel (slide-over) -->
+<div id="complaint-detail-panel" class="hidden fixed inset-y-0 right-0 w-[440px] bg-white shadow-2xl z-50 flex flex-col border-l border-outline-variant/20">
+  <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/20 bg-surface-container-low flex-shrink-0">
+    <h2 class="font-title-sm text-on-surface">Chi tiet khieu nai</h2>
+    <button onclick="document.getElementById('complaint-detail-panel').classList.add('hidden')" class="p-2 hover:bg-white rounded-full transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+  </div>
+  <div id="panel-body" class="flex-1 overflow-y-auto p-5 space-y-4">
+    <div class="py-8 text-center text-on-surface-variant text-body-sm">Dang tai...</div>
+  </div>
+  <div class="p-4 border-t border-outline-variant/20 flex gap-3 flex-shrink-0">
+    <button id="panel-confirm-btn" class="flex-1 bg-primary text-white rounded-xl py-2.5 text-body-sm font-bold hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined text-[16px]">check_circle</span>
+      Xac nhan xu ly
+    </button>
+    <button onclick="document.getElementById('complaint-detail-panel').classList.add('hidden')" class="border border-outline-variant rounded-xl py-2.5 px-5 text-body-sm font-medium hover:bg-surface-variant/50 transition-all">
+      Dong
+    </button>
+  </div>
+</div>
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('../Khachhang/dangnhap.html')) return;
+
+  /* ---- Maps ---- */
+  var STATUS_MAP = {
+    'OPEN':        { label: 'Chua xu ly', cls: 'bg-error text-white',         dot: 'bg-error' },
+    'IN_PROGRESS': { label: 'Dang xu ly', cls: 'bg-yellow-500 text-white',    dot: 'bg-yellow-500' },
+    'RESOLVED':    { label: 'Da giai quyet', cls: 'bg-green-600 text-white',  dot: 'bg-green-500' },
+    'CLOSED':      { label: 'Da dong',    cls: 'bg-gray-400 text-white',       dot: 'bg-gray-400' },
+  };
+  var PRIORITY_MAP = {
+    'HIGH':   { label: 'Khan cap', cls: 'bg-error text-white' },
+    'MEDIUM': { label: 'Binh thuong', cls: 'bg-yellow-500 text-white' },
+    'LOW':    { label: 'Thap', cls: 'bg-gray-400 text-white' },
+  };
+
+  var allTickets = [];
+  var currentFilter = '';
+
+  function fmtDT(d) {
+    if (!d) return '';
+    var dt = new Date(d);
+    var now = new Date();
+    var diff = Math.floor((now - dt) / 60000);
+    if (diff < 60) return diff < 1 ? 'Vua xong' : diff + ' phut truoc';
+    if (diff < 1440) return Math.floor(diff/60) + ' gio truoc';
+    return dt.toLocaleDateString('vi-VN') + ' ' + dt.toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'});
+  }
+
+  /* ---- Render card list ---- */
+  function renderCards(tickets) {
+    var container = document.getElementById('complaint-list');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!tickets || tickets.length === 0) {
+      container.innerHTML = '<div class="py-16 text-center text-on-surface-variant"><span class="material-symbols-outlined text-5xl block mb-3 opacity-20">inbox</span>Khong co khieu nai nao</div>';
+      return;
+    }
+    tickets.forEach(function(t) {
+      var s = STATUS_MAP[t.status] || STATUS_MAP['OPEN'];
+      var p = PRIORITY_MAP[t.priority] || PRIORITY_MAP['MEDIUM'];
+      var userName = (t.users && t.users.full_name) || 'Nguoi dung #' + t.user_id;
+      var orderCode = t.orders ? '#' + t.orders.order_code : (t.order_id ? '#ORD-' + t.order_id : 'N/A');
+      var isUrgent = t.priority === 'HIGH';
+
+      var card = document.createElement('div');
+      card.className = 'complaint-card bg-white p-5 rounded-2xl border border-outline-variant/20 shadow-sm hover:border-primary/40 hover:shadow-md transition-all cursor-pointer';
+      card.setAttribute('data-tid', t.ticket_id);
+      card.innerHTML = [
+        '<div class="flex justify-between items-start mb-4">',
+          '<div class="flex items-center gap-3">',
+            '<div class="w-10 h-10 rounded-xl ' + (isUrgent ? 'bg-error/10 text-error' : 'bg-secondary-container/10 text-secondary') + ' flex items-center justify-center">',
+              '<span class="material-symbols-outlined" style="font-variation-settings:\'FILL\' 1">' + (isUrgent ? 'warning' : 'info') + '</span>',
+            '</div>',
+            '<div>',
+              '<h3 class="font-bold text-on-surface">' + (t.ticket_code || '#TK-' + t.ticket_id) + '</h3>',
+              '<p class="text-[11px] text-on-surface-variant">' + fmtDT(t.created_at) + '</p>',
+            '</div>',
+          '</div>',
+          '<div class="flex flex-col items-end gap-1">',
+            '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ' + s.cls + '">' + s.label + '</span>',
+            '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ' + p.cls + '">' + p.label + '</span>',
+          '</div>',
+        '</div>',
+        '<div class="grid grid-cols-2 gap-3 mb-3">',
+          '<div><p class="text-[10px] font-bold text-on-surface-variant uppercase">Chu de</p>',
+          '<p class="text-body-sm font-semibold text-on-surface line-clamp-1">' + (t.subject || 'Khieu nai') + '</p></div>',
+          '<div><p class="text-[10px] font-bold text-on-surface-variant uppercase">Nguoi gui</p>',
+          '<p class="text-body-sm font-semibold text-on-surface">' + userName + '</p></div>',
+          '<div><p class="text-[10px] font-bold text-on-surface-variant uppercase">Don hang</p>',
+          '<p class="text-body-sm text-primary font-semibold">' + orderCode + '</p></div>',
+          '<div><p class="text-[10px] font-bold text-on-surface-variant uppercase">Admin xu ly</p>',
+          '<p class="text-body-sm text-on-surface-variant">' + (t.admins ? t.admins.full_name : 'Chua phan cong') + '</p></div>',
+        '</div>',
+        '<p class="text-body-sm text-on-surface-variant mb-4 line-clamp-2 italic">"' + (t.description || '') + '"</p>',
+        '<div class="flex gap-2">',
+          (t.status !== 'RESOLVED' && t.status !== 'CLOSED' ?
+            '<button class="open-detail-btn flex-1 bg-primary text-white py-2 rounded-xl font-label-bold text-body-sm hover:opacity-90 active:scale-95 transition-all" data-tid="' + t.ticket_id + '">Xu ly ngay</button>' :
+            '<span class="flex items-center gap-1 text-green-600 font-bold text-body-sm"><span class="material-symbols-outlined text-[16px]">check_circle</span>Da xu ly</span>'
+          ),
+          '<button class="view-detail-btn border border-outline-variant/30 text-on-surface-variant px-4 py-2 rounded-xl font-label-bold text-body-sm hover:bg-surface-container-low transition-all" data-tid="' + t.ticket_id + '">Chi tiet</button>',
+        '</div>',
+      ].join('');
+      container.appendChild(card);
+    });
+
+    /* Events */
+    container.querySelectorAll('.open-detail-btn, .view-detail-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openDetailPanel(parseInt(btn.getAttribute('data-tid')));
+      });
+    });
+  }
+
+  /* ---- Detail Panel ---- */
+  async function openDetailPanel(ticketId) {
+    var panel = document.getElementById('complaint-detail-panel');
+    if (!panel) return;
+    panel.classList.remove('hidden');
+
+    var ticket = allTickets.find(function(t) { return t.ticket_id === ticketId; });
+    if (!ticket) return;
+
+    var s = STATUS_MAP[ticket.status] || STATUS_MAP['OPEN'];
+    var p = PRIORITY_MAP[ticket.priority] || PRIORITY_MAP['MEDIUM'];
+    var userName = (ticket.users && ticket.users.full_name) || 'Nguoi dung #' + ticket.user_id;
+    var userPhone = (ticket.users && ticket.users.phone) || '';
+    var orderCode = ticket.orders ? '#' + ticket.orders.order_code : (ticket.order_id ? '#ORD-' + ticket.order_id : 'N/A');
+
+    var panelBody = document.getElementById('panel-body');
+    if (panelBody) panelBody.innerHTML = [
+      '<div class="bg-surface-container-low rounded-xl p-4 space-y-2.5 border border-outline-variant/20">',
+        '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Ma ticket</span><span class="font-bold text-primary">' + (ticket.ticket_code || '#TK-' + ticket.ticket_id) + '</span></div>',
+        '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Nguoi gui</span><span class="font-semibold">' + userName + (userPhone ? ' · ' + userPhone : '') + '</span></div>',
+        '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Don hang</span><span class="font-semibold text-primary">' + orderCode + '</span></div>',
+        '<div class="flex justify-between items-center"><span class="text-[11px] text-on-surface-variant">Trang thai</span><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ' + s.cls + '">' + s.label + '</span></div>',
+        '<div class="flex justify-between items-center"><span class="text-[11px] text-on-surface-variant">Uu tien</span><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ' + p.cls + '">' + p.label + '</span></div>',
+        '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Ngay gui</span><span class="text-[12px]">' + fmtDT(ticket.created_at) + '</span></div>',
+      '</div>',
+      '<div class="bg-white rounded-xl p-4 border border-outline-variant/20">',
+        '<h4 class="text-[11px] font-bold text-on-surface-variant uppercase mb-2">Chu de</h4>',
+        '<p class="font-semibold text-on-surface">' + (ticket.subject || '') + '</p>',
+      '</div>',
+      '<div class="bg-white rounded-xl p-4 border border-outline-variant/20">',
+        '<h4 class="text-[11px] font-bold text-on-surface-variant uppercase mb-2">Mo ta chi tiet</h4>',
+        '<p class="text-body-sm text-on-surface leading-relaxed">' + (ticket.description || '') + '</p>',
+      '</div>',
+      '<div class="bg-primary/5 p-4 rounded-2xl border border-primary/20">',
+        '<h4 class="text-[11px] font-bold text-primary uppercase mb-3">Quyet dinh xu ly</h4>',
+        '<div class="space-y-2 mb-3">',
+          ['resolved', 'closed', 'in_progress'].map(function(v, i) {
+            var labels = ['Da giai quyet', 'Da dong / Tu choi', 'Dang xu ly'];
+            return '<label class="flex items-center gap-3 p-2.5 bg-white rounded-xl border border-outline-variant/20 cursor-pointer hover:border-primary/40 transition-colors"><input type="radio" name="panel-decision" value="' + v.toUpperCase() + '" class="accent-primary"> <span class="text-body-sm font-medium">' + labels[i] + '</span></label>';
+          }).join(''),
+        '</div>',
+        '<textarea id="panel-note" class="w-full bg-white border border-outline-variant/30 rounded-xl p-3 text-body-sm focus:ring-primary focus:border-primary resize-none" rows="3" placeholder="Ghi chu ly do quyet dinh..."></textarea>',
+      '</div>',
+    ].join('');
+
+    // Confirm button
+    var confirmBtn = document.getElementById('panel-confirm-btn');
+    if (confirmBtn) {
+      confirmBtn.onclick = async function() {
+        var decision = document.querySelector('input[name="panel-decision"]:checked');
+        if (!decision) { alert('Vui long chon quyet dinh'); return; }
+        var note = (document.getElementById('panel-note') || {}).value || '';
+        showLoading();
+        try {
+          await apiFetch('/api/admin/tickets/' + ticketId, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: decision.value })
+          });
+          hideLoading();
+          showToastMsg('Da xu ly khieu nai ' + (ticket.ticket_code || '#TK-' + ticketId));
+          panel.classList.add('hidden');
+          setTimeout(function() { location.reload(); }, 1200);
+        } catch(e) { hideLoading(); showToastMsg('Loi: ' + e.message); }
+      };
+    }
+  }
+
+  /* ---- Tab filters ---- */
+  function applyFilter() {
+    var filtered = currentFilter ? allTickets.filter(function(t) { return t.status === currentFilter; }) : allTickets;
+    renderCards(filtered);
+    updateTabCounts();
+  }
+
+  function updateTabCounts() {
+    var el = function(id) { return document.getElementById(id); };
+    if (el('tab-count-all'))   el('tab-count-all').textContent   = allTickets.length;
+    if (el('tab-count-open'))  el('tab-count-open').textContent  = allTickets.filter(function(t){ return t.status === 'OPEN'; }).length;
+    if (el('tab-count-prog'))  el('tab-count-prog').textContent  = allTickets.filter(function(t){ return t.status === 'IN_PROGRESS'; }).length;
+    if (el('tab-count-done'))  el('tab-count-done').textContent  = allTickets.filter(function(t){ return t.status === 'RESOLVED' || t.status === 'CLOSED'; }).length;
+  }
+
+  document.querySelectorAll('[data-status-filter]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('[data-status-filter]').forEach(function(b) {
+        b.classList.remove('bg-primary', 'text-white', 'border-primary');
+        b.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      });
+      btn.classList.add('bg-primary', 'text-white');
+      btn.classList.remove('bg-surface-container-low', 'text-on-surface-variant', 'bg-error/10', 'text-error', 'border-error/20');
+      currentFilter = btn.getAttribute('data-status-filter');
+      applyFilter();
+    });
+  });
+
+  /* ---- Search ---- */
+  var searchInput = document.getElementById('complaint-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      var q = searchInput.value.toLowerCase();
+      var base = currentFilter ? allTickets.filter(function(t) { return t.status === currentFilter; }) : allTickets;
+      var filtered = !q ? base : base.filter(function(t) {
+        return (t.subject && t.subject.toLowerCase().includes(q)) ||
+               (t.description && t.description.toLowerCase().includes(q)) ||
+               (t.users && t.users.full_name && t.users.full_name.toLowerCase().includes(q)) ||
+               (t.users && t.users.phone && t.users.phone.includes(q)) ||
+               (t.ticket_code && t.ticket_code.toLowerCase().includes(q));
+      });
+      renderCards(filtered);
+    });
+  }
+
+  /* ---- Priority filter ---- */
+  var prioritySelect = document.getElementById('priority-filter');
+  if (prioritySelect) {
+    prioritySelect.addEventListener('change', function() {
+      var val = prioritySelect.value;
+      var filtered = val ? allTickets.filter(function(t) { return t.priority === val; }) : allTickets;
+      if (currentFilter) filtered = filtered.filter(function(t) { return t.status === currentFilter; });
+      renderCards(filtered);
+    });
+  }
+
+  /* ---- Load data ---- */
+  showLoading();
+  try {
+    allTickets = await apiFetch('/api/admin/tickets');
+    hideLoading();
+    applyFilter();
+  } catch(e) {
+    hideLoading();
+    showToastMsg('Loi tai du lieu: ' + e.message);
+    console.error(e);
+  }
+
+  /* ---- Logout ---- */
+  var logoutBtn = document.querySelector('button[title="Dang xuat"]');
+  if (logoutBtn) logoutBtn.addEventListener('click', function() { ChiOiAuth.logout('../Khachhang/dangnhap.html'); });
+})();
+</script>
+</body></html>

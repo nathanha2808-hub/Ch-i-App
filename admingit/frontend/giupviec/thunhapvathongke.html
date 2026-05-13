@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Thống kê - Tasker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "tertiary-fixed": "#b8eaff",
+                "on-secondary-fixed-variant": "#6d391d",
+                "on-secondary": "#ffffff",
+                "on-secondary-container": "#794226",
+                "background": "#fff8f6",
+                "on-tertiary": "#ffffff",
+                "inverse-surface": "#3b2e28",
+                "tertiary": "#006780",
+                "primary-fixed-dim": "#ffb693",
+                "surface-tint": "#a04100",
+                "error-container": "#ffdad6",
+                "primary-fixed": "#ffdbcc",
+                "tertiary-container": "#00b1da",
+                "secondary": "#895032",
+                "on-error-container": "#93000a",
+                "on-tertiary-container": "#003f4f",
+                "tertiary-fixed-dim": "#52d5ff",
+                "on-surface-variant": "#584238",
+                "surface-container-high": "#fae4da",
+                "on-tertiary-fixed-variant": "#004d61",
+                "on-surface": "#241914",
+                "on-background": "#241914",
+                "surface-bright": "#fff8f6",
+                "surface-container-lowest": "#ffffff",
+                "inverse-on-surface": "#ffede6",
+                "surface-dim": "#ecd6cc",
+                "on-primary": "#ffffff",
+                "surface-variant": "#f4ded5",
+                "on-error": "#ffffff",
+                "surface-container-low": "#fff1eb",
+                "on-primary-fixed": "#351000",
+                "error": "#ba1a1a",
+                "secondary-fixed-dim": "#ffb693",
+                "secondary-fixed": "#ffdbcc",
+                "surface-container-highest": "#f4ded5",
+                "outline-variant": "#dfc0b3",
+                "on-secondary-fixed": "#351000",
+                "surface-container": "#ffeae1",
+                "secondary-container": "#feb28e",
+                "on-primary-container": "#642600",
+                "on-primary-fixed-variant": "#7a3000",
+                "inverse-primary": "#ffb693",
+                "primary": "#a04100",
+                "outline": "#8b7266",
+                "surface": "#fff8f6",
+                "on-tertiary-fixed": "#001f28",
+                "primary-container": "#ff7e36"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "sm": "8px",
+                "container-padding": "16px",
+                "xs": "4px",
+                "xl": "32px",
+                "base": "4px",
+                "stack-gap": "12px",
+                "md": "16px",
+                "lg": "24px"
+            },
+            "fontFamily": {
+                "label-caps": ["Be Vietnam Pro"],
+                "title-sm": ["Be Vietnam Pro"],
+                "headline-md": ["Be Vietnam Pro"],
+                "display-lg": ["Be Vietnam Pro"],
+                "body-sm": ["Be Vietnam Pro"],
+                "body-lg": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #fff8f6; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .chart-bar { transition: height 0.3s ease; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+          body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .teal-gradient {
+            background: linear-gradient(135deg, #00b1da 0%, #006780 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth transitions */
+        a, button { transition: all 0.2s ease; }
+        /* Card hover effect */
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0" style="background: transparent; pointer-events: none;"></div>
+
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-md h-16 w-full fixed top-0 z-50     bg-transparent relative z-40">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-white text-headline-md active:scale-95 transition-all cursor-pointer">menu</span>
+<h1 class="font-headline-md text-headline-md text-white">Thống kê</h1>
+</div>
+<button class="flex items-center gap-xs px-3 py-1 bg-white/20 rounded-full text-white hover:opacity-90 active:scale-95 transition-all">
+<span class="font-label-caps text-label-caps">Tháng này</span>
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+</button>
+</header>
+<main class="pt-20 px-container-padding space-y-md relative z-10">
+<!-- Wallet Card -->
+<div class="bg-surface-container-lowest border border-primary-fixed p-lg rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.04)]">
+<div class="flex flex-col gap-sm">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Số dư khả dụng</span>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[28px]">account_balance_wallet</span>
+<span class="font-display-lg text-display-lg text-on-surface">... đ</span>
+</div>
+<button class="mt-md w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-surface font-title-sm text-title-sm rounded-full shadow-lg active:scale-95 transition-all">
+                    YÊU CẦU RÚT TIỀN
+                </button>
+<p class="text-[11px] text-on-surface-variant leading-tight mt-sm">
+                    * T+1 · Min 100k · Khấu trừ TNCN 10% nếu &gt;2tr
+                </p>
+</div>
+</div>
+<!-- KPI Grid 2x2 -->
+<div class="grid grid-cols-2 gap-md">
+<!-- Total Income -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-primary-fixed shadow-[0_4px_15px_rgba(0,0,0,0.04)]">
+<span class="font-label-caps text-label-caps text-on-surface-variant">TỔNG THU NHẬP</span>
+<p id="kpi-total-income" class="font-title-sm text-title-sm text-primary mt-xs">-- đ</p>
+</div>
+<!-- Orders -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-primary-fixed shadow-[0_4px_15px_rgba(0,0,0,0.04)]">
+<span class="font-label-caps text-label-caps text-on-surface-variant">HOÀN THÀNH</span>
+<p id="kpi-completed" class="font-title-sm text-title-sm text-primary mt-xs">-- đơn</p>
+</div>
+<!-- Completion Rate -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-primary-fixed shadow-[0_4px_15px_rgba(0,0,0,0.04)]">
+<span class="font-label-caps text-label-caps text-on-surface-variant">TỶ LỆ HOÀN THÀNH</span>
+<p id="kpi-rate" class="font-title-sm text-title-sm text-primary mt-xs">--%</p>
+</div>
+<!-- Rating -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-primary-fixed shadow-[0_4px_15px_rgba(0,0,0,0.04)]">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ĐÁNH GIÁ</span>
+<div class="flex items-center gap-xs mt-xs">
+<p id="kpi-rating" class="font-title-sm text-title-sm text-primary">--</p>
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+</div>
+<!-- Bar Chart Section -->
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-primary-fixed shadow-[0_4px_15px_rgba(0,0,0,0.04)]">
+<h3 class="font-title-sm text-title-sm text-on-surface mb-lg">Xu hướng thu nhập</h3>
+<div class="flex items-end justify-between h-40 gap-sm">
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-primary-fixed rounded-t-lg h-24"></div>
+<span class="text-[10px] font-label-caps">T2</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-primary-fixed rounded-t-lg h-32"></div>
+<span class="text-[10px] font-label-caps">T3</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full  rounded-t-lg h-16 shadow-md"></div>
+<span class="text-[10px] font-label-caps text-primary">T4</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-primary-fixed rounded-t-lg h-28"></div>
+<span class="text-[10px] font-label-caps">T5</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-primary-fixed rounded-t-lg h-36"></div>
+<span class="text-[10px] font-label-caps">T6</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-primary-fixed rounded-t-lg h-20"></div>
+<span class="text-[10px] font-label-caps">T7</span>
+</div>
+<div class="flex flex-col items-center gap-xs flex-1">
+<div class="w-full bg-primary-fixed rounded-t-lg h-12"></div>
+<span class="text-[10px] font-label-caps">CN</span>
+</div>
+</div>
+</div>
+<!-- History Section -->
+<div class="space-y-sm" id="income-history-section">
+<h3 class="font-title-sm text-title-sm text-on-surface px-xs">Lịch sử thu nhập</h3>
+<!-- Items sẽ được render động từ API -->
+<p id="no-history-msg" class="text-body-sm text-on-surface-variant px-xs py-md text-center">Đang tải dữ liệu...</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+
+<!-- Navigation Shell -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+    <!-- Trang chủ -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-transform" href="trangchutasker.html">
+        <span class="material-symbols-outlined text-[28px]" >home</span>
+        <span class="text-label-sm font-label-sm">Trang chủ</span>
+    </a>
+    <!-- Lịch sử -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-colors" href="lichsudonhang.html">
+        <span class="material-symbols-outlined text-[28px]" >history</span>
+        <span class="text-label-sm font-label-sm font-medium">Lịch sử</span>
+    </a>
+    <!-- Thống kê -->
+    <a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-colors" href="thunhapvathongke.html">
+        <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+        <span class="text-label-sm font-label-sm font-medium">Thống kê</span>
+    </a>
+    <!-- Tài khoản -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-colors" href="hosocanhan.html">
+        <span class="material-symbols-outlined text-[28px]" >person</span>
+        <span class="text-label-sm font-label-sm font-medium">Cá nhân</span>
+    </a>
+</nav>
+
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhaptasker.html')) return;
+
+  var user = ChiOiAuth.getUser();
+
+  // ===== 1. Load Wallet Balance =====
+  try {
+    var wallet = await apiFetch('/api/wallets/balance');
+    if (wallet) {
+      var balanceEl = document.querySelector('.font-display-lg.text-display-lg');
+      if (balanceEl) balanceEl.textContent = formatVND(wallet.balance || 0);
+    }
+  } catch (e) { console.warn('[Thống kê] Không load được số dư:', e.message); }
+
+  // ===== 2. Load Tasker Order History → Tính KPI =====
+  var totalOrders = 0;
+  var completedOrders = 0;
+  try {
+    var orders = await apiFetch('/api/taskers/history');
+    if (orders && orders.length > 0) {
+      totalOrders = orders.length;
+      completedOrders = orders.filter(function(o) { return o.status === 'COMPLETED'; }).length;
+    }
+  } catch (e) { console.warn('[Thống kê] Không load được lịch sử đơn:', e.message); }
+
+  // Tỷ lệ hoàn thành
+  var completionRate = totalOrders > 0 ? Math.round((completedOrders / totalOrders) * 100) : 0;
+  var rateEl = document.getElementById('kpi-rate');
+  if (rateEl) rateEl.textContent = completionRate + '%';
+
+  // Đánh giá — lấy từ user data (lưu trong localStorage khi login)
+  var ratingEl = document.getElementById('kpi-rating');
+  if (ratingEl && user && user.average_rating !== undefined && user.average_rating !== null) {
+    ratingEl.textContent = Number(user.average_rating).toFixed(1);
+  } else if (ratingEl) {
+    ratingEl.textContent = 'N/A';
+  }
+
+  // ===== 3. Load Transaction History (income items) =====
+  try {
+    var transactions = await apiFetch('/api/wallets/transactions');
+    var historySection = document.getElementById('income-history-section');
+    var noHistoryMsg = document.getElementById('no-history-msg');
+    if (historySection && transactions && transactions.length > 0) {
+      // Keep title h3, remove placeholder message
+      var title = historySection.querySelector('h3');
+      historySection.innerHTML = '';
+      if (title) historySection.appendChild(title);
+
+      var totalIncome = 0;
+
+      transactions.forEach(function(tx) {
+        if (tx.type === 'COMMISSION' || tx.type === 'DEPOSIT') totalIncome += Math.abs(tx.amount);
+
+        var icon = tx.type === 'COMMISSION' ? 'cleaning_services' : (tx.type === 'WITHDRAWAL' ? 'savings' : 'account_balance_wallet');
+        var typeLabel = tx.type === 'COMMISSION' ? tx.description || 'Thu nhập dịch vụ' : (tx.type === 'WITHDRAWAL' ? 'Rút tiền' : 'Nạp tiền');
+        var isCredit = tx.type !== 'WITHDRAWAL';
+        var prefix = isCredit ? '+' : '-';
+
+        var div = document.createElement('div');
+        div.className = 'bg-surface-container-lowest p-md rounded-xl border border-primary-fixed shadow-[0_4px_15px_rgba(0,0,0,0.04)] flex justify-between items-center';
+        div.innerHTML =
+          '<div class="flex items-center gap-md">' +
+            '<div class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center"><span class="material-symbols-outlined text-primary">' + icon + '</span></div>' +
+            '<div><p class="font-title-sm text-[16px] text-on-surface">' + typeLabel + '</p>' +
+            '<p class="text-body-sm text-on-surface-variant">' + formatDateTime(tx.created_at) + '</p>' +
+            (tx.type === 'COMMISSION' ? '<p class="text-[11px] text-secondary italic">Đã trừ 15% phí nền tảng</p>' : '') +
+          '</div></div>' +
+          '<p class="font-title-sm text-title-sm ' + (isCredit ? 'text-primary' : 'text-error') + '">' + prefix + formatVND(Math.abs(tx.amount)) + '</p>';
+        historySection.appendChild(div);
+      });
+
+      // ===== Update KPI Cards với data thực =====
+      var totalIncomeEl = document.getElementById('kpi-total-income');
+      if (totalIncomeEl) totalIncomeEl.textContent = formatVND(totalIncome);
+      var completedEl = document.getElementById('kpi-completed');
+      if (completedEl) completedEl.textContent = completedOrders + ' đơn';
+
+      // ===== Render Bar Chart từ transaction data =====
+      var chartContainer = document.querySelector('.flex.items-end.justify-between.h-40');
+      if (chartContainer && transactions.length > 0) {
+        // Gom thu nhập theo ngày trong tuần
+        var dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        var dailyIncome = [0, 0, 0, 0, 0, 0, 0]; // CN=0 ... T7=6
+        transactions.forEach(function(tx) {
+          if (tx.type === 'COMMISSION' || tx.type === 'DEPOSIT') {
+            var day = new Date(tx.created_at).getDay();
+            dailyIncome[day] += Math.abs(tx.amount);
+          }
+        });
+        var maxIncome = Math.max.apply(null, dailyIncome) || 1;
+        var today = new Date().getDay();
+
+        // Sắp xếp: T2 T3 T4 T5 T6 T7 CN
+        var orderedDays = [1, 2, 3, 4, 5, 6, 0];
+        chartContainer.innerHTML = '';
+        orderedDays.forEach(function(dayIdx) {
+          var pct = (dailyIncome[dayIdx] / maxIncome) * 140;
+          var barH = Math.max(pct, 8);
+          var isToday = dayIdx === today;
+          var col = document.createElement('div');
+          col.className = 'flex flex-col items-center gap-xs flex-1';
+          col.innerHTML = '<div class="w-full ' + (isToday ? 'bg-primary' : 'bg-primary-fixed') + ' rounded-t-lg chart-bar" style="height:' + barH + 'px"></div>' +
+            '<span class="text-[10px] font-label-caps ' + (isToday ? 'text-primary font-bold' : '') + '">' + dayNames[dayIdx] + '</span>';
+          chartContainer.appendChild(col);
+        });
+      }
+    } else {
+      // Không có transactions — hiển thị message
+      if (noHistoryMsg) noHistoryMsg.textContent = 'Chưa có giao dịch nào.';
+      var totalIncomeEl = document.getElementById('kpi-total-income');
+      if (totalIncomeEl) totalIncomeEl.textContent = '0 đ';
+      var completedEl = document.getElementById('kpi-completed');
+      if (completedEl) completedEl.textContent = completedOrders + ' đơn';
+    }
+  } catch (e) { console.warn('[Thống kê] Không load được giao dịch:', e.message); }
+
+  // ===== 4. Withdraw Button =====
+  var withdrawBtn = document.querySelector('button[class*="from-primary"]');
+  if (withdrawBtn) {
+    withdrawBtn.addEventListener('click', async function() {
+      var amount = prompt('Nhập số tiền muốn rút (tối thiểu 100.000 đ):');
+      if (!amount) return;
+      var amountNum = parseInt(amount.replace(/\D/g, ''));
+      if (isNaN(amountNum) || amountNum < 100000) { showToastMsg('Số tiền tối thiểu 100.000 đ'); return; }
+
+      showLoading();
+      try {
+        await apiFetch('/api/wallets/withdraw', { method: 'POST', body: { amount: amountNum } });
+        hideLoading();
+        showToastMsg('✅ Yêu cầu rút ' + formatVND(amountNum) + ' đã được gửi!');
+        setTimeout(function() { location.reload(); }, 2000);
+      } catch (e) {
+        hideLoading();
+        showToastMsg('❌ ' + e.message);
+      }
+    });
+  }
+})();
+</script>
+</body></html>

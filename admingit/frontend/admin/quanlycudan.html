@@ -1,0 +1,924 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#ffdbcc",
+                    "surface-variant": "#f4ded5",
+                    "tertiary-fixed-dim": "#52d5ff",
+                    "on-tertiary-container": "#003f4f",
+                    "on-surface": "#241914",
+                    "surface-container-high": "#fae4da",
+                    "on-background": "#241914",
+                    "on-primary-fixed": "#351000",
+                    "surface-container-low": "#fff1eb",
+                    "on-primary-container": "#642600",
+                    "on-primary-fixed-variant": "#7a3000",
+                    "inverse-on-surface": "#ffede6",
+                    "secondary-container": "#ff8849",
+                    "outline": "#8b7266",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#f4ded5",
+                    "surface-bright": "#fff8f6",
+                    "primary-fixed": "#ffdbcc",
+                    "surface-tint": "#a04100",
+                    "inverse-surface": "#3b2e28",
+                    "on-tertiary-fixed-variant": "#004d61",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#ffb693",
+                    "background": "#fff8f6",
+                    "tertiary-fixed": "#b8eaff",
+                    "surface-container": "#ffeae1",
+                    "primary-container": "#ff7e36",
+                    "surface-dim": "#ecd6cc",
+                    "outline-variant": "#dfc0b3",
+                    "primary": "#a04100",
+                    "on-tertiary-fixed": "#001f28",
+                    "inverse-primary": "#ffb693",
+                    "secondary": "#a04100",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#7a3000",
+                    "on-surface-variant": "#584238",
+                    "tertiary-container": "#00b1da",
+                    "tertiary": "#006780",
+                    "secondary-fixed-dim": "#ffb693",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#fff8f6",
+                    "on-secondary-container": "#6b2900",
+                    "on-secondary-fixed": "#351000",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container_padding": "32px",
+                    "gutter": "24px",
+                    "stack_sm": "8px",
+                    "stack_lg": "24px",
+                    "stack_md": "16px",
+                    "sidebar_width": "240px"
+            },
+            "fontFamily": {
+                    "title-sm": ["Be Vietnam Pro"],
+                    "label-md": ["Be Vietnam Pro"],
+                    "headline-md": ["Be Vietnam Pro"],
+                    "label-bold": ["Be Vietnam Pro"],
+                    "display-lg": ["Be Vietnam Pro"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "body-md": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-bold": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "display-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fff8f6;
+            color: #241914;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+    </style>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(160,65,0,0.15); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(160,65,0,0.3); }
+        /* Sidebar active indicator animation */
+        aside nav a { position: relative; border-radius: 8px; }
+        aside nav a:hover { background: rgba(160,65,0,0.06); }
+        /* Card subtle animations */
+        .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(88,66,56,0.08); }
+        /* Table row hover */
+        tbody tr { transition: background-color 0.15s ease; }
+        tbody tr:hover { background-color: rgba(255,126,54,0.04); }
+        /* Button press effect */
+        button:active, a:active { transform: scale(0.97); }
+        /* Smooth page transitions */
+        main { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* Orange accent gradient for header elements */
+        .admin-gradient { background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); }
+        /* Focus ring for inputs */
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(160,65,0,0.2); 
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- Sidebar Component -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-dim shadow-md flex flex-col py-stack_lg z-50">
+<div class="px-6 mb-8">
+<h1 class="font-display-lg text-display-lg text-primary">Chị Ơi</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin CMS</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="bangdieukhien.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydonhang.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label-md text-label-md">Đơn hàng</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="canthiepdonhang.html">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-md text-label-md">Can thiệp</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlytasker.html">
+<span class="material-symbols-outlined">engineering</span>
+<span class="font-label-md text-label-md">Tasker</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-primary border-l-4 border-primary transition-all duration-200 ease-in-out" href="quanlycudan.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="font-label-md text-label-md">Cư dân</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
+<span class="material-symbols-outlined">inbox</span>
+<span class="font-label-md text-label-md">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="xulykhieunai.html">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-md text-label-md">Khiếu nại</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="baocaodoanhthu.html">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-md text-label-md">Báo cáo</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Admin</p>
+<p class="text-[11px] text-on-surface-variant truncate">Quản trị viên</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors" title="Đăng xuất">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[240px] flex-1 flex flex-col min-w-0">
+<!-- TopAppBar Component -->
+<header class="h-16 fixed top-0 right-0 left-[240px] bg-surface flex justify-between items-center px-container_padding z-40">
+<h2 class="font-headline-md text-headline-md text-on-surface">Quản lý Cư dân</h2>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center bg-surface-container-low px-4 py-2 rounded-full w-64">
+<span class="material-symbols-outlined text-on-surface-variant mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm p-0 w-full" placeholder="Tìm theo tên, SĐT..." type="text"/>
+</div>
+<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-variant rounded-xl transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-variant rounded-xl transition-all">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Admin Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFp5N5nt0KLrQ_Kifjr1wKDbPnZ5j6862w84n2qb--szr5dPSUtZEIhJfleFXXoc1H5Xd6SxDV-dUUy__XRIOsOyItyTH5g2tdRzpp7ObxTCDl65zkeAW9_G3KE4Uh1i9EOD_6ypboS6PzOVdag5vHszq9XolR5EZSUcIj11TpC5AEFF6UZUn70bHzxxGW1ECXgmDm9JHbCj5xF7QKzPSlZ70ws59KFymgDiXI6lr056jd0HNXHBpYk9UsBwM5w-pyXyA-_A--3KA"/>
+</div>
+</div>
+</header>
+<!-- Canvas Content -->
+<div class="mt-16 p-container_padding flex gap-gutter">
+<!-- Left Side: Table and Stats -->
+<div class="flex-1 space-y-stack_lg min-w-0">
+<!-- Stats Row -->
+<div class="grid grid-cols-3 gap-gutter">
+<div class="bg-surface-container-lowest p-stack_md rounded-xl shadow-sm flex items-center gap-4">
+  <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+    <span class="material-symbols-outlined">group</span>
+  </div>
+  <div>
+    <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Tổng cư dân</p>
+    <h3 id="stat-total" class="text-on-surface font-title-sm text-title-sm">...</h3>
+  </div>
+</div>
+<div class="bg-surface-container-lowest p-stack_md rounded-xl shadow-sm flex items-center gap-4">
+  <div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary">
+    <span class="material-symbols-outlined">check_circle</span>
+  </div>
+  <div>
+    <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Hoạt động</p>
+    <h3 id="stat-active" class="text-on-surface font-title-sm text-title-sm">...</h3>
+  </div>
+</div>
+<div class="bg-surface-container-lowest p-stack_md rounded-xl shadow-sm flex items-center gap-4">
+  <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary">
+    <span class="material-symbols-outlined">add_reaction</span>
+  </div>
+  <div>
+    <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Mới tháng này</p>
+    <h3 id="stat-new" class="text-on-surface font-title-sm text-title-sm">...</h3>
+  </div>
+</div>
+</div>
+<!-- Toolbar -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-3 flex-1">
+<div class="relative flex-1 min-w-[200px]"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+  <input id="cudan-search" class="w-full pl-9 pr-4 py-2 bg-white border border-outline-variant/30 rounded-xl text-body-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none shadow-sm transition-all" placeholder="Tim ten, SDT..."/>
+</div>
+<select id="filter-status" class="min-w-[160px] bg-white border border-outline-variant/30 text-body-sm rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none shadow-sm">
+<option value="">Tất cả trạng thái</option>
+<option value="ACTIVE">Hoạt động</option>
+<option value="BANNED">Đã khóa</option>
+</select>
+</div>
+<button id="btn-add-resident" class="bg-primary text-white px-5 py-2 rounded-xl font-label-bold flex items-center gap-2 hover:opacity-90 transition-opacity whitespace-nowrap flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+Thêm cư dân mới
+</button>
+</div>
+
+<!-- Modal Thêm cư dân mới -->
+<div id="modal-add-resident" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="modal-add-overlay"></div>
+  <div class="relative bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-md p-8 z-10 animate-fadeIn">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-title-sm text-title-sm text-on-surface">Thêm cư dân mới</h3>
+      <button id="btn-close-add-modal" class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="form-add-resident" class="space-y-4">
+      <div>
+        <label class="block text-body-sm text-on-surface-variant mb-1">Họ và tên <span class="text-error">*</span></label>
+        <input id="add-fullname" type="text" placeholder="Nguyễn Văn A"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2 text-body-sm focus:ring-primary focus:border-primary outline-none" required/>
+      </div>
+      <div>
+        <label class="block text-body-sm text-on-surface-variant mb-1">Số điện thoại <span class="text-error">*</span></label>
+        <input id="add-phone" type="tel" placeholder="0901234567"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2 text-body-sm focus:ring-primary focus:border-primary outline-none" required/>
+      </div>
+      <div>
+        <label class="block text-body-sm text-on-surface-variant mb-1">Mật khẩu <span class="text-error">*</span></label>
+        <input id="add-password" type="password" placeholder="Tối thiểu 6 ký tự"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2 text-body-sm focus:ring-primary focus:border-primary outline-none" required/>
+      </div>
+      <div>
+        <label class="block text-body-sm text-on-surface-variant mb-1">Email</label>
+        <input id="add-email" type="email" placeholder="example@email.com"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2 text-body-sm focus:ring-primary focus:border-primary outline-none"/>
+      </div>
+      <div id="add-error" class="hidden text-error text-body-sm bg-error-container rounded-xl px-4 py-2"></div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" id="btn-cancel-add"
+          class="flex-1 py-3 bg-surface-container-low text-on-surface-variant rounded-xl font-label-bold hover:bg-surface-container transition">
+          Hủy
+        </button>
+        <button type="submit" id="btn-submit-add"
+          class="flex-1 py-3 bg-primary text-white rounded-xl font-label-bold hover:opacity-90 transition flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">person_add</span>
+          Tạo tài khoản
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Data Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-4 w-12"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></th>
+<th class="p-4 font-label-bold text-on-surface-variant">CƯ DÂN</th>
+<th class="p-4 font-label-bold text-on-surface-variant">SỐ ĐIỆN THOẠI</th>
+<th class="p-4 font-label-bold text-on-surface-variant">KHU VỰC</th>
+<th class="p-4 font-label-bold text-on-surface-variant">ĐƠN HÀNG</th>
+<th class="p-4 font-label-bold text-on-surface-variant text-right">CHI TIÊU</th>
+<th class="p-4 font-label-bold text-on-surface-variant">TRẠNG THÁI</th>
+<th class="p-4 font-label-bold text-on-surface-variant">THAO TÁC</th>
+</tr>
+</thead>
+<tbody id="cudan-tbody" class="divide-y divide-surface-container-low">
+  <tr><td colspan="8" class="text-center py-10 text-on-surface-variant">Đang tải dữ liệu...</td></tr>
+</tbody>
+
+</table>
+<!-- Pagination -->
+<div class="p-4 flex items-center justify-between border-t border-outline-variant bg-surface-container-lowest">
+<p id="cudan-pag-info" class="text-body-sm text-on-surface-variant">Đang tải...</p>
+</div>
+</div>
+</div>
+<!-- Resident Detail Panel (Right Drawer style) -->
+<aside id="cudan-detail-panel" class="w-[340px] bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col border-l border-outline-variant/10 hidden">
+<div class="p-6 border-b border-outline-variant/10 flex items-center justify-between">
+  <h3 class="font-title-sm text-title-sm text-on-surface">Chi tiết cư dân</h3>
+  <button id="btn-close-detail" class="text-on-surface-variant hover:text-primary transition-colors">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+</div>
+<div class="p-6 flex flex-col items-center text-center">
+  <div class="relative mb-4">
+    <div class="w-24 h-24 rounded-full border-4 border-surface-container-low shadow-sm bg-primary/10 flex items-center justify-center">
+      <span class="material-symbols-outlined text-primary text-[48px]">person</span>
+    </div>
+    <span id="detail-status-dot" class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-4 border-surface-container-lowest rounded-full hidden"></span>
+  </div>
+  <h4 id="detail-name" class="font-title-sm text-title-sm text-on-surface">---</h4>
+  <p id="detail-since" class="text-body-sm text-on-surface-variant">Cư dân từ ---</p>
+  <div class="w-full mt-6 space-y-4 text-left">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-sm">call</span>
+      <span id="detail-phone" class="text-body-sm text-on-surface">---</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-sm">location_on</span>
+      <span id="detail-address" class="text-body-sm text-on-surface">---</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-sm">badge</span>
+      <span id="detail-status-label" class="text-body-sm text-on-surface">---</span>
+    </div>
+  </div>
+</div>
+<div class="px-6 py-4 bg-surface-container-low flex justify-between">
+  <div>
+    <p class="text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Tổng đơn hàng</p>
+    <p id="detail-orders" class="font-title-sm text-title-sm text-primary">0</p>
+  </div>
+  <div class="text-right">
+    <p class="text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Chi tiêu</p>
+    <p id="detail-spent" class="font-title-sm text-title-sm text-on-surface">—</p>
+  </div>
+</div>
+<div class="flex-1 p-6 overflow-y-auto">
+  <h5 class="font-label-bold text-on-surface-variant uppercase tracking-widest text-[10px] mb-4">LỊCH SỬ ĐƠN HÀNG GẦN ĐÂY</h5>
+  <div id="detail-orders-list" class="space-y-3">
+    <p class="text-body-sm text-on-surface-variant text-center">Chọn một cư dân để xem lịch sử</p>
+  </div>
+</div>
+<div class="p-6 border-t border-outline-variant/10 flex gap-3">
+  <button id="detail-btn-lock" class="flex-1 py-3 bg-error-container text-error rounded-xl font-label-bold flex items-center justify-center gap-2 hover:opacity-90 transition">
+    <span class="material-symbols-outlined text-sm">lock</span>
+    Khóa tài khoản
+  </button>
+</div>
+</aside>
+</div>
+</main>
+<!-- CHIOI-JS-INJECT -->
+<script>
+(function() {
+
+  // ---- 1. TABS ----
+  document.querySelectorAll('[data-tab-group]').forEach(function(tabGroup) {
+    var groupName = tabGroup.getAttribute('data-tab-group');
+    tabGroup.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-tab]');
+      if (!btn) return;
+      var tabId = btn.getAttribute('data-tab');
+      // Deactivate all tabs in group
+      document.querySelectorAll('[data-tab-group="' + groupName + '"] [data-tab]').forEach(function(t) {
+        t.classList.remove('text-primary', 'border-primary', 'border-b-2', 'font-semibold', 'bg-secondary-container/10');
+        t.classList.add('text-on-surface-variant');
+      });
+      // Activate clicked tab
+      btn.classList.add('text-primary', 'border-primary', 'border-b-2', 'font-semibold');
+      btn.classList.remove('text-on-surface-variant');
+      // Hide all panes
+      document.querySelectorAll('[data-tab-pane]').forEach(function(p) {
+        p.classList.add('hidden');
+      });
+      // Show target pane
+      var pane = document.querySelector('[data-tab-pane="' + tabId + '"]');
+      if (pane) pane.classList.remove('hidden');
+    });
+  });
+
+  // ---- 2. CLOSE ALL MODALS/PANELS ON LOAD ----
+  document.querySelectorAll('[data-modal], [data-panel]').forEach(function(el) {
+    el.classList.add('hidden');
+  });
+  // Also hide any element with class that suggests it's a modal overlay
+  document.querySelectorAll('.fixed.inset-0, [id*="modal"], [id*="overlay"], [id*="detail-panel"], [id*="slide-panel"]').forEach(function(el) {
+    // Only hide if it's a modal/overlay type (has backdrop-like styling or z-50+)
+    if (el.classList.contains('inset-0') || el.id.toLowerCase().includes('modal') || el.id.toLowerCase().includes('overlay') || el.id.toLowerCase().includes('panel')) {
+      el.classList.add('hidden');
+    }
+  });
+
+  // ---- 3. TOGGLE PANELS/MODALS ----
+  // Open: data-open="target-id"
+  document.querySelectorAll('[data-open]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var target = document.getElementById(btn.getAttribute('data-open'));
+      if (target) {
+        target.classList.remove('hidden');
+        // animate slide-in
+        target.style.animation = 'slideIn 0.2s ease';
+      }
+    });
+  });
+
+  // Close: data-close="target-id" OR data-close-self
+  document.querySelectorAll('[data-close]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var target = document.getElementById(btn.getAttribute('data-close'));
+      if (target) target.classList.add('hidden');
+    });
+  });
+  document.querySelectorAll('[data-close-self]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var modal = btn.closest('[data-modal], [data-panel], .fixed.inset-0');
+      if (modal) modal.classList.add('hidden');
+    });
+  });
+
+  // Click backdrop to close
+  document.querySelectorAll('[data-modal]').forEach(function(modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
+  });
+
+  // ---- 4. TABLE SEARCH FILTER ----
+  document.querySelectorAll('[data-search-table]').forEach(function(input) {
+    var tableId = input.getAttribute('data-search-table');
+    input.addEventListener('input', function() {
+      var q = input.value.toLowerCase().trim();
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = q === '' || text.includes(q) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- 5. CONFIRM ACTION BUTTONS ----
+  document.querySelectorAll('[data-confirm]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var msg = btn.getAttribute('data-confirm') || 'Bạn có chắc chắn không?';
+      if (!confirm(msg)) e.preventDefault();
+    });
+  });
+
+  // ---- 6. STATUS BADGE TOGGLE ----
+  document.querySelectorAll('[data-approve]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var row = btn.closest('tr, [data-item]');
+      if (row) {
+        var badge = row.querySelector('[data-status]');
+        if (badge) {
+          badge.textContent = 'Đã duyệt';
+          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-green-100 text-green-700';
+        }
+        btn.disabled = true;
+        btn.textContent = 'Đã duyệt';
+        btn.className = btn.className + ' opacity-50 cursor-not-allowed';
+        var rejectBtn = row.querySelector('[data-reject]');
+        if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.className += ' opacity-50 cursor-not-allowed'; }
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-reject]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (!confirm('Từ chối người dùng này?')) return;
+      var row = btn.closest('tr, [data-item]');
+      if (row) {
+        var badge = row.querySelector('[data-status]');
+        if (badge) {
+          badge.textContent = 'Đã từ chối';
+          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-red-100 text-red-700';
+        }
+        btn.disabled = true;
+        btn.textContent = 'Đã từ chối';
+        btn.className += ' opacity-50 cursor-not-allowed';
+        var approveBtn = row.querySelector('[data-approve]');
+        if (approveBtn) { approveBtn.disabled = true; approveBtn.className += ' opacity-50 cursor-not-allowed'; }
+      }
+    });
+  });
+
+  // ---- 7. DROPDOWN FILTER (visual) ----
+  document.querySelectorAll('[data-filter-col]').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      var col = parseInt(sel.getAttribute('data-filter-col'));
+      var val = sel.value.toLowerCase();
+      var tableId = sel.getAttribute('data-filter-table');
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        var cell = row.cells[col];
+        var text = cell ? cell.textContent.toLowerCase() : '';
+        row.style.display = val === '' || val === 'all' || text.includes(val) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- 8. INBOX: click conversation row to show chat ----
+  document.querySelectorAll('[data-conversation]').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('[data-conversation]').forEach(function(i) {
+        i.classList.remove('bg-primary-container/15', 'border-l-4', 'border-primary');
+      });
+      item.classList.add('bg-primary-container/15', 'border-l-4', 'border-primary');
+      // Remove unread bold
+      item.classList.remove('font-semibold');
+      var chatPanel = document.getElementById('chat-panel');
+      var emptyState = document.getElementById('chat-empty');
+      if (chatPanel) chatPanel.classList.remove('hidden');
+      if (emptyState) emptyState.classList.add('hidden');
+    });
+  });
+
+  // ---- 9. SEND MESSAGE (Inbox) ----
+  var sendBtn = document.getElementById('send-msg-btn');
+  var msgInput = document.getElementById('msg-input');
+  var chatMessages = document.getElementById('chat-messages');
+  if (sendBtn && msgInput && chatMessages) {
+    function sendMessage() {
+      var text = msgInput.value.trim();
+      if (!text) return;
+      var bubble = document.createElement('div');
+      bubble.className = 'flex justify-end';
+      bubble.innerHTML = '<div class="max-w-[70%] bg-primary-container text-on-primary-container rounded-2xl rounded-br-sm px-4 py-2 text-sm">' + text + '<div class="text-[10px] opacity-60 mt-1 text-right">Vừa xong</div></div>';
+      chatMessages.appendChild(bubble);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      msgInput.value = '';
+    }
+    sendBtn.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+  }
+
+  // ---- 10. SLIDE-IN ANIMATION ----
+  var style = document.createElement('style');
+  style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }';
+  document.head.appendChild(style);
+
+})();
+</script><!-- END-CHIOI-JS-INJECT -->
+
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('../Khachhang/dangnhap.html')) return;
+
+  var allCustomers = [];
+  var allOrders = [];
+  var currentUserId = null;
+
+  // ---- MODAL THÊM CƯ DÂN ----
+  var modal = document.getElementById('modal-add-resident');
+  var btnAdd = document.getElementById('btn-add-resident');
+  var btnCloseModal = document.getElementById('btn-close-add-modal');
+  var btnCancelAdd = document.getElementById('btn-cancel-add');
+  var overlay = document.getElementById('modal-add-overlay');
+  var formAdd = document.getElementById('form-add-resident');
+  var addError = document.getElementById('add-error');
+
+  function openAddModal() {
+    if (modal) { modal.classList.remove('hidden'); formAdd && formAdd.reset(); if (addError) addError.classList.add('hidden'); }
+  }
+  function closeAddModal() { if (modal) modal.classList.add('hidden'); }
+
+  if (btnAdd) btnAdd.addEventListener('click', openAddModal);
+  if (btnCloseModal) btnCloseModal.addEventListener('click', closeAddModal);
+  if (btnCancelAdd) btnCancelAdd.addEventListener('click', closeAddModal);
+  if (overlay) overlay.addEventListener('click', closeAddModal);
+
+  if (formAdd) {
+    formAdd.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (addError) addError.classList.add('hidden');
+      var fullName = document.getElementById('add-fullname').value.trim();
+      var phone = document.getElementById('add-phone').value.trim();
+      var password = document.getElementById('add-password').value;
+      var email = document.getElementById('add-email').value.trim();
+
+      if (!fullName || !phone || !password) {
+        if (addError) { addError.textContent = 'Vui lòng điền đầy đủ các trường bắt buộc.'; addError.classList.remove('hidden'); }
+        return;
+      }
+      if (password.length < 6) {
+        if (addError) { addError.textContent = 'Mật khẩu phải có ít nhất 6 ký tự.'; addError.classList.remove('hidden'); }
+        return;
+      }
+
+      var submitBtn = document.getElementById('btn-submit-add');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Đang tạo...'; }
+
+      try {
+        var body = { full_name: fullName, phone: phone, password: password, role: 'CUSTOMER' };
+        if (email) body.email = email;
+        await apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify(body) });
+        closeAddModal();
+        showToastMsg('✅ Đã tạo tài khoản cư dân: ' + fullName);
+        // Reload danh sách
+        var newUsers = await apiFetch('/api/admin/users');
+        allCustomers = (newUsers || []).filter(function(u) { return u.role === 'CUSTOMER'; });
+        filterAndRender();
+        // Cập nhật stat-total
+        var statTotal = document.getElementById('stat-total');
+        if (statTotal) statTotal.textContent = allCustomers.length;
+        var statActive = document.getElementById('stat-active');
+        if (statActive) statActive.textContent = allCustomers.filter(function(u) { return u.status === 'ACTIVE'; }).length;
+      } catch(err) {
+        if (addError) { addError.textContent = '❌ ' + (err.message || 'Lỗi tạo tài khoản'); addError.classList.remove('hidden'); }
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span class="material-symbols-outlined text-sm">person_add</span> Tạo tài khoản'; }
+      }
+    });
+  }
+  // ---- END MODAL ----
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('vi-VN');
+
+  }
+
+  function renderTable(customers) {
+    var tbody = document.getElementById('cudan-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    if (!customers || customers.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-10 text-on-surface-variant">Không có cư dân nào</td></tr>';
+      var pag = document.getElementById('cudan-pag-info');
+      if (pag) pag.textContent = '0 cư dân';
+      return;
+    }
+
+    customers.forEach(function(u, idx) {
+      var isActive = u.status === 'ACTIVE';
+      var statusHtml = isActive
+        ? '<span class="px-3 py-1 rounded-full bg-green-100 text-green-700 font-label-md text-[10px]">HOẠT ĐỘNG</span>'
+        : '<span class="px-3 py-1 rounded-full bg-error-container text-error font-label-md text-[10px]">ĐÃ KHÓA</span>';
+      var orders = allOrders.filter(function(o) { return o.customer_id === u.user_id; });
+      var spent = orders
+        .filter(function(o) { return o.status === 'COMPLETED'; })
+        .reduce(function(sum, o) { return sum + Number(o.total_price || 0); }, 0);
+      var spentStr = spent > 0 ? spent.toLocaleString('vi-VN') + 'đ' : '—';
+
+      var tr = document.createElement('tr');
+      tr.className = (idx % 2 ? 'bg-background ' : '') + 'hover:bg-surface-container-low transition-colors group cursor-pointer';
+      var addr = (u.customers && u.customers.default_address) ? u.customers.default_address : '—';
+      tr.innerHTML =
+        '<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>' +
+        '<td class="p-4"><div class="flex items-center gap-3">' +
+          '<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[18px]">person</span></div>' +
+          '<div><p class="font-label-bold text-on-surface">' + (u.full_name || '—') + '</p>' +
+          '<p class="text-body-sm text-on-surface-variant">' + (u.phone || '—') + '</p></div></div></td>' +
+        '<td class="p-4 text-body-sm">' + (u.phone || '—') + '</td>' +
+        '<td class="p-4 text-body-sm">' + addr + '</td>' +
+        '<td class="p-4 text-body-sm text-center font-medium">' + orders.length + '</td>' +
+        '<td class="p-4 text-body-sm text-right font-medium text-primary">' + spentStr + '</td>' +
+        '<td class="p-4">' + statusHtml + '</td>' +
+        '<td class="p-4"><div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">' +
+          '<button class="view-btn text-primary hover:bg-primary-fixed p-1 rounded-lg" title="Xem hồ sơ" data-uid="' + u.user_id + '"><span class="material-symbols-outlined text-[20px]">visibility</span></button>' +
+          (isActive
+            ? '<button class="lock-btn text-error hover:bg-error-container p-1 rounded-lg" title="Kh\u00f3a" data-uid="' + u.user_id + '"><span class="material-symbols-outlined text-[20px]">lock</span></button>'
+            : '<button class="unlock-btn text-primary hover:bg-primary-fixed p-1 rounded-lg" title="Mở khóa" data-uid="' + u.user_id + '"><span class="material-symbols-outlined text-[20px]">lock_open</span></button>') +
+        '</div></td>';
+
+      tr.addEventListener('click', function(e) {
+        if (e.target.closest('button') || e.target.tagName === 'INPUT') return;
+        openDetail(u);
+      });
+      tbody.appendChild(tr);
+    });
+
+    // bind action buttons
+    tbody.querySelectorAll('.view-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var u = customers.find(function(c) { return c.user_id == btn.getAttribute('data-uid'); });
+        if (u) openDetail(u);
+      });
+    });
+
+    // bind lock/unlock buttons in table rows
+    tbody.querySelectorAll('.lock-btn, .unlock-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var uid = parseInt(btn.getAttribute('data-uid'));
+        var u = allCustomers.find(function(c) { return c.user_id === uid; });
+        if (!u) return;
+        var newStatus = u.status === 'ACTIVE' ? 'BANNED' : 'ACTIVE';
+        var action = newStatus === 'BANNED' ? 'Khóa' : 'Mở khóa';
+        if (!confirm(action + ' tài khoản "' + (u.full_name || u.phone) + '"?')) return;
+        showLoading();
+        apiFetch('/api/admin/users/' + uid + '/status', {
+          method: 'PATCH',
+          body: JSON.stringify({ status: newStatus })
+        }).then(function() {
+          hideLoading();
+          showToastMsg('✅ Đã ' + action.toLowerCase() + ' tài khoản!');
+          // Update local data, re-render without reload
+          u.status = newStatus;
+          filterAndRender();
+          if (currentUserId === uid) openDetail(u);
+        }).catch(function(err) {
+          hideLoading();
+          showToastMsg('❌ Lỗi: ' + err.message);
+        });
+      });
+    });
+
+    var pagEl = document.getElementById('cudan-pag-info');
+    if (pagEl) pagEl.textContent = 'Hiển thị ' + customers.length + ' cư dân';
+  }
+
+  function openDetail(u) {
+    currentUserId = u.user_id;
+    var panel = document.getElementById('cudan-detail-panel');
+    if (!panel) return;
+    panel.classList.remove('hidden');
+
+    document.getElementById('detail-name').textContent = u.full_name || '—';
+    document.getElementById('detail-since').textContent = 'Cư dân từ ' + fmtDate(u.created_at);
+    document.getElementById('detail-phone').textContent = u.phone || '—';
+    document.getElementById('detail-address').textContent = (u.customers && u.customers.default_address) ? u.customers.default_address : '—';
+    document.getElementById('detail-status-label').textContent = u.status === 'ACTIVE' ? 'Đang hoạt động' : 'Đã khóa';
+
+    var dot = document.getElementById('detail-status-dot');
+    if (dot) {
+      dot.classList.remove('hidden', 'bg-green-500', 'bg-error');
+      dot.classList.add(u.status === 'ACTIVE' ? 'bg-green-500' : 'bg-error');
+    }
+
+    var orders = allOrders.filter(function(o) { return o.customer_id === u.user_id; });
+    var spent = orders
+      .filter(function(o) { return o.status === 'COMPLETED'; })
+      .reduce(function(sum, o) { return sum + Number(o.total_price || 0); }, 0);
+    document.getElementById('detail-orders').textContent = orders.length + ' đơn';
+
+    var detailSpent = document.getElementById('detail-spent');
+    if (detailSpent) detailSpent.textContent = spent > 0 ? spent.toLocaleString('vi-VN') + 'đ' : '—';
+
+    var listEl = document.getElementById('detail-orders-list');
+    if (listEl) {
+      listEl.innerHTML = '';
+      if (orders.length === 0) {
+        listEl.innerHTML = '<p class="text-body-sm text-on-surface-variant text-center">Chưa có đơn hàng nào</p>';
+      } else {
+        orders.slice(0, 5).forEach(function(o) {
+          var svcName = (o.services && o.services.name) ? o.services.name : 'Dịch vụ';
+          var statusText = {'COMPLETED':'Hoàn thành','CANCELLED':'Đã hủy','IN_PROGRESS':'Đang làm','ACCEPTED':'Đã nhận','PENDING':'Chờ'}[o.status] || o.status;
+          var item = document.createElement('div');
+          item.className = 'flex gap-3 items-start';
+          item.innerHTML =
+            '<div class="w-9 h-9 rounded-lg bg-orange-100 flex items-center justify-center text-primary flex-shrink-0"><span class="material-symbols-outlined text-[18px]">receipt_long</span></div>' +
+            '<div class="flex-1 min-w-0"><p class="text-body-sm font-medium text-on-surface truncate">' + svcName + '</p>' +
+            '<p class="text-[11px] text-on-surface-variant">' + fmtDate(o.created_at) + ' • ' + statusText + '</p></div>';
+          listEl.appendChild(item);
+        });
+      }
+    }
+
+    var lockBtn = document.getElementById('detail-btn-lock');
+    if (lockBtn) {
+      lockBtn.innerHTML = u.status === 'ACTIVE'
+        ? '<span class="material-symbols-outlined text-sm">lock</span> Khóa tài khoản'
+        : '<span class="material-symbols-outlined text-sm">lock_open</span> Mở khóa tài khoản';
+      lockBtn.className = u.status === 'ACTIVE'
+        ? 'flex-1 py-3 bg-error-container text-error rounded-xl font-label-bold flex items-center justify-center gap-2 hover:opacity-90 transition'
+        : 'flex-1 py-3 bg-green-100 text-green-700 rounded-xl font-label-bold flex items-center justify-center gap-2 hover:opacity-90 transition';
+    }
+  }
+
+  // Close panel
+  var closeBtn = document.getElementById('btn-close-detail');
+  if (closeBtn) closeBtn.addEventListener('click', function() {
+    var panel = document.getElementById('cudan-detail-panel');
+    if (panel) panel.classList.add('hidden');
+  });
+
+  // Lock button in detail panel
+  var detailLockBtn = document.getElementById('detail-btn-lock');
+  if (detailLockBtn) {
+    detailLockBtn.addEventListener('click', function() {
+      if (!currentUserId) return;
+      var u = allCustomers.find(function(c) { return c.user_id === currentUserId; });
+      if (!u) return;
+      var newStatus = u.status === 'ACTIVE' ? 'BANNED' : 'ACTIVE';
+      var action = newStatus === 'BANNED' ? 'Khóa' : 'Mở khóa';
+      if (!confirm(action + ' tài khoản "' + (u.full_name || u.phone) + '"?')) return;
+      showLoading();
+      apiFetch('/api/admin/users/' + currentUserId + '/status', {
+        method: 'PATCH',
+        body: JSON.stringify({ status: newStatus })
+      }).then(function() {
+        hideLoading();
+        showToastMsg('✅ Đã ' + action.toLowerCase() + ' tài khoản!');
+        u.status = newStatus;
+        openDetail(u);
+        filterAndRender();
+      }).catch(function(err) {
+        hideLoading();
+        showToastMsg('❌ Lỗi: ' + err.message);
+      });
+    });
+  }
+
+  // Filter & Search
+  var searchInput = document.querySelector('input[placeholder*="Tìm"]');
+  var filterStatus = document.getElementById('filter-status');
+
+  function filterAndRender() {
+    var q = searchInput ? searchInput.value.toLowerCase() : '';
+    var st = filterStatus ? filterStatus.value : '';
+    var filtered = allCustomers.filter(function(u) {
+      var matchQ = !q || (u.full_name && u.full_name.toLowerCase().includes(q)) || (u.phone && u.phone.includes(q));
+      var matchSt = !st || u.status === st;
+      return matchQ && matchSt;
+    });
+    renderTable(filtered);
+  }
+
+  if (searchInput) searchInput.addEventListener('input', filterAndRender);
+  if (filterStatus) filterStatus.addEventListener('change', filterAndRender);
+
+  // Load data
+  showLoading();
+  try {
+    var results = await Promise.all([
+      apiFetch('/api/admin/users'),
+      apiFetch('/api/admin/orders')
+    ]);
+    hideLoading();
+    var users = results[0] || [];
+    allOrders = results[1] || [];
+
+    allCustomers = users.filter(function(u) { return u.role === 'CUSTOMER'; });
+
+    var now = new Date();
+    var activeCount = allCustomers.filter(function(u) { return u.status === 'ACTIVE'; }).length;
+    var newThisMonth = allCustomers.filter(function(u) {
+      var d = new Date(u.created_at);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+
+    var statTotal = document.getElementById('stat-total');
+    var statActive = document.getElementById('stat-active');
+    var statNew = document.getElementById('stat-new');
+    if (statTotal) statTotal.textContent = allCustomers.length;
+    if (statActive) statActive.textContent = activeCount;
+    if (statNew) statNew.textContent = '+' + newThisMonth;
+
+    renderTable(allCustomers);
+
+    // Logout
+    var logoutBtn = document.querySelector('button[title="Đăng xuất"]');
+    if (logoutBtn) logoutBtn.addEventListener('click', function() { ChiOiAuth.logout('../Khachhang/dangnhap.html'); });
+
+  } catch (e) {
+    hideLoading();
+    showToastMsg('❌ Lỗi tải dữ liệu: ' + e.message);
+    console.error('[CưDân]', e);
+  }
+})();
+</script>
+</body></html>

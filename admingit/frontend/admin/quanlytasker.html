@@ -1,0 +1,992 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #fff8f6;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#8b7266",
+                      "on-secondary-fixed-variant": "#7a3000",
+                      "on-tertiary-fixed": "#001f28",
+                      "on-background": "#241914",
+                      "surface-dim": "#ecd6cc",
+                      "on-surface": "#241914",
+                      "error": "#ba1a1a",
+                      "primary-fixed-dim": "#ffb693",
+                      "on-secondary-container": "#6b2900",
+                      "surface-container-low": "#fff1eb",
+                      "outline-variant": "#dfc0b3",
+                      "tertiary": "#006780",
+                      "on-tertiary-fixed-variant": "#004d61",
+                      "on-tertiary-container": "#003f4f",
+                      "error-container": "#ffdad6",
+                      "surface-container-lowest": "#ffffff",
+                      "background": "#fff8f6",
+                      "inverse-on-surface": "#ffede6",
+                      "inverse-surface": "#3b2e28",
+                      "primary": "#a04100",
+                      "secondary-fixed-dim": "#ffb693",
+                      "primary-fixed": "#ffdbcc",
+                      "on-primary-container": "#642600",
+                      "on-primary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "surface-container-high": "#fae4da",
+                      "secondary-container": "#ff8849",
+                      "on-secondary-fixed": "#351000",
+                      "surface-container": "#ffeae1",
+                      "surface": "#fff8f6",
+                      "on-primary-fixed-variant": "#7a3000",
+                      "inverse-primary": "#ffb693",
+                      "on-error": "#ffffff",
+                      "tertiary-container": "#00b1da",
+                      "surface-bright": "#fff8f6",
+                      "surface-variant": "#f4ded5",
+                      "on-tertiary": "#ffffff",
+                      "primary-container": "#ff7e36",
+                      "on-primary-fixed": "#351000",
+                      "tertiary-fixed-dim": "#52d5ff",
+                      "tertiary-fixed": "#b8eaff",
+                      "on-surface-variant": "#584238",
+                      "on-secondary": "#ffffff",
+                      "surface-tint": "#a04100",
+                      "secondary-fixed": "#ffdbcc",
+                      "surface-container-highest": "#f4ded5",
+                      "secondary": "#a04100"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack_sm": "8px",
+                      "sidebar_width": "240px",
+                      "stack_lg": "24px",
+                      "gutter": "24px",
+                      "stack_md": "16px",
+                      "container_padding": "32px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Be Vietnam Pro"],
+                      "body-md": ["Be Vietnam Pro"],
+                      "display-lg": ["Be Vietnam Pro"],
+                      "title-sm": ["Be Vietnam Pro"],
+                      "label-md": ["Be Vietnam Pro"],
+                      "body-sm": ["Be Vietnam Pro"],
+                      "label-bold": ["Be Vietnam Pro"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "display-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "label-bold": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-dim shadow-md flex flex-col py-stack_lg z-50">
+<div class="px-6 mb-8">
+<h1 class="font-display-lg text-display-lg text-primary">Chị Ơi</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin CMS</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="bangdieukhien.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydonhang.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label-md text-label-md">Đơn hàng</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="canthiepdonhang.html">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-md text-label-md">Can thiệp</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-primary border-l-4 border-primary transition-all duration-200 ease-in-out" href="quanlytasker.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">engineering</span>
+<span class="font-label-md text-label-md">Tasker</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlycudan.html">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Cư dân</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
+<span class="material-symbols-outlined">inbox</span>
+<span class="font-label-md text-label-md">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="xulykhieunai.html">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-md text-label-md">Khiếu nại</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="baocaodoanhthu.html">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-md text-label-md">Báo cáo</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Admin</p>
+<p class="text-[11px] text-on-surface-variant truncate">Quản trị viên</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors" title="Đăng xuất">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-[240px] h-16 z-10 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_padding">
+<div class="flex items-center">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Quản lý Tasker</h2>
+</div>
+<div class="flex items-center gap-stack_md">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help_outline">help_outline</span>
+</button>
+<div class="flex items-center gap-2 pl-4 border-l border-outline-variant">
+<img alt="Admin Avatar" class="w-8 h-8 rounded-full border border-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbS0-qBW3lbFR17S-6JJWBlBIHpEHTvFJMJxkQThFqtKlBquIf0kYhlcN-I5WDFss7geadaAiZi5W6nrrXlEpPL0kQde9NtyAF0mhfb9J3DpTBMbqc30X5KL5PJSofUF2R7zYxO7RzUINWfJUIavg6yvhLv5pHpw_gw0kwYmxK0rxMlP1-lWjwVyf7WobYpr-qGfiu9kOtjQf2xjZF_wOVVOZsxOFEEL0giW2aR6t1WNTQ_J77aYnseslORp2j9MrU15poW2NBm0E"/>
+<span class="font-body-sm font-semibold text-on-surface">Admin CMS</span>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-[240px] pt-24 px-container_padding pb-10">
+<div class="flex gap-gutter">
+<!-- Left Column: Main List (75%) -->
+<div class="flex-1 min-w-0">
+<!-- Tabs Section -->
+<div class="flex items-center gap-8 mb-6 border-b border-outline-variant">
+<button id="tab-all" class="pb-3 border-b-2 border-primary text-primary font-semibold text-body-md">Tất cả Tasker</button>
+<button id="tab-pending" class="pb-3 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
+    Chờ duyệt
+    <span id="badge-pending" class="bg-error text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span>
+</button>
+<button id="tab-active" class="pb-3 text-on-surface-variant hover:text-primary transition-colors">Đang hoạt động</button>
+<button id="tab-locked" class="pb-3 text-on-surface-variant hover:text-primary transition-colors">Bị tạm khóa</button>
+</div>
+<!-- Filters Section -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm mb-6 flex flex-wrap gap-3 items-center">
+  <!-- Search -->
+  <div class="flex-1 min-w-[220px] relative">
+    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+    <input class="w-full pl-10 pr-4 py-2 bg-surface-container border border-outline-variant/20 rounded-xl text-body-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Tìm kiếm theo tên, email, SĐT..." type="text"/>
+  </div>
+  <!-- Loại dịch vụ -->
+  <select id="tasker-svc-filter" class="min-w-[140px] bg-surface-container border border-outline-variant/20 rounded-xl text-body-sm py-2 px-3 focus:ring-2 focus:ring-primary/20 outline-none">
+    <option value="">Loại dịch vụ</option>
+    <option value="don dep">Dọn dẹp</option>
+    <option value="giat ui">Giặt ủi</option>
+    <option value="sua chua">Sửa chữa</option>
+  </select>
+  <!-- Khu vực -->
+  <select id="tasker-area-filter" class="min-w-[120px] bg-surface-container border border-outline-variant/20 rounded-xl text-body-sm py-2 px-3 focus:ring-2 focus:ring-primary/20 outline-none">
+    <option value="">Khu vực</option>
+    <option value="quan 1">Quận 1</option>
+    <option value="quan 3">Quận 3</option>
+    <option value="binh thanh">Bình Thạnh</option>
+  </select>
+  <!-- Trạng thái -->
+  <select id="tasker-status-filter" class="min-w-[130px] bg-surface-container border border-outline-variant/20 rounded-xl text-body-sm py-2 px-3 focus:ring-2 focus:ring-primary/20 outline-none">
+    <option value="">Trạng thái</option>
+    <option value="Hoat dong">Hoạt động</option>
+    <option value="Cho duyet">Chờ duyệt</option>
+    <option value="Tam khoa">Tạm khóa</option>
+  </select>
+  <!-- Lọc button -->
+  <button id="btn-tasker-filter" class="bg-primary text-white px-5 py-2 rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1.5 text-body-sm whitespace-nowrap">
+    <span class="material-symbols-outlined text-[16px]">filter_list</span>Lọc
+  </button>
+</div>
+<!-- Tasker Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(36,25,20,0.04)] overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></th>
+<th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Họ và Tên</th>
+<th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Dịch vụ</th>
+<th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Khu vực</th>
+<th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Đơn/Rating</th>
+<th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Trạng thái</th>
+<th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Ngày đăng ký</th>
+<th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Thao tác</th>
+</tr>
+</thead>
+<tbody id="tasker-tbody" class="divide-y divide-outline-variant/10">
+    <tr><td colspan="8" class="text-center py-8 text-on-surface-variant">Đang tải dữ liệu...</td></tr>
+<tr class="hover:bg-background transition-colors">
+<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A professional headshot of a friendly Vietnamese tasker woman in her late 30s, smiling warmly at the camera. She has her hair neatly tied back and wears a clean, professional uniform with a subtle brand logo. The lighting is soft and natural, emphasizing a trustworthy and dependable presence. The background is a clean, neutral interior setting typical of a high-end service application profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw0Km5FwSDnlgpOkpDKqA8lsme4C19vD5mBrFGMLG2AEDk1KFJF8nuwWWrofslxIQQ46wpsTUnoUJi9mhHvGJCznNRqs_zNcVtBas9Za1shWjeznTojoKIAs4kFIVlsJAik-HVd_KwPgittEKiubvtXs20bUc-ZuwGJFAdgbPgl3MJIL2L3uGtZ3fsajq13j1juFN8elFFiKb6ZPgWJk3tb5sbbH31xd5pH5PAFnjR2LZ61x0VPREfA7MuMpZZH1drBpbmBoW4mmk"/>
+<div>
+<p class="font-semibold text-body-md text-on-surface">Lê Thị Thu</p>
+<p class="text-body-sm text-on-surface-variant opacity-70">thu.le@email.com</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-sm">Dọn dẹp nhà cửa</td>
+<td class="p-4 text-body-sm">Quận 1, HCM</td>
+<td class="p-4 text-body-sm">
+<div class="flex flex-col">
+<span>124 đơn</span>
+<div class="flex items-center text-yellow-500">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="ml-1 font-bold">4.9</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Hoạt động</span>
+</td>
+<td class="p-4 text-body-sm text-on-surface-variant">12/05/2023</td>
+<td class="p-4">
+<div class="flex gap-2">
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Pending -->
+<tr class="bg-background/40 hover:bg-background transition-colors">
+<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A portrait of a young Vietnamese man in his 20s looking earnest and professional, suitable for a service worker profile. He is wearing a simple polo shirt. The lighting is clear and bright, consistent with a modern light-mode dashboard aesthetic. The overall mood is approachable and professional, set against a soft, out-of-focus urban background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe9MbNawDIt_ERtY44YJcMyfGyO93--65MY9wRpTil4-Rcx5a02CVNTlqA4knRNybySFoeZIesYTau1ivZewHqUjOZGyLfIPA2IL1pKSioPit-5KFrHNlSL1cB4pQXBNe9FtDCKbEstu_IgIuWGG3cjl43Lrvwuxc0Vn44GWPfx_78UmdNrAVTKiM8DwGU0CAvSd08PhMwefcHuf9Get5-urSDc6sbJp2-YSTj7Ap1uHVdpRDzaLPq7cTVCLxgsO1ylx9XXmNLehQ"/>
+<div>
+<p class="font-semibold text-body-md text-on-surface">Nguyễn Minh Quân</p>
+<p class="text-body-sm text-on-surface-variant opacity-70">quan.nm@email.com</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-sm">Giặt ủi đồ len</td>
+<td class="p-4 text-body-sm">Quận 7, HCM</td>
+<td class="p-4 text-body-sm">
+<div class="flex flex-col">
+<span>0 đơn</span>
+<div class="flex items-center text-on-surface-variant/40">
+<span class="material-symbols-outlined text-[16px]">star</span>
+<span class="ml-1">--</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Chờ duyệt</span>
+</td>
+<td class="p-4 text-body-sm text-on-surface-variant">02/11/2023</td>
+<td class="p-4">
+<div class="flex gap-2">
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Locked -->
+<tr class="hover:bg-background transition-colors">
+<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A profile photo of an older Vietnamese gentleman, perhaps in his 50s, looking serious yet professional. He is dressed in a collared shirt. The lighting is direct but soft, creating a sense of experience and reliability. The color palette of the image is muted and warm, blending seamlessly with the earth-toned design system of the administrative dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBrLUqZ7El-sjPOF82-fDcx6RVhmNJyyBcyTHNbYgr1Eqtm2BjFbyvLAe21nisFzs0FuDD-6kiyhJAu_H3eoYrYeL4Vy2ZSt5nGhYrNrkB2hSdjhG0HXxmSU94vuWt3rOrQvEU00lPUpGdl0ckL2Vofaa4xEq89RHW3vJMwGkslR41JypG3evocQlbrewjkFgFlBx7YrOFU2xXiMqQU7irg4_kJX19WsrdavHeFMAn-dJCRhR4RZ1ybleMunwJRa53b2--1a6F1lU"/>
+<div>
+<p class="font-semibold text-body-md text-on-surface">Trần Hữu Lộc</p>
+<p class="text-body-sm text-on-surface-variant opacity-70">loc.th@email.com</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-sm">Sửa chữa điện nước</td>
+<td class="p-4 text-body-sm">Quận 3, HCM</td>
+<td class="p-4 text-body-sm">
+<div class="flex flex-col">
+<span>45 đơn</span>
+<div class="flex items-center text-yellow-500">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="ml-1 font-bold">4.2</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Tạm khóa</span>
+</td>
+<td class="p-4 text-body-sm text-on-surface-variant">15/01/2023</td>
+<td class="p-4">
+<div class="flex gap-2">
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Active -->
+<tr class="bg-background/40 hover:bg-background transition-colors">
+<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A portrait of a cheerful young Vietnamese woman, smiling brightly, wearing a modest apron which suggests her service role. The lighting is warm and high-key, providing an optimistic and energetic feel for the profile. The visual style is crisp and modern, fitting perfectly into a sophisticated CMS interface focused on community and service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzITDyLk1MQvMI1PvsZppHsg7fs6mUY29j_A_MZfuRy-9MEbuulCnUfOcz7POZqlns1AihkUxmvJy7UfxZgKYa0mbL3vypUTF6pvQdKEIQ_sfWKup5yZrnvJwtB1Q9LgBlYXGImfPIYh_muX6TOnT3W59l9_pHKUia3ZxHLDQ3fb6Q3gLEcuSURR-flwtwlvMV001Kco9BVt7qdd4y8ydhUCI5TzcUvKYXr1MpnggyIxLCvXRypgLs9vEqT8ZBlp-Pgwv7qs4hiSs"/>
+<div>
+<p class="font-semibold text-body-md text-on-surface">Phạm Phương Anh</p>
+<p class="text-body-sm text-on-surface-variant opacity-70">anh.pp@email.com</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-sm">Nấu ăn tại gia</td>
+<td class="p-4 text-body-sm">Bình Thạnh, HCM</td>
+<td class="p-4 text-body-sm">
+<div class="flex flex-col">
+<span>212 đơn</span>
+<div class="flex items-center text-yellow-500">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="ml-1 font-bold">5.0</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Hoạt động</span>
+</td>
+<td class="p-4 text-body-sm text-on-surface-variant">20/02/2023</td>
+<td class="p-4">
+<div class="flex gap-2">
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Active -->
+<tr class="hover:bg-background transition-colors">
+<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A clean, professional headshot of a middle-aged Vietnamese man with glasses, conveying intelligence and reliability. He is wearing a simple casual shirt. The background is a soft blue, contrasting nicely with the warm tones of the dashboard. The lighting is balanced and soft, creating a modern, approachable aesthetic suitable for a professional CMS user list." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY0vsTUPpyNxE-2QUaHzPjNmH7wKo8KZWthrY2vH2mxWsZIkfJSJRhVfuqKABhJUACjcQf8t1qZ2TnZNwrn071GidtlobBM6WJqfTf-2Ilf_bkG7vCCJgJRCMFmBZwjAHxWJDpiL2pWegMPwbEtaBhgSH_fb7mUuTVoYsPUyv7VhAqJcgdifVHs-i93SYkQXWAXIT390srQT-0Up3a-dFyWoShwXH3LDZrv2SGinjCbpUFUazKdwawKxv_dpRNxty5rYdnpSQuS7U"/>
+<div>
+<p class="font-semibold text-body-md text-on-surface">Hoàng Văn Vinh</p>
+<p class="text-body-sm text-on-surface-variant opacity-70">vinh.hv@email.com</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-sm">Vệ sinh máy lạnh</td>
+<td class="p-4 text-body-sm">Tân Bình, HCM</td>
+<td class="p-4 text-body-sm">
+<div class="flex flex-col">
+<span>89 đơn</span>
+<div class="flex items-center text-yellow-500">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="ml-1 font-bold">4.7</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Hoạt động</span>
+</td>
+<td class="p-4 text-body-sm text-on-surface-variant">08/04/2023</td>
+<td class="p-4">
+<div class="flex gap-2">
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 6: Pending -->
+<tr class="bg-background/40 hover:bg-background transition-colors">
+<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A profile image of a pleasant-looking Vietnamese woman in her 20s, with a clean and professional appearance. Her expression is helpful and friendly. She is pictured in a well-lit, minimalist environment. The high-quality photography captures a sense of modern professionalism and reliability, aligning perfectly with a premium service application's visual identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwZPuTJ8xiik6BkvfR8G_Xzy4lUo3hayL1U9BnzbiLBnDhL_I-v64JvkEIJ5EC20yScftk3YobJ0RErMY6W7hPm9bsch1K0bYu8PE3FONZ4P6WQdEwCON3srjkec6YghomBIWNJZ7SaKtffiKlqBTekxq86KGOytbnUlDaElU_ErnNFY0Lk4KSoCvZoDNrZp-hBRL9vlNGzF7S7KPERrDfEjlH-W2u_gQSXtHL0ml-2U8gRLA5Mm-kL3SYhiGmVyWppipwBYFXVb8"/>
+<div>
+<p class="font-semibold text-body-md text-on-surface">Trần Tuyết Mai</p>
+<p class="text-body-sm text-on-surface-variant opacity-70">mai.tt@email.com</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-sm">Trông trẻ</td>
+<td class="p-4 text-body-sm">Phú Nhuận, HCM</td>
+<td class="p-4 text-body-sm">
+<div class="flex flex-col">
+<span>0 đơn</span>
+<div class="flex items-center text-on-surface-variant/40">
+<span class="material-symbols-outlined text-[16px]">star</span>
+<span class="ml-1">--</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Chờ duyệt</span>
+</td>
+<td class="p-4 text-body-sm text-on-surface-variant">03/11/2023</td>
+<td class="p-4">
+<div class="flex gap-2">
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
+<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="p-4 flex justify-between items-center bg-surface-container-low border-t border-outline-variant">
+<p id="tasker-pagination-info" class="text-body-sm text-on-surface-variant">Dang tai...</p>
+</div>
+</div>
+</div>
+
+<!-- Right Column: Pending Panel (300px) -->
+<div class="w-[300px] flex-shrink-0">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(36,25,20,0.04)] overflow-hidden">
+<div class="p-4 bg-primary-container text-white flex justify-between items-center">
+<h3 class="font-title-sm">Tasker mới chờ duyệt</h3>
+<span id="badge-pending-panel" class="bg-white/20 px-2 py-1 rounded-md text-[10px] font-bold">0</span>
+</div>
+<div id="pending-panel-list" class="p-4 space-y-4">
+    <p class="text-center text-body-sm text-on-surface-variant py-4">Đang tải...</p>
+</div>
+</div>
+<!-- Summary Info Card -->
+<div class="mt-stack_lg p-stack_md bg-surface-container-low border border-outline-variant/30 rounded-xl">
+<h4 class="font-title-sm text-on-surface mb-3">Thống kê nhanh</h4>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-white p-3 rounded-lg shadow-sm">
+<p class="text-[10px] text-on-surface-variant uppercase font-bold mb-1">Tổng Tasker</p>
+<p id="stat-total" class="text-headline-md font-bold text-primary">...</p>
+</div>
+<div class="bg-white p-3 rounded-lg shadow-sm">
+<p class="text-[10px] text-on-surface-variant uppercase font-bold mb-1">Chờ duyệt</p>
+<p id="stat-pending" class="text-headline-md font-bold text-tertiary">...</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<script>
+// Make view buttons open a panel
+document.querySelectorAll('table tbody tr').forEach(function(row) {
+  row.style.cursor = 'pointer';
+  row.addEventListener('click', function(e) {
+    if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+    var panel = document.getElementById('tasker-detail-panel') || document.querySelector('[data-panel]');
+    if (panel) panel.classList.remove('hidden');
+  });
+});
+// Ensure approve/reject actions work
+document.querySelectorAll('button').forEach(function(btn) {
+  var text = btn.textContent.trim();
+  if (text === 'Duyệt' || text === 'Approve') {
+    if (!btn.hasAttribute('data-approve')) btn.setAttribute('data-approve','true');
+  }
+  if (text === 'Từ chối' || text === 'Reject') {
+    if (!btn.hasAttribute('data-reject')) btn.setAttribute('data-reject','true');
+  }
+});
+</script>
+<!-- CHIOI-JS-INJECT -->
+<script>
+(function() {
+
+  // ---- 1. TABS ----
+  document.querySelectorAll('[data-tab-group]').forEach(function(tabGroup) {
+    var groupName = tabGroup.getAttribute('data-tab-group');
+    tabGroup.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-tab]');
+      if (!btn) return;
+      var tabId = btn.getAttribute('data-tab');
+      // Deactivate all tabs in group
+      document.querySelectorAll('[data-tab-group="' + groupName + '"] [data-tab]').forEach(function(t) {
+        t.classList.remove('text-primary', 'border-primary', 'border-b-2', 'font-semibold', 'bg-secondary-container/10');
+        t.classList.add('text-on-surface-variant');
+      });
+      // Activate clicked tab
+      btn.classList.add('text-primary', 'border-primary', 'border-b-2', 'font-semibold');
+      btn.classList.remove('text-on-surface-variant');
+      // Hide all panes
+      document.querySelectorAll('[data-tab-pane]').forEach(function(p) {
+        p.classList.add('hidden');
+      });
+      // Show target pane
+      var pane = document.querySelector('[data-tab-pane="' + tabId + '"]');
+      if (pane) pane.classList.remove('hidden');
+    });
+  });
+
+  // ---- 2. CLOSE ALL MODALS/PANELS ON LOAD ----
+  document.querySelectorAll('[data-modal], [data-panel]').forEach(function(el) {
+    el.classList.add('hidden');
+  });
+  // Also hide any element with class that suggests it's a modal overlay
+  document.querySelectorAll('.fixed.inset-0, [id*="modal"], [id*="overlay"], [id*="detail-panel"], [id*="slide-panel"]').forEach(function(el) {
+    // Only hide if it's a modal/overlay type (has backdrop-like styling or z-50+)
+    if (el.classList.contains('inset-0') || el.id.toLowerCase().includes('modal') || el.id.toLowerCase().includes('overlay') || el.id.toLowerCase().includes('panel')) {
+      el.classList.add('hidden');
+    }
+  });
+
+  // ---- 3. TOGGLE PANELS/MODALS ----
+  // Open: data-open="target-id"
+  document.querySelectorAll('[data-open]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var target = document.getElementById(btn.getAttribute('data-open'));
+      if (target) {
+        target.classList.remove('hidden');
+        // animate slide-in
+        target.style.animation = 'slideIn 0.2s ease';
+      }
+    });
+  });
+
+  // Close: data-close="target-id" OR data-close-self
+  document.querySelectorAll('[data-close]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var target = document.getElementById(btn.getAttribute('data-close'));
+      if (target) target.classList.add('hidden');
+    });
+  });
+  document.querySelectorAll('[data-close-self]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var modal = btn.closest('[data-modal], [data-panel], .fixed.inset-0');
+      if (modal) modal.classList.add('hidden');
+    });
+  });
+
+  // Click backdrop to close
+  document.querySelectorAll('[data-modal]').forEach(function(modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
+  });
+
+  // ---- 4. TABLE SEARCH FILTER ----
+  document.querySelectorAll('[data-search-table]').forEach(function(input) {
+    var tableId = input.getAttribute('data-search-table');
+    input.addEventListener('input', function() {
+      var q = input.value.toLowerCase().trim();
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = q === '' || text.includes(q) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- 5. CONFIRM ACTION BUTTONS ----
+  document.querySelectorAll('[data-confirm]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var msg = btn.getAttribute('data-confirm') || 'Bạn có chắc chắn không?';
+      if (!confirm(msg)) e.preventDefault();
+    });
+  });
+
+  // ---- 6. STATUS BADGE TOGGLE ----
+  document.querySelectorAll('[data-approve]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var row = btn.closest('tr, [data-item]');
+      if (row) {
+        var badge = row.querySelector('[data-status]');
+        if (badge) {
+          badge.textContent = 'Đã duyệt';
+          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-green-100 text-green-700';
+        }
+        btn.disabled = true;
+        btn.textContent = 'Đã duyệt';
+        btn.className = btn.className + ' opacity-50 cursor-not-allowed';
+        var rejectBtn = row.querySelector('[data-reject]');
+        if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.className += ' opacity-50 cursor-not-allowed'; }
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-reject]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (!confirm('Từ chối người dùng này?')) return;
+      var row = btn.closest('tr, [data-item]');
+      if (row) {
+        var badge = row.querySelector('[data-status]');
+        if (badge) {
+          badge.textContent = 'Đã từ chối';
+          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-red-100 text-red-700';
+        }
+        btn.disabled = true;
+        btn.textContent = 'Đã từ chối';
+        btn.className += ' opacity-50 cursor-not-allowed';
+        var approveBtn = row.querySelector('[data-approve]');
+        if (approveBtn) { approveBtn.disabled = true; approveBtn.className += ' opacity-50 cursor-not-allowed'; }
+      }
+    });
+  });
+
+  // ---- 7. DROPDOWN FILTER (visual) ----
+  document.querySelectorAll('[data-filter-col]').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      var col = parseInt(sel.getAttribute('data-filter-col'));
+      var val = sel.value.toLowerCase();
+      var tableId = sel.getAttribute('data-filter-table');
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        var cell = row.cells[col];
+        var text = cell ? cell.textContent.toLowerCase() : '';
+        row.style.display = val === '' || val === 'all' || text.includes(val) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- 8. INBOX: click conversation row to show chat ----
+  document.querySelectorAll('[data-conversation]').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('[data-conversation]').forEach(function(i) {
+        i.classList.remove('bg-primary-container/15', 'border-l-4', 'border-primary');
+      });
+      item.classList.add('bg-primary-container/15', 'border-l-4', 'border-primary');
+      // Remove unread bold
+      item.classList.remove('font-semibold');
+      var chatPanel = document.getElementById('chat-panel');
+      var emptyState = document.getElementById('chat-empty');
+      if (chatPanel) chatPanel.classList.remove('hidden');
+      if (emptyState) emptyState.classList.add('hidden');
+    });
+  });
+
+  // ---- 9. SEND MESSAGE (Inbox) ----
+  var sendBtn = document.getElementById('send-msg-btn');
+  var msgInput = document.getElementById('msg-input');
+  var chatMessages = document.getElementById('chat-messages');
+  if (sendBtn && msgInput && chatMessages) {
+    function sendMessage() {
+      var text = msgInput.value.trim();
+      if (!text) return;
+      var bubble = document.createElement('div');
+      bubble.className = 'flex justify-end';
+      bubble.innerHTML = '<div class="max-w-[70%] bg-primary-container text-on-primary-container rounded-2xl rounded-br-sm px-4 py-2 text-sm">' + text + '<div class="text-[10px] opacity-60 mt-1 text-right">Vừa xong</div></div>';
+      chatMessages.appendChild(bubble);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      msgInput.value = '';
+    }
+    sendBtn.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+  }
+
+  // ---- 10. SLIDE-IN ANIMATION ----
+  var style = document.createElement('style');
+  style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }';
+  document.head.appendChild(style);
+
+})();
+</script><!-- END-CHIOI-JS-INJECT -->
+
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('../Khachhang/dangnhap.html')) return;
+
+  var kycStatusMap = {
+    'APPROVED': { label: 'Hoạt động', cls: 'bg-green-100 text-green-700' },
+    'ACTIVE':   { label: 'Hoạt động', cls: 'bg-green-100 text-green-700' },
+    'PENDING':  { label: 'Chờ duyệt', cls: 'bg-orange-100 text-orange-700' },
+    'PENDING_APPROVAL': { label: 'Chờ duyệt', cls: 'bg-orange-100 text-orange-700' },
+    'REJECTED': { label: 'Tạm khóa', cls: 'bg-red-100 text-red-700' },
+    'SUSPENDED':{ label: 'Tạm khóa', cls: 'bg-red-100 text-red-700' }
+  };
+
+  var allTaskers = [];
+  var currentFilter = 'all';
+
+  function getKycStatus(tasker) {
+    return tasker.kyc_status || tasker.status || 'PENDING';
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    var dt = new Date(d);
+    return dt.toLocaleDateString('vi-VN');
+  }
+
+  function renderTable(taskers) {
+    var tbody = document.getElementById('tasker-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!taskers || taskers.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-10 text-on-surface-variant">Không có Tasker nào</td></tr>';
+      var pag = document.getElementById('tasker-pagination-info');
+      if (pag) pag.textContent = '0 Tasker';
+      return;
+    }
+
+    taskers.forEach(function(tasker, idx) {
+      var ks = getKycStatus(tasker);
+      var s = kycStatusMap[ks] || { label: ks, cls: 'bg-gray-100 text-gray-700' };
+      var isPending = ks === 'PENDING' || ks === 'PENDING_APPROVAL';
+
+      var tr = document.createElement('tr');
+      tr.className = (idx % 2 ? 'bg-background/40 ' : '') + 'hover:bg-background transition-colors';
+      tr.innerHTML =
+        '<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>' +
+        '<td class="p-4"><div class="flex items-center gap-3">' +
+          '<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[20px]">person</span></div>' +
+          '<div><p class="font-semibold text-body-md text-on-surface">' + (tasker.full_name || '—') + '</p>' +
+          '<p class="text-body-sm text-on-surface-variant opacity-70">' + (tasker.phone || '—') + '</p></div></div></td>' +
+        '<td class="p-4 text-body-sm">' + (tasker.service_type || '—') + '</td>' +
+        '<td class="p-4 text-body-sm">' + (tasker.area || '—') + '</td>' +
+        '<td class="p-4 text-body-sm"><div class="flex flex-col"><span>' + (tasker.order_count || 0) + ' đơn</span>' +
+          '<div class="flex items-center text-yellow-500"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' 1;">star</span>' +
+          '<span class="ml-1 font-bold">' + (tasker.avg_rating ? Number(tasker.avg_rating).toFixed(1) : '—') + '</span></div></div></td>' +
+        '<td class="p-4"><span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ' + s.cls + '">' + s.label + '</span></td>' +
+        '<td class="p-4 text-body-sm text-on-surface-variant">' + formatDate(tasker.created_at) + '</td>' +
+        '<td class="p-4"><div class="flex gap-2">' +
+          (isPending ?
+            '<button class="approve-btn px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-[11px] font-bold transition-colors" data-uid="' + tasker.tasker_id + '">Duyệt</button>' +
+            '<button class="reject-btn px-3 py-1.5 border border-error text-error hover:bg-error/10 rounded-lg text-[11px] font-bold transition-colors" data-uid="' + tasker.tasker_id + '">Từ chối</button>' :
+            '<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined">visibility</span></button>'
+          ) +
+        '</div></td>';
+
+      tbody.appendChild(tr);
+    });
+
+    // Bind approve/reject buttons
+    tbody.querySelectorAll('.approve-btn').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        var uid = btn.getAttribute('data-uid');
+        showLoading();
+        try {
+          await apiFetch('/api/admin/taskers/' + uid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'APPROVED' }) });
+          hideLoading();
+          showToastMsg('✅ Đã duyệt Tasker #' + uid);
+          setTimeout(function() { location.reload(); }, 1500);
+        } catch (e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+      });
+    });
+    tbody.querySelectorAll('.reject-btn').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        if (!confirm('Từ chối Tasker này?')) return;
+        var uid = btn.getAttribute('data-uid');
+        showLoading();
+        try {
+          await apiFetch('/api/admin/taskers/' + uid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'REJECTED' }) });
+          hideLoading();
+          showToastMsg('✅ Đã từ chối Tasker #' + uid);
+          setTimeout(function() { location.reload(); }, 1500);
+        } catch (e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+      });
+    });
+
+    var pag = document.getElementById('tasker-pagination-info');
+    if (pag) pag.textContent = 'Hiển thị ' + taskers.length + ' Tasker';
+  }
+
+  function renderPendingPanel(pendingTaskers) {
+    var panel = document.getElementById('pending-panel-list');
+    if (!panel) return;
+
+    var badge = document.getElementById('badge-pending');
+    var badge2 = document.getElementById('badge-pending-panel');
+    if (badge) badge.textContent = pendingTaskers.length;
+    if (badge2) badge2.textContent = pendingTaskers.length;
+
+    if (pendingTaskers.length === 0) {
+      panel.innerHTML = '<p class="text-center text-body-sm text-on-surface-variant py-4">Không có Tasker chờ duyệt</p>';
+      return;
+    }
+
+    panel.innerHTML = '';
+    pendingTaskers.slice(0, 5).forEach(function(t) {
+      var div = document.createElement('div');
+      div.className = 'p-3 border border-outline-variant/20 rounded-xl hover:border-primary/30 transition-all bg-surface-container-lowest';
+      div.innerHTML =
+        '<div class="flex items-center gap-3 mb-3">' +
+          '<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary">person</span></div>' +
+          '<div class="min-w-0"><p class="font-semibold text-body-sm truncate">' + (t.full_name || '—') + '</p>' +
+          '<p class="text-[11px] text-on-surface-variant">' + (t.service_type || 'N/A') + ' • ' + formatDate(t.created_at) + '</p></div>' +
+        '</div>' +
+        '<div class="flex gap-2">' +
+          '<button class="approve-panel-btn flex-1 bg-green-600 hover:bg-green-700 text-white py-1.5 rounded-lg text-[11px] font-bold transition-colors" data-uid="' + t.tasker_id + '">Duyệt</button>' +
+          '<button class="reject-panel-btn flex-1 border border-error text-error hover:bg-error/10 py-1.5 rounded-lg text-[11px] font-bold transition-colors" data-uid="' + t.tasker_id + '">Từ chối</button>' +
+        '</div>';
+
+      div.querySelector('.approve-panel-btn').addEventListener('click', async function() {
+        var uid = this.getAttribute('data-uid');
+        showLoading();
+        try {
+          await apiFetch('/api/admin/taskers/' + uid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'APPROVED' }) });
+          hideLoading();
+          showToastMsg('✅ Đã duyệt Tasker');
+          setTimeout(function() { location.reload(); }, 1500);
+        } catch(e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+      });
+      div.querySelector('.reject-panel-btn').addEventListener('click', async function() {
+        if (!confirm('Từ chối Tasker này?')) return;
+        var uid = this.getAttribute('data-uid');
+        showLoading();
+        try {
+          await apiFetch('/api/admin/taskers/' + uid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'REJECTED' }) });
+          hideLoading();
+          showToastMsg('✅ Đã từ chối');
+          setTimeout(function() { location.reload(); }, 1500);
+        } catch(e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+      });
+
+      panel.appendChild(div);
+    });
+  }
+
+  function filterAndRender(filter, searchQuery) {
+    var filtered = allTaskers.slice();
+    // Tab filter
+    if (filter === 'pending') {
+      filtered = filtered.filter(function(t) { return t.kyc_status === 'PENDING' || t.kyc_status === 'PENDING_APPROVAL'; });
+    } else if (filter === 'active') {
+      filtered = filtered.filter(function(t) { return t.kyc_status === 'APPROVED' || t.kyc_status === 'ACTIVE'; });
+    } else if (filter === 'locked') {
+      filtered = filtered.filter(function(t) { return t.kyc_status === 'REJECTED' || t.kyc_status === 'SUSPENDED'; });
+    }
+    // Dropdown filters
+    var svcSel = document.getElementById('tasker-svc-filter');
+    var areaSel = document.getElementById('tasker-area-filter');
+    var statusSel = document.getElementById('tasker-status-filter');
+    var svcVal = svcSel ? svcSel.value : '';
+    var areaVal = areaSel ? areaSel.value : '';
+    var statusVal = statusSel ? statusSel.value : '';
+    if (svcVal) {
+      filtered = filtered.filter(function(t) { return (t.service_type || '').toLowerCase().includes(svcVal.toLowerCase()); });
+    }
+    if (areaVal) {
+      filtered = filtered.filter(function(t) { return (t.area || '').toLowerCase().includes(areaVal.toLowerCase()); });
+    }
+    if (statusVal) {
+      var statusKeyMap = { 'Hoat dong': ['APPROVED','ACTIVE'], 'Cho duyet': ['PENDING','PENDING_APPROVAL'], 'Tam khoa': ['REJECTED','SUSPENDED'] };
+      var keys = statusKeyMap[statusVal] || [statusVal.toUpperCase()];
+      filtered = filtered.filter(function(t) { return keys.indexOf(t.kyc_status) >= 0; });
+    }
+    // Search
+    if (searchQuery) {
+      var q = searchQuery.toLowerCase();
+      filtered = filtered.filter(function(t) {
+        return (t.full_name && t.full_name.toLowerCase().includes(q)) ||
+               (t.phone && t.phone.toLowerCase().includes(q)) ||
+               (t.service_type && t.service_type.toLowerCase().includes(q));
+      });
+    }
+    renderTable(filtered);
+  }
+
+  // Tab switching
+  ['all','pending','active','locked'].forEach(function(id) {
+    var btn = document.getElementById('tab-' + id);
+    if (btn) btn.addEventListener('click', function() {
+      currentFilter = id;
+      ['all','pending','active','locked'].forEach(function(t) {
+        var b = document.getElementById('tab-' + t);
+        if (b) { b.classList.remove('border-b-2','border-primary','text-primary','font-semibold'); b.classList.add('text-on-surface-variant'); }
+      });
+      btn.classList.add('border-b-2','border-primary','text-primary','font-semibold');
+      btn.classList.remove('text-on-surface-variant');
+      filterAndRender(currentFilter, searchInput ? searchInput.value : '');
+    });
+  });
+
+  // Search input
+  var searchInput = document.querySelector('input[placeholder*="Tìm kiếm"]');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      filterAndRender(currentFilter, searchInput.value);
+    });
+  }
+
+  // Dropdown filter events
+  ['tasker-svc-filter', 'tasker-area-filter', 'tasker-status-filter'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('change', function() { filterAndRender(currentFilter, searchInput ? searchInput.value : ''); });
+  });
+
+  // Load data
+  showLoading();
+  try {
+    var users = await apiFetch('/api/admin/users');
+    hideLoading();
+
+    allTaskers = (users || []).filter(function(u) { return u.role === 'TASKER' && u.taskers; }).map(function(u) {
+      return {
+        user_id: u.user_id,
+        tasker_id: u.taskers.tasker_id,
+        full_name: u.full_name,
+        phone: u.phone,
+        created_at: u.created_at,
+        kyc_status: u.taskers.kyc_status || u.status,
+        service_type: u.taskers.service_type,
+        area: u.taskers.area,
+        order_count: u.taskers.order_count || 0,
+        avg_rating: u.taskers.average_rating
+      };
+    });
+
+    var pendingTaskers = allTaskers.filter(function(t) { return t.kyc_status === 'PENDING' || t.kyc_status === 'PENDING_APPROVAL'; });
+
+    // Update stats
+    var statTotal = document.getElementById('stat-total');
+    var statPending = document.getElementById('stat-pending');
+    if (statTotal) statTotal.textContent = allTaskers.length;
+    if (statPending) statPending.textContent = pendingTaskers.length;
+
+    renderTable(allTaskers);
+    renderPendingPanel(pendingTaskers);
+
+    // Logout
+    var logoutBtn = document.querySelector('button[title="Đăng xuất"]');
+    if (logoutBtn) logoutBtn.addEventListener('click', function() { ChiOiAuth.logout('../Khachhang/dangnhap.html'); });
+
+  } catch (e) {
+    hideLoading();
+    showToastMsg('❌ Lỗi tải dữ liệu Tasker: ' + e.message);
+    console.error('[Admin Tasker]', e);
+  }
+})();
+
+</script>
+</body></html>

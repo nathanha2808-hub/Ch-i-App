@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chị Ơi CMS - Quản lý ví &amp; Giao dịch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#b8eaff",
+                        "surface-container-high": "#fae4da",
+                        "primary-fixed": "#ffdbcc",
+                        "inverse-on-surface": "#ffede6",
+                        "primary-container": "#ff7e36",
+                        "primary-fixed-dim": "#ffb693",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#dfc0b3",
+                        "surface-container": "#ffeae1",
+                        "secondary-fixed": "#ffdbcc",
+                        "background": "#fff8f6",
+                        "on-tertiary-fixed": "#001f28",
+                        "on-error": "#ffffff",
+                        "on-background": "#241914",
+                        "on-primary-fixed": "#351000",
+                        "surface-variant": "#f4ded5",
+                        "on-tertiary-container": "#003f4f",
+                        "tertiary": "#006780",
+                        "on-surface": "#241914",
+                        "secondary-container": "#ff8849",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#fff1eb",
+                        "surface-dim": "#ecd6cc",
+                        "on-secondary-fixed-variant": "#7a3000",
+                        "on-secondary-container": "#6b2900",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#00b1da",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "on-secondary-fixed": "#351000",
+                        "on-primary-container": "#642600",
+                        "inverse-surface": "#3b2e28",
+                        "secondary-fixed-dim": "#ffb693",
+                        "inverse-primary": "#ffb693",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#a04100",
+                        "tertiary-fixed-dim": "#52d5ff",
+                        "surface": "#fff8f6",
+                        "outline": "#8b7266",
+                        "surface-bright": "#fff8f6",
+                        "primary": "#a04100",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#a04100",
+                        "on-surface-variant": "#584238",
+                        "surface-container-highest": "#f4ded5",
+                        "on-tertiary-fixed-variant": "#004d61"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container_padding": "32px",
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "stack_lg": "24px",
+                        "sidebar_width": "240px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "label-bold": ["Be Vietnam Pro"],
+                        "display-lg": ["Be Vietnam Pro"],
+                        "title-sm": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "label-bold": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "display-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #fff8f6;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            color: #241914;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            background-color: rgba(255, 126, 54, 0.1);
+            color: #a04100;
+            border-left: 4px solid #a04100;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 20px 0 rgba(36, 25, 20, 0.04);
+        }
+    </style>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(160,65,0,0.15); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(160,65,0,0.3); }
+        /* Sidebar active indicator animation */
+        aside nav a { position: relative; border-radius: 8px; }
+        aside nav a:hover { background: rgba(160,65,0,0.06); }
+        /* Card subtle animations */
+        .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(88,66,56,0.08); }
+        /* Table row hover */
+        tbody tr { transition: background-color 0.15s ease; }
+        tbody tr:hover { background-color: rgba(255,126,54,0.04); }
+        /* Button press effect */
+        button:active, a:active { transform: scale(0.97); }
+        /* Smooth page transitions */
+        main { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* Orange accent gradient for header elements */
+        .admin-gradient { background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); }
+        /* Focus ring for inputs */
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(160,65,0,0.2); 
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar Component -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-dim shadow-md flex flex-col py-stack_lg z-50">
+<div class="px-6 mb-8">
+<h1 class="font-display-lg text-display-lg text-primary">Chị Ơi</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin CMS</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="bangdieukhien.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydonhang.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label-md text-label-md">Đơn hàng</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="canthiepdonhang.html">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-md text-label-md">Can thiệp</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlytasker.html">
+<span class="material-symbols-outlined">engineering</span>
+<span class="font-label-md text-label-md">Tasker</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlycudan.html">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Cư dân</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-primary border-l-4 border-primary transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
+<span class="material-symbols-outlined">inbox</span>
+<span class="font-label-md text-label-md">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="xulykhieunai.html">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-md text-label-md">Khiếu nại</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="baocaodoanhthu.html">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-md text-label-md">Báo cáo</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Admin</p>
+<p class="text-[11px] text-on-surface-variant truncate">Quản trị viên</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors" title="Đăng xuất">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- TopAppBar Component -->
+<header class="fixed top-0 right-0 left-[240px] h-16 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant/20 flex justify-between items-center px-8">
+<div class="flex items-center gap-4">
+<h2 class="font-title-sm text-title-sm text-on-surface">Quản lý ví &amp; Giao dịch</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-sm w-64 focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Tìm giao dịch, ID, người dùng..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="hover:bg-surface-container-high/50 rounded-full p-2 transition-colors relative">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-surface"></span>
+</button>
+<button class="hover:bg-surface-container-high/50 rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-[240px] pt-16 min-h-screen">
+<div class="p-8 space-y-6">
+
+  <!-- Filter Bar -->
+  <div class="flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 shadow-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-sm text-on-surface-variant">filter_list</span>
+        <select id="tx-type-filter" class="bg-transparent border-none text-body-sm focus:ring-0 outline-none cursor-pointer pr-1">
+          <option value="">Tất cả giao dịch</option>
+          <option value="NAP">Nạp tiền (TOPUP/DEPOSIT)</option>
+          <option value="THANHTOAN">Thanh toán (PAYMENT/CHARGE/FEE)</option>
+          <option value="HOAN">Hoàn tiền (REFUND)</option>
+          <option value="RUT">Rút tiền (WITHDRAWAL/WITHDRAW)</option>
+          <option value="THUNHAP">Thu nhập (EARNING/INCOME/COMMISSION)</option>
+          <option value="BONUS">Thưởng (BONUS)</option>
+        </select>
+      </div>
+      <span id="tx-count" class="text-body-sm text-on-surface-variant"></span>
+    </div>
+    <button class="bg-primary text-white px-5 py-2.5 rounded-xl font-label-bold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all text-body-sm">
+      <span class="material-symbols-outlined text-sm">download</span>
+      Xuat bao cao
+    </button>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-outline-variant/20">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-blue-500" style="font-variation-settings:'FILL' 1;font-size:20px">account_balance</span>
+        </div>
+        <p class="font-label-bold text-[10px] text-on-surface-variant uppercase tracking-wide leading-tight">Tong so du<br>he thong</p>
+      </div>
+      <h3 id="stat-total-balance" class="text-[20px] font-bold text-on-surface">&#x2014;</h3>
+    </div>
+    <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-outline-variant/20">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-primary" style="font-size:20px">swap_horiz</span>
+        </div>
+        <p class="font-label-bold text-[10px] text-on-surface-variant uppercase tracking-wide leading-tight">Giao dich<br>hom nay</p>
+      </div>
+      <h3 id="stat-today-tx" class="text-[20px] font-bold text-on-surface">&#x2014;</h3>
+    </div>
+    <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-outline-variant/20">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-yellow-600" style="font-size:20px">pending_actions</span>
+        </div>
+        <p class="font-label-bold text-[10px] text-on-surface-variant uppercase tracking-wide leading-tight">Cho duyet<br>rut tien</p>
+      </div>
+      <h3 id="stat-pending-wd" class="text-[20px] font-bold text-yellow-600">&#x2014;</h3>
+    </div>
+    <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-outline-variant/20">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-green-600" style="font-variation-settings:'FILL' 1;font-size:20px">payments</span>
+        </div>
+        <p class="font-label-bold text-[10px] text-on-surface-variant uppercase tracking-wide leading-tight">Thanh toan<br>thang nay</p>
+      </div>
+      <h3 id="stat-paid-month" class="text-[20px] font-bold text-green-600">&#x2014;</h3>
+    </div>
+  </div>
+
+  <!-- Yeu cau rut tien (full width, grid ngang) -->
+  <div class="bg-white rounded-2xl shadow-sm border border-outline-variant/20 overflow-hidden">
+    <div class="px-5 py-4 border-b border-outline-variant/20 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+        <h3 class="font-title-sm text-on-surface">Yeu cau rut tien Tasker</h3>
+      </div>
+      <span id="wd-badge" class="bg-primary text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">...</span>
+    </div>
+    <div id="wd-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+      <p class="text-body-sm text-on-surface-variant text-center py-4 col-span-full">Dang tai...</p>
+    </div>
+  </div>
+
+  <!-- Bang lich su giao dich (full width) -->
+  <div class="bg-white rounded-2xl shadow-sm border border-outline-variant/20 overflow-hidden">
+    <div class="px-5 py-4 border-b border-outline-variant/20 flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">receipt_long</span>
+      <h3 class="font-title-sm text-on-surface">Lich su giao dich</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-surface-container-low/70 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+            <th class="px-5 py-3 border-b border-outline-variant/20">Ma GD</th>
+            <th class="px-5 py-3 border-b border-outline-variant/20">Nguoi dung</th>
+            <th class="px-5 py-3 border-b border-outline-variant/20">Loai</th>
+            <th class="px-5 py-3 border-b border-outline-variant/20">So tien</th>
+            <th class="px-5 py-3 border-b border-outline-variant/20">Trang thai</th>
+            <th class="px-5 py-3 border-b border-outline-variant/20">Thoi gian</th>
+          </tr>
+        </thead>
+        <tbody id="tx-tbody" class="divide-y divide-outline-variant/10 text-body-sm">
+          <tr><td colspan="6" class="text-center py-16 text-on-surface-variant">
+            <span class="material-symbols-outlined text-5xl block mb-3 opacity-20">hourglass_empty</span>
+            Dang tai du lieu...
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</main>
+<!-- CHIOI-JS-INJECT -->
+<script>
+(function() {
+
+  // ---- 1. TABS ----
+  document.querySelectorAll('[data-tab-group]').forEach(function(tabGroup) {
+    var groupName = tabGroup.getAttribute('data-tab-group');
+    tabGroup.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-tab]');
+      if (!btn) return;
+      var tabId = btn.getAttribute('data-tab');
+      // Deactivate all tabs in group
+      document.querySelectorAll('[data-tab-group="' + groupName + '"] [data-tab]').forEach(function(t) {
+        t.classList.remove('text-primary', 'border-primary', 'border-b-2', 'font-semibold', 'bg-secondary-container/10');
+        t.classList.add('text-on-surface-variant');
+      });
+      // Activate clicked tab
+      btn.classList.add('text-primary', 'border-primary', 'border-b-2', 'font-semibold');
+      btn.classList.remove('text-on-surface-variant');
+      // Hide all panes
+      document.querySelectorAll('[data-tab-pane]').forEach(function(p) {
+        p.classList.add('hidden');
+      });
+      // Show target pane
+      var pane = document.querySelector('[data-tab-pane="' + tabId + '"]');
+      if (pane) pane.classList.remove('hidden');
+    });
+  });
+
+  // ---- 2. CLOSE ALL MODALS/PANELS ON LOAD ----
+  document.querySelectorAll('[data-modal], [data-panel]').forEach(function(el) {
+    el.classList.add('hidden');
+  });
+  // Also hide any element with class that suggests it's a modal overlay
+  document.querySelectorAll('.fixed.inset-0, [id*="modal"], [id*="overlay"], [id*="detail-panel"], [id*="slide-panel"]').forEach(function(el) {
+    // Only hide if it's a modal/overlay type (has backdrop-like styling or z-50+)
+    if (el.classList.contains('inset-0') || el.id.toLowerCase().includes('modal') || el.id.toLowerCase().includes('overlay') || el.id.toLowerCase().includes('panel')) {
+      el.classList.add('hidden');
+    }
+  });
+
+  // ---- 3. TOGGLE PANELS/MODALS ----
+  // Open: data-open="target-id"
+  document.querySelectorAll('[data-open]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var target = document.getElementById(btn.getAttribute('data-open'));
+      if (target) {
+        target.classList.remove('hidden');
+        // animate slide-in
+        target.style.animation = 'slideIn 0.2s ease';
+      }
+    });
+  });
+
+  // Close: data-close="target-id" OR data-close-self
+  document.querySelectorAll('[data-close]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var target = document.getElementById(btn.getAttribute('data-close'));
+      if (target) target.classList.add('hidden');
+    });
+  });
+  document.querySelectorAll('[data-close-self]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var modal = btn.closest('[data-modal], [data-panel], .fixed.inset-0');
+      if (modal) modal.classList.add('hidden');
+    });
+  });
+
+  // Click backdrop to close
+  document.querySelectorAll('[data-modal]').forEach(function(modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
+  });
+
+  // ---- 4. TABLE SEARCH FILTER ----
+  document.querySelectorAll('[data-search-table]').forEach(function(input) {
+    var tableId = input.getAttribute('data-search-table');
+    input.addEventListener('input', function() {
+      var q = input.value.toLowerCase().trim();
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = q === '' || text.includes(q) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- 5. CONFIRM ACTION BUTTONS ----
+  document.querySelectorAll('[data-confirm]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var msg = btn.getAttribute('data-confirm') || 'Bạn có chắc chắn không?';
+      if (!confirm(msg)) e.preventDefault();
+    });
+  });
+
+  // ---- 6. STATUS BADGE TOGGLE ----
+  document.querySelectorAll('[data-approve]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var row = btn.closest('tr, [data-item]');
+      if (row) {
+        var badge = row.querySelector('[data-status]');
+        if (badge) {
+          badge.textContent = 'Đã duyệt';
+          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-green-100 text-green-700';
+        }
+        btn.disabled = true;
+        btn.textContent = 'Đã duyệt';
+        btn.className = btn.className + ' opacity-50 cursor-not-allowed';
+        var rejectBtn = row.querySelector('[data-reject]');
+        if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.className += ' opacity-50 cursor-not-allowed'; }
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-reject]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (!confirm('Từ chối người dùng này?')) return;
+      var row = btn.closest('tr, [data-item]');
+      if (row) {
+        var badge = row.querySelector('[data-status]');
+        if (badge) {
+          badge.textContent = 'Đã từ chối';
+          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-red-100 text-red-700';
+        }
+        btn.disabled = true;
+        btn.textContent = 'Đã từ chối';
+        btn.className += ' opacity-50 cursor-not-allowed';
+        var approveBtn = row.querySelector('[data-approve]');
+        if (approveBtn) { approveBtn.disabled = true; approveBtn.className += ' opacity-50 cursor-not-allowed'; }
+      }
+    });
+  });
+
+  // ---- 7. DROPDOWN FILTER (visual) ----
+  document.querySelectorAll('[data-filter-col]').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      var col = parseInt(sel.getAttribute('data-filter-col'));
+      var val = sel.value.toLowerCase();
+      var tableId = sel.getAttribute('data-filter-table');
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        var cell = row.cells[col];
+        var text = cell ? cell.textContent.toLowerCase() : '';
+        row.style.display = val === '' || val === 'all' || text.includes(val) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- 8. INBOX: click conversation row to show chat ----
+  document.querySelectorAll('[data-conversation]').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('[data-conversation]').forEach(function(i) {
+        i.classList.remove('bg-primary-container/15', 'border-l-4', 'border-primary');
+      });
+      item.classList.add('bg-primary-container/15', 'border-l-4', 'border-primary');
+      // Remove unread bold
+      item.classList.remove('font-semibold');
+      var chatPanel = document.getElementById('chat-panel');
+      var emptyState = document.getElementById('chat-empty');
+      if (chatPanel) chatPanel.classList.remove('hidden');
+      if (emptyState) emptyState.classList.add('hidden');
+    });
+  });
+
+  // ---- 9. SEND MESSAGE (Inbox) ----
+  var sendBtn = document.getElementById('send-msg-btn');
+  var msgInput = document.getElementById('msg-input');
+  var chatMessages = document.getElementById('chat-messages');
+  if (sendBtn && msgInput && chatMessages) {
+    function sendMessage() {
+      var text = msgInput.value.trim();
+      if (!text) return;
+      var bubble = document.createElement('div');
+      bubble.className = 'flex justify-end';
+      bubble.innerHTML = '<div class="max-w-[70%] bg-primary-container text-on-primary-container rounded-2xl rounded-br-sm px-4 py-2 text-sm">' + text + '<div class="text-[10px] opacity-60 mt-1 text-right">Vừa xong</div></div>';
+      chatMessages.appendChild(bubble);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      msgInput.value = '';
+    }
+    sendBtn.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+  }
+
+  // ---- 10. SLIDE-IN ANIMATION ----
+  var style = document.createElement('style');
+  style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }';
+  document.head.appendChild(style);
+
+})();
+</script><!-- END-CHIOI-JS-INJECT -->
+
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('../Khachhang/dangnhap.html')) return;
+
+  // ---- Helpers ----
+  function fmtVND(n) {
+    n = Math.abs(Number(n || 0));
+    if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + ' Tđ';
+    if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'Mđ';
+    return n.toLocaleString('vi-VN') + 'đ';
+  }
+  function fmtVNDFull(n) {
+    return Math.abs(Number(n || 0)).toLocaleString('vi-VN') + 'đ';
+  }
+  function fmtDT(d) {
+    if (!d) return '—';
+    var dt = new Date(d);
+    return dt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' - ' +
+           dt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+  }
+
+  var TYPE_MAP = {
+    // Standard types
+    'TOPUP':      { label: 'Nạp tiền',    cls: 'bg-green-100 text-green-700' },
+    'DEPOSIT':    { label: 'Nạp tiền',    cls: 'bg-green-100 text-green-700' },
+    'PAYMENT':    { label: 'Thanh toán', cls: 'bg-blue-100 text-blue-700' },
+    'CHARGE':     { label: 'Thanh toán', cls: 'bg-blue-100 text-blue-700' },
+    'REFUND':     { label: 'Hoàn tiền',  cls: 'bg-yellow-100 text-yellow-700' },
+    'WITHDRAWAL': { label: 'Rút tiền',  cls: 'bg-purple-100 text-purple-700' },
+    'WITHDRAW':   { label: 'Rút tiền',  cls: 'bg-purple-100 text-purple-700' },
+    'EARNING':    { label: 'Thu nhập',  cls: 'bg-teal-100 text-teal-700' },
+    'INCOME':     { label: 'Thu nhập',  cls: 'bg-teal-100 text-teal-700' },
+    'FEE':        { label: 'Phí dịch vụ', cls: 'bg-orange-100 text-orange-700' },
+    'COMMISSION': { label: 'Hoa hồng', cls: 'bg-indigo-100 text-indigo-700' },
+    'TRANSFER':   { label: 'Chuyển tiền', cls: 'bg-pink-100 text-pink-700' },
+    'BONUS':      { label: 'Thưởng',     cls: 'bg-amber-100 text-amber-700' },
+  };
+  var STATUS_MAP = {
+    'COMPLETED': { dot: 'bg-green-500', label: 'Thành công' },
+    'SUCCESS':   { dot: 'bg-green-500', label: 'Thành công' },
+    'PENDING':   { dot: 'bg-orange-400', label: 'Đang xử lý' },
+    'PROCESSING':{ dot: 'bg-orange-400', label: 'Đang xử lý' },
+    'FAILED':    { dot: 'bg-red-500', label: 'Thất bại' },
+    'CANCELLED': { dot: 'bg-gray-400', label: 'Đã hủy' },
+  };
+
+  var allTransactions = [];
+
+  // ---- Render transaction table ----
+  function renderTxTable(txs) {
+    var tbody = document.getElementById('tx-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    if (!txs || txs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-12 text-on-surface-variant"><span class="material-symbols-outlined text-4xl block mb-2 opacity-20">inbox</span>Không có giao dịch nào</td></tr>';
+      return;
+    }
+    txs.forEach(function(tx, idx) {
+      var user = tx.wallets && tx.wallets.users ? tx.wallets.users : null;
+      var userName = user ? user.full_name : 'Người dùng #' + tx.wallet_id;
+      var typeInfo = TYPE_MAP[tx.type] || { label: tx.type, cls: 'bg-gray-100 text-gray-700' };
+      var statusInfo = STATUS_MAP[tx.status] || { dot: 'bg-gray-400', label: tx.status };
+      var isCredit = tx.type === 'TOPUP' || tx.type === 'REFUND' || tx.type === 'EARNING';
+      var amtClass = isCredit ? 'text-green-600 font-bold' : 'text-error font-bold';
+      var amtPrefix = isCredit ? '+' : '-';
+      var txCode = tx.transaction_code ? tx.transaction_code.substring(0, 16) + (tx.transaction_code.length > 16 ? '...' : '') : ('#TX' + tx.transaction_id);
+
+      var tr = document.createElement('tr');
+      tr.className = (idx % 2 ? 'bg-surface-container-low/30 ' : '') + 'hover:bg-primary/5 transition-colors';
+      tr.innerHTML =
+        '<td class="px-5 py-3 font-mono text-[11px] text-on-surface-variant">' + txCode + '</td>' +
+        '<td class="px-5 py-3"><div class="flex items-center gap-2.5">' +
+          '<div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">' +
+            '<span class="material-symbols-outlined text-primary" style="font-size:14px">person</span></div>' +
+          '<div><p class="text-body-sm font-medium leading-tight">' + userName + '</p>' +
+          (user ? '<p class="text-[10px] text-on-surface-variant">' + user.phone + '</p>' : '') +
+          '</div></div></td>' +
+        '<td class="px-5 py-3"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ' + typeInfo.cls + '">' + typeInfo.label + '</span></td>' +
+        '<td class="px-5 py-3 ' + amtClass + '">' + amtPrefix + fmtVNDFull(tx.amount) + '</td>' +
+        '<td class="px-5 py-3"><div class="flex items-center gap-1.5 text-body-sm"><span class="w-1.5 h-1.5 rounded-full ' + statusInfo.dot + '"></span>' + statusInfo.label + '</div></td>' +
+        '<td class="px-5 py-3 text-on-surface-variant text-[12px]">' + fmtDT(tx.created_at) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ---- Filter ----
+  var GROUP_FILTER = {
+    'NAP':      ['TOPUP', 'DEPOSIT'],
+    'THANHTOAN':['PAYMENT', 'CHARGE', 'FEE'],
+    'HOAN':     ['REFUND'],
+    'RUT':      ['WITHDRAWAL', 'WITHDRAW'],
+    'THUNHAP':  ['EARNING', 'INCOME', 'COMMISSION'],
+    'BONUS':    ['BONUS'],
+  };
+
+  function applyFilter() {
+    var val = (document.getElementById('tx-type-filter') || {}).value || '';
+    var filtered;
+    if (!val) {
+      filtered = allTransactions;
+    } else if (GROUP_FILTER[val]) {
+      var allowed = GROUP_FILTER[val];
+      filtered = allTransactions.filter(function(t) { return allowed.indexOf(t.type) !== -1; });
+    } else {
+      filtered = allTransactions.filter(function(t) { return t.type === val; });
+    }
+    renderTxTable(filtered);
+    var countEl = document.getElementById('tx-count');
+    if (countEl) countEl.textContent = 'Hiển thị ' + filtered.length + ' / ' + allTransactions.length + ' giao dịch';
+  }
+
+  var filterSelect = document.getElementById('tx-type-filter');
+  if (filterSelect) filterSelect.addEventListener('change', applyFilter);
+
+  // ---- Search ----
+  var searchInput = document.querySelector('input[placeholder*="Tìm giao dịch"]');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      var q = searchInput.value.toLowerCase();
+      var filtered = allTransactions.filter(function(t) {
+        var user = t.wallets && t.wallets.users;
+        return !q ||
+          (t.transaction_code && t.transaction_code.toLowerCase().includes(q)) ||
+          (user && user.full_name && user.full_name.toLowerCase().includes(q)) ||
+          (user && user.phone && user.phone.includes(q));
+      });
+      renderTxTable(filtered);
+    });
+  }
+
+  // ---- Load all ----
+  showLoading();
+  try {
+    var [stats, txs, withdrawals] = await Promise.all([
+      apiFetch('/api/admin/wallet-stats'),
+      apiFetch('/api/admin/transactions'),
+      apiFetch('/api/admin/withdrawals')
+    ]);
+    hideLoading();
+    allTransactions = txs || [];
+
+    // Update stat cards
+    var elTotalBal = document.getElementById('stat-total-balance');
+    var elTodayTx  = document.getElementById('stat-today-tx');
+    var elPending   = document.getElementById('stat-pending-wd');
+    var elPaid      = document.getElementById('stat-paid-month');
+    if (elTotalBal) elTotalBal.textContent = fmtVND(stats.totalBalance);
+    if (elTodayTx)  elTodayTx.textContent  = stats.todayTransactions + ' GD';
+    if (elPending)  elPending.textContent   = fmtVND(stats.pendingWithdrawal);
+    if (elPaid)     elPaid.textContent      = fmtVND(stats.paidThisMonth);
+
+    // Render với filter hiện tại
+    applyFilter();
+
+    // ---- Withdrawals ----
+    var pendingWd = (withdrawals || []).filter(function(w) { return w.status === 'PENDING'; });
+    var wdBadge = document.getElementById('wd-badge');
+    if (wdBadge) wdBadge.textContent = pendingWd.length + ' mới';
+
+    var wdContainer = document.getElementById('wd-container');
+    if (wdContainer) {
+      wdContainer.innerHTML = '';
+      if (pendingWd.length === 0) {
+        wdContainer.innerHTML = '<p class="text-body-sm text-on-surface-variant text-center py-6">Không có yêu cầu rút tiền nào</p>';
+      } else {
+        pendingWd.slice(0, 6).forEach(function(wd) {
+          var userName = (wd.wallets && wd.wallets.users && wd.wallets.users.full_name) || 'Tasker #' + wd.wallet_id;
+          var walletBalance = (wd.wallets && wd.wallets.balance) ? fmtVNDFull(wd.wallets.balance) : '—';
+          var reqTime = wd.created_at ? fmtDT(wd.created_at) : '—';
+          var item = document.createElement('div');
+          item.className = 'bg-surface-container-low/40 border border-outline-variant/20 rounded-xl p-4 flex flex-col gap-3 hover:bg-surface-container-low transition-colors';
+          item.innerHTML =
+            '<div class="flex items-center justify-between">' +
+              '<div class="flex items-center gap-2.5">' +
+                '<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary" style="font-size:18px">person</span></div>' +
+                '<div><p class="font-label-bold text-on-surface text-[13px]">' + userName + '</p>' +
+                '<p class="text-[10px] text-on-surface-variant">Dư ví: ' + walletBalance + '</p></div>' +
+              '</div>' +
+              '<div class="text-right"><p class="text-primary font-bold text-[16px]">' + fmtVNDFull(wd.amount) + '</p>' +
+              '<p class="text-[10px] text-on-surface-variant">' + reqTime + '</p></div>' +
+            '</div>' +
+            '<div class="flex gap-2">' +
+              '<button class="wd-approve flex-1 bg-green-600 text-white py-1.5 rounded-lg font-label-bold text-[11px] hover:bg-green-700 transition-colors flex items-center justify-center gap-1" data-wid="' + wd.transaction_id + '"><span class="material-symbols-outlined" style="font-size:14px">check_circle</span>Duyệt rút</button>' +
+              '<button class="wd-reject border border-error text-error py-1.5 px-3 rounded-lg font-label-bold text-[11px] hover:bg-error/5 transition-colors flex items-center justify-center gap-1" data-wid="' + wd.transaction_id + '"><span class="material-symbols-outlined" style="font-size:14px">cancel</span>Từ chối</button>' +
+            '</div>';
+          wdContainer.appendChild(item);
+        });
+
+        // Events
+        wdContainer.querySelectorAll('.wd-approve').forEach(function(btn) {
+          btn.addEventListener('click', async function() {
+            if (!confirm('Duyệt yêu cầu rút tiền này?')) return;
+            var wid = btn.getAttribute('data-wid');
+            showLoading();
+            try {
+              await apiFetch('/api/admin/withdrawals/' + wid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'COMPLETED' }) });
+              hideLoading();
+              showToastMsg('✅ Đã duyệt yêu cầu rút tiền!');
+              setTimeout(function() { location.reload(); }, 1200);
+            } catch(e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+          });
+        });
+        wdContainer.querySelectorAll('.wd-reject').forEach(function(btn) {
+          btn.addEventListener('click', async function() {
+            if (!confirm('Từ chối yêu cầu rút tiền này?')) return;
+            var wid = btn.getAttribute('data-wid');
+            showLoading();
+            try {
+              await apiFetch('/api/admin/withdrawals/' + wid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'FAILED' }) });
+              hideLoading();
+              showToastMsg('✅ Đã từ chối yêu cầu!');
+              setTimeout(function() { location.reload(); }, 1200);
+            } catch(e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+          });
+        });
+      }
+    }
+
+    // Logout
+    var logoutBtn = document.querySelector('button[title="Đăng xuất"]');
+    if (logoutBtn) logoutBtn.addEventListener('click', function() { ChiOiAuth.logout('../Khachhang/dangnhap.html'); });
+
+  } catch(e) {
+    hideLoading();
+    showToastMsg('❌ Lỗi tải dữ liệu: ' + e.message);
+    console.error('[Ví]', e);
+  }
+})();
+</script>
+</body></html>

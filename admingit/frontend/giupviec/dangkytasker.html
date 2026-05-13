@@ -1,0 +1,223 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Đăng ký Tasker - Chị Ơi!</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#794226",
+                        "on-surface-variant": "#584238",
+                        "outline": "#8b7266",
+                        "on-background": "#241914",
+                        "on-tertiary-fixed": "#001f28",
+                        "tertiary-fixed": "#b8eaff",
+                        "secondary-fixed-dim": "#ffb693",
+                        "primary-container": "#ff7e36",
+                        "on-surface": "#241914",
+                        "inverse-primary": "#ffb693",
+                        "secondary": "#895032",
+                        "inverse-on-surface": "#ffede6",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "surface-variant": "#f4ded5",
+                        "surface-dim": "#ecd6cc",
+                        "surface-container-highest": "#f4ded5",
+                        "on-secondary-fixed-variant": "#6d391d",
+                        "tertiary-container": "#00b1da",
+                        "error": "#ba1a1a",
+                        "tertiary": "#006780",
+                        "surface-bright": "#fff8f6",
+                        "primary-fixed-dim": "#ffb693",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#ffdbcc",
+                        "on-primary-fixed": "#351000",
+                        "on-primary-container": "#642600",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#a04100",
+                        "on-secondary": "#ffffff",
+                        "background": "#fff8f6",
+                        "primary-fixed": "#ffdbcc",
+                        "inverse-surface": "#3b2e28",
+                        "on-secondary-fixed": "#351000",
+                        "surface-container": "#ffeae1",
+                        "primary": "#a04100",
+                        "outline-variant": "#dfc0b3",
+                        "surface-container-low": "#fff1eb",
+                        "surface-container-high": "#fae4da",
+                        "tertiary-fixed-dim": "#52d5ff",
+                        "on-tertiary-container": "#003f4f",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "surface": "#fff8f6",
+                        "on-tertiary-fixed-variant": "#004d61",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "lg": "24px",
+                        "container-padding": "16px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "stack-gap": "12px",
+                        "sm": "8px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Be Vietnam Pro"],
+                        "label-caps": ["Be Vietnam Pro"],
+                        "title-sm": ["Be Vietnam Pro"],
+                        "display-lg": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #fff8f6; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .primary-gradient { background: linear-gradient(180deg, #a04100 0%, #ff7e36 100%); }
+        .card-shadow { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+          body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .teal-gradient {
+            background: linear-gradient(135deg, #00b1da 0%, #006780 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth transitions */
+        a, button { transition: all 0.2s ease; }
+        /* Card hover effect */
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-on-background">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0" style="background: linear-gradient(180deg, rgba(255,126,54,0.9) 0%, rgba(255,126,54,0) 100%); pointer-events: none;"></div>
+
+<!-- Header: TopAppBar Implementation -->
+<header class="   sticky top-0 z-50 transition-all duration-200 bg-transparent relative z-40">
+<div class="flex justify-between items-center w-full px-container-padding h-16">
+<button class="active:scale-95 transition-all duration-200">
+<span class="material-symbols-outlined text-white">arrow_back</span>
+</button>
+<h1 class="text-headline-md font-headline-md font-extrabold text-white">Đăng ký Tasker</h1>
+<button class="active:scale-95 transition-all duration-200">
+<span class="material-symbols-outlined text-white">chat_bubble</span>
+</button>
+</div>
+<!-- Extended Gradient Branding -->
+<div class="h-12 primary-gradient w-full"></div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow px-container-padding  pb-32 relative z-10">
+<div class="space-y-stack-gap">
+<!-- Welcome Info Section -->
+<div class="bg-surface-container-lowest p-lg rounded-xl card-shadow border border-surface-container">
+<h2 class="text-title-sm font-title-sm text-primary mb-xs">Trở thành đối tác</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Hãy điền thông tin bên dưới để bắt đầu hành trình cùng Chị Ơi! chuyên nghiệp và tận tâm.</p>
+</div>
+<!-- Registration Form -->
+<form class="space-y-lg">
+<!-- Personal Info Group -->
+<div class="space-y-md">
+<div>
+<label class="block text-label-caps font-label-caps text-on-surface-variant mb-xs ml-base">HỌ VÀ TÊN (*)</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl px-md py-md text-body-lg font-body-lg focus:ring-2 focus:ring-primary-container card-shadow placeholder:text-outline-variant" placeholder="Nhập họ và tên đầy đủ" type="text"/>
+</div>
+<div>
+<label class="block text-label-caps font-label-caps text-on-surface-variant mb-xs ml-base">SỐ CCCD (*)</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl px-md py-md text-body-lg font-body-lg focus:ring-2 focus:ring-primary-container card-shadow placeholder:text-outline-variant" placeholder="Nhập số căn cước công dân" type="text"/>
+</div>
+</div>
+<!-- Service Selection -->
+<div class="space-y-sm">
+<label class="block text-label-caps font-label-caps text-on-surface-variant ml-base">DỊCH VỤ ĐĂNG KÝ</label>
+<div class="flex flex-wrap gap-sm">
+<button class="px-lg py-sm rounded-full primary-gradient text-on-surface text-label-caps font-label-caps shadow-md active:scale-95 transition-all" type="button">Dọn nhà</button>
+<button class="px-lg py-sm rounded-full bg-surface-container-high text-on-secondarybg-surface-container text-label-caps font-label-caps border border-outline-variant hover:bg-secondary-fixed-dim/20 transition-all" type="button">Trông trẻ</button>
+<button class="px-lg py-sm rounded-full bg-surface-container-high text-on-secondarybg-surface-container text-label-caps font-label-caps border border-outline-variant hover:bg-secondary-fixed-dim/20 transition-all" type="button">Mua hộ WinMart</button>
+</div>
+</div>
+<!-- eKYC Section -->
+<div class="space-y-sm">
+<label class="block text-label-caps font-label-caps text-on-surface-variant ml-base">XÁC THỰC DANH TÍNH</label>
+<div class="relative overflow-hidden group">
+<button class="w-full aspect-video bg-surface-container-lowest border-2 border-dashed border-primary-container/30 rounded-xl flex flex-col items-center justify-center p-lg gap-sm active:scale-[0.98] transition-all card-shadow" type="button">
+<div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">person_search</span>
+</div>
+<span class="text-title-sm font-title-sm text-on-surfacebg-surface-container text-center px-lg">Mở Camera xác thực khuôn mặt và chụp CCCD</span>
+<span class="text-body-sm font-body-sm text-outline">Quy trình tự động mất khoảng 2 phút</span>
+</button>
+</div>
+</div>
+<!-- Documents Section -->
+<div class="space-y-sm">
+<label class="block text-label-caps font-label-caps text-on-surface-variant ml-base">HỒ SƠ PHÁP LÝ</label>
+<div class="bg-surface-container-lowest p-md rounded-xl card-shadow border border-surface-container flex items-center justify-between">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">description</span>
+<div>
+<p class="text-body-lg font-title-sm text-on-surface">Lý lịch tư pháp số 1 (*)</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Yêu cầu bản gốc hoặc bản sao công chứng</p>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full bg-primary-fixed-dim/20 flex items-center justify-center text-primary hover: hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined">upload</span>
+</button>
+</div>
+</div>
+<!-- Compliance Notice -->
+<div class="flex gap-sm items-start px-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Tôi cam kết các thông tin cung cấp là chính xác và hoàn toàn chịu trách nhiệm trước pháp luật.</p>
+</div>
+</form>
+</div>
+</main>
+<!-- Footer: FAB & Global Action -->
+<div class="fixed bottom-0 left-0 right-0 pbg-surface-container-padding /80 backdrop-blur-md">
+<div class="max-w-md mx-auto w-full">
+<button class="w-full py-md rounded-full primary-gradient text-on-surface font-headline-md shadow-lg active:scale-95 transition-all duration-200">
+                Gửi hồ sơ
+            </button>
+</div>
+</div>
+<!-- Navigation Shell (BottomNavBar Placeholder context) -->
+<!-- Note: Following the rule to suppress navigation if page has "Back" action implying temporary departure. Content priority is form focus. -->
+</body></html>
