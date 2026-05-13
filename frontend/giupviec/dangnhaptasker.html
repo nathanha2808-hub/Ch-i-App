@@ -204,7 +204,42 @@ if (toggleBtn) {
   });
 }
 
+// Cooldown helper — chống 429 ThrottlerException loop (server limit 10/min/IP)
+var COOLDOWN_KEY = 'chioi_tasker_login_cooldown_until';
+var DEFAULT_BTN_HTML = '<span class="text-white font-title-sm text-title-sm font-bold">ĐĂNG NHẬP</span>';
+function getRemainingCooldown() {
+  var until = parseInt(sessionStorage.getItem(COOLDOWN_KEY) || '0');
+  return Math.max(0, until - Date.now());
+}
+function startCountdown(seconds) {
+  sessionStorage.setItem(COOLDOWN_KEY, Date.now() + seconds * 1000);
+  tickCountdown();
+}
+function tickCountdown() {
+  var btn = document.getElementById('loginBtn');
+  var errorEl = document.getElementById('errorMsg');
+  if (!btn || !errorEl) return;
+  var remaining = getRemainingCooldown();
+  if (remaining <= 0) {
+    btn.disabled = false;
+    btn.innerHTML = DEFAULT_BTN_HTML;
+    sessionStorage.removeItem(COOLDOWN_KEY);
+    errorEl.style.display = 'none';
+    return;
+  }
+  var secs = Math.ceil(remaining / 1000);
+  btn.disabled = true;
+  btn.innerHTML = '<span class="text-white font-title-sm text-title-sm font-bold">Đợi ' + secs + 's...</span>';
+  errorEl.textContent = '⏳ Đã thử quá nhiều lần. Đợi ' + secs + 's rồi thử lại.';
+  errorEl.style.display = 'block';
+  setTimeout(tickCountdown, 1000);
+}
+// Resume cooldown on page load
+if (getRemainingCooldown() > 0) setTimeout(tickCountdown, 100);
+
 async function handleTaskerLogin() {
+  if (getRemainingCooldown() > 0) { tickCountdown(); return; }
+
   var phone = document.getElementById('phoneInput').value.trim();
   var pass = document.getElementById('passwordInput').value.trim();
   var errorEl = document.getElementById('errorMsg');
@@ -254,10 +289,15 @@ async function handleTaskerLogin() {
       return;
     }
   } catch (err) {
+    // 429 ThrottlerException → start 60s cooldown
+    if (err.message && (err.message.indexOf('Too Many Requests') >= 0 || err.message.indexOf('ThrottlerException') >= 0)) {
+      startCountdown(60);
+      return;
+    }
     errorEl.textContent = err.message || 'Sai số điện thoại hoặc mật khẩu.';
     errorEl.style.display = 'block';
     loginBtn.disabled = false;
-    loginBtn.innerHTML = '<span class="text-white font-title-sm text-title-sm font-bold">ĐĂNG NHẬP</span>';
+    loginBtn.innerHTML = DEFAULT_BTN_HTML;
   }
 }
 
