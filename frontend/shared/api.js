@@ -9,7 +9,10 @@
 // ==============================================================
 // 1. CẤU HÌNH
 // ==============================================================
-const API_BASE = 'http://127.0.0.1:3000'; // Backend NestJS chạy ở port 3000
+// API_BASE = '' → dùng same-origin (current host). Yêu cầu nginx có proxy /api/ + /socket.io/.
+// Local dev: set window.__CHIOI_API_BASE__ = 'http://127.0.0.1:3033' trước khi load script.
+// Production khi api.chioi.vn có DNS riêng: set 'https://api.chioi.vn'.
+const API_BASE = (typeof window !== 'undefined' && window.__CHIOI_API_BASE__) || '';
 
 // ==============================================================
 // 2. TOKEN MANAGEMENT
