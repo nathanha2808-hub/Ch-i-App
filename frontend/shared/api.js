@@ -7,9 +7,11 @@
  */
 
 // ==============================================================
-// 1. CẤU HÌNH
+// 1. CẤU HÌNH - TỰ ĐỘNG DETECT IP (LAN hoặc localhost)
 // ==============================================================
-const API_BASE = 'http://127.0.0.1:3000'; // Backend NestJS chạy ở port 3000
+// Tự lấy hostname của trang đang chạy → backend cùng IP, port 3000
+// Hoạt động cả khi dùng localhost VÀ khi truy cập qua IP LAN (WiFi)
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:3000`;
 
 // ==============================================================
 // 2. TOKEN MANAGEMENT

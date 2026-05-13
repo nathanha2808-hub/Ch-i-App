@@ -109,17 +109,44 @@ let ApiController = class ApiController {
     async getAdminUsers() {
         return this.apiService.getAdminUsers();
     }
+    async updateUserStatus(req, id, status) {
+        return this.apiService.updateUserStatus(req.user.userId, id, status);
+    }
     async getAdminOrders() {
         return this.apiService.getAdminOrders();
     }
     async adminCancelOrder(req, id) {
         return this.apiService.adminCancelOrder(req.user.userId, id);
     }
-    async getAdminTickets() {
-        return this.apiService.getAdminTickets();
+    async adminAssignTasker(req, id, taskerId) {
+        return this.apiService.adminAssignTasker(req.user.userId, id, taskerId);
+    }
+    async adminResolveOrder(req, id, note) {
+        return this.apiService.adminResolveOrder(req.user.userId, id, note);
+    }
+    async getAdminInboxStats() {
+        return this.apiService.getAdminInboxStats();
+    }
+    async getAdminTicketsList(status, priority) {
+        return this.apiService.getAdminTickets(status, priority);
+    }
+    async getAdminTicketDetail(id) {
+        return this.apiService.getAdminTicket(id);
+    }
+    async updateAdminTicket(id, body) {
+        return this.apiService.updateAdminTicket(id, body);
     }
     async getAdminWithdrawals() {
         return this.apiService.getAdminWithdrawals();
+    }
+    async getAdminTransactions(type) {
+        return this.apiService.getAdminTransactions(type);
+    }
+    async getAdminWalletStats() {
+        return this.apiService.getAdminWalletStats();
+    }
+    async getAdminReportStats(period) {
+        return this.apiService.getAdminReportStats(period || '30d');
     }
 };
 exports.ApiController = ApiController;
@@ -375,6 +402,17 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ApiController.prototype, "getAdminUsers", null);
 __decorate([
+    (0, common_1.Patch)('admin/users/:id/status'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Khóa hoặc mở khóa tài khoản người dùng' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(2, (0, common_1.Body)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number, String]),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "updateUserStatus", null);
+__decorate([
     (0, common_1.Get)('admin/orders'),
     (0, roles_decorator_1.Roles)('ADMIN'),
     (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách Orders' }),
@@ -393,13 +431,64 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ApiController.prototype, "adminCancelOrder", null);
 __decorate([
-    (0, common_1.Get)('admin/tickets'),
+    (0, common_1.Patch)('admin/orders/:id/assign'),
     (0, roles_decorator_1.Roles)('ADMIN'),
-    (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách khiếu nại/hỗ trợ (UC-AD-07)' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Admin can thiệp gán Tasker thủ công' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(2, (0, common_1.Body)('tasker_id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number, Number]),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "adminAssignTasker", null);
+__decorate([
+    (0, common_1.Patch)('admin/orders/:id/resolve'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Admin đánh dấu đã xử lý can thiệp' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(2, (0, common_1.Body)('note')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number, String]),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "adminResolveOrder", null);
+__decorate([
+    (0, common_1.Get)('admin/tickets/stats'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Thống kê inbox (tổng, open, in_progress, resolved)' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], ApiController.prototype, "getAdminTickets", null);
+], ApiController.prototype, "getAdminInboxStats", null);
+__decorate([
+    (0, common_1.Get)('admin/tickets'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Danh sách ticket hỗ trợ (filter status/priority)' }),
+    __param(0, (0, common_1.Query)('status')),
+    __param(1, (0, common_1.Query)('priority')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "getAdminTicketsList", null);
+__decorate([
+    (0, common_1.Get)('admin/tickets/:id'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Chi tiết ticket + tin nhắn liên quan' }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "getAdminTicketDetail", null);
+__decorate([
+    (0, common_1.Patch)('admin/tickets/:id'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Cập nhật trạng thái / ưu tiên ticket' }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "updateAdminTicket", null);
 __decorate([
     (0, common_1.Get)('admin/withdrawals'),
     (0, roles_decorator_1.Roles)('ADMIN'),
@@ -408,6 +497,32 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ApiController.prototype, "getAdminWithdrawals", null);
+__decorate([
+    (0, common_1.Get)('admin/transactions'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy lịch sử giao dịch (có filter type, giới hạn 100)' }),
+    __param(0, (0, common_1.Query)('type')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "getAdminTransactions", null);
+__decorate([
+    (0, common_1.Get)('admin/wallet-stats'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Thống kê tổng hợp ví' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "getAdminWalletStats", null);
+__decorate([
+    (0, common_1.Get)('admin/report-stats'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, swagger_1.ApiOperation)({ summary: 'Báo cáo tổng hợp: doanh thu, đơn hàng, Tasker top, dịch vụ top, biểu đồ theo ngày' }),
+    __param(0, (0, common_1.Query)('period')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ApiController.prototype, "getAdminReportStats", null);
 exports.ApiController = ApiController = __decorate([
     (0, swagger_1.ApiTags)('Data (Dịch vụ, Gói, Lịch sử)'),
     (0, swagger_1.ApiBearerAuth)(),

@@ -295,12 +295,38 @@ let ApiService = class ApiService {
                 role: true,
                 status: true,
                 created_at: true,
-                taskers: true
+                taskers: true,
+                customers: { select: { default_address: true } }
             }
         });
     }
+    async updateUserStatus(adminId, userId, status) {
+        const allowed = ['ACTIVE', 'BANNED'];
+        if (!allowed.includes(status))
+            throw new common_1.BadRequestException('Trạng thái không hợp lệ');
+        const user = await this.prisma.users.update({
+            where: { user_id: userId },
+            data: { status, updated_at: new Date() },
+            select: { user_id: true, phone: true, full_name: true, role: true, status: true }
+        });
+        await this.prisma.admin_audit_logs.create({
+            data: {
+                admin_id: adminId,
+                action: status === 'BANNED' ? 'BAN_USER' : 'UNBAN_USER',
+                target_table: 'users',
+                target_id: userId,
+                new_data: { status }
+            }
+        });
+        return user;
+    }
     async getAdminOrders() {
         return this.prisma.orders.findMany({
+            include: {
+                services: true,
+                customers: { include: { users: true } },
+                taskers: { include: { users: true } }
+            },
             orderBy: { created_at: 'desc' },
             take: 100
         });
@@ -321,17 +347,239 @@ let ApiService = class ApiService {
         });
         return order;
     }
-    async getAdminTickets() {
-        return this.prisma.support_tickets.findMany({
-            include: { users: true },
-            orderBy: { created_at: 'desc' }
+    async adminAssignTasker(adminId, orderId, taskerId) {
+        const order = await this.prisma.orders.update({
+            where: { order_id: orderId },
+            data: {
+                tasker_id: taskerId,
+                status: 'ACCEPTED',
+                updated_at: new Date()
+            }
         });
+        await this.prisma.admin_audit_logs.create({
+            data: {
+                admin_id: adminId,
+                action: 'FORCE_ASSIGN_TASKER',
+                target_table: 'orders',
+                target_id: orderId,
+                new_data: { status: 'ACCEPTED', tasker_id: taskerId }
+            }
+        });
+        return order;
+    }
+    async adminResolveOrder(adminId, orderId, resolutionNote) {
+        await this.prisma.admin_audit_logs.create({
+            data: {
+                admin_id: adminId,
+                action: 'RESOLVE_INTERVENTION',
+                target_table: 'orders',
+                target_id: orderId,
+                new_data: { note: resolutionNote }
+            }
+        });
+        return { success: true, message: 'Đã lưu lịch sử can thiệp' };
+    }
+    async getAdminTickets(status, priority) {
+        const where = {};
+        if (status)
+            where.status = status;
+        if (priority)
+            where.priority = priority;
+        return this.prisma.support_tickets.findMany({
+            where,
+            orderBy: { created_at: 'desc' },
+            take: 100,
+            include: {
+                users: { select: { user_id: true, full_name: true, phone: true, email: true } },
+                orders: { select: { order_id: true, order_code: true, status: true } },
+                admins: { select: { admin_id: true } },
+            },
+        });
+    }
+    async getAdminTicket(ticketId) {
+        const ticket = await this.prisma.support_tickets.findUnique({
+            where: { ticket_id: ticketId },
+            include: {
+                users: { select: { user_id: true, full_name: true, phone: true, email: true } },
+                orders: { select: { order_id: true, order_code: true, status: true } },
+                admins: { select: { admin_id: true } },
+            },
+        });
+        let messages = [];
+        if (ticket?.order_id) {
+            messages = await this.prisma.messages.findMany({
+                where: { order_id: ticket.order_id },
+                orderBy: { created_at: 'asc' },
+                include: {
+                    users_messages_sender_idTousers: { select: { user_id: true, full_name: true, role: true } },
+                },
+                take: 50,
+            });
+        }
+        return { ticket, messages };
+    }
+    async updateAdminTicket(ticketId, data) {
+        return this.prisma.support_tickets.update({
+            where: { ticket_id: ticketId },
+            data: { ...data, updated_at: new Date() },
+        });
+    }
+    async getAdminInboxStats() {
+        const [total, open, inProgress, resolved] = await Promise.all([
+            this.prisma.support_tickets.count(),
+            this.prisma.support_tickets.count({ where: { status: 'OPEN' } }),
+            this.prisma.support_tickets.count({ where: { status: 'IN_PROGRESS' } }),
+            this.prisma.support_tickets.count({ where: { status: 'RESOLVED' } }),
+        ]);
+        return { total, open, inProgress, resolved };
     }
     async getAdminWithdrawals() {
         return this.prisma.transactions.findMany({
             where: { type: 'WITHDRAWAL' },
             orderBy: { created_at: 'desc' }
         });
+    }
+    async getAdminTransactions(type) {
+        const where = {};
+        if (type && type !== 'ALL')
+            where.type = type;
+        return this.prisma.transactions.findMany({
+            where,
+            include: {
+                wallets: {
+                    include: {
+                        users: { select: { user_id: true, full_name: true, phone: true, role: true } }
+                    }
+                },
+                orders: { select: { order_code: true } }
+            },
+            orderBy: { created_at: 'desc' },
+            take: 100
+        });
+    }
+    async getAdminWalletStats() {
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const [totalBalance, todayCount, pendingWithdrawal, paidThisMonth] = await Promise.all([
+            this.prisma.wallets.aggregate({ _sum: { balance: true } }),
+            this.prisma.transactions.count({ where: { created_at: { gte: startOfDay } } }),
+            this.prisma.transactions.aggregate({
+                where: { type: 'WITHDRAWAL', status: 'PENDING' },
+                _sum: { amount: true }
+            }),
+            this.prisma.transactions.aggregate({
+                where: { type: 'PAYMENT', status: 'COMPLETED', created_at: { gte: startOfMonth } },
+                _sum: { amount: true }
+            }),
+        ]);
+        return {
+            totalBalance: Number(totalBalance._sum.balance || 0),
+            todayTransactions: todayCount,
+            pendingWithdrawal: Number(pendingWithdrawal._sum.amount || 0),
+            paidThisMonth: Number(paidThisMonth._sum.amount || 0),
+        };
+    }
+    async getAdminReportStats(period = '30d') {
+        const now = new Date();
+        const days = period === '7d' ? 7 : period === '90d' ? 90 : 30;
+        const fromDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        const [totalOrders, completedOrders, cancelledOrders, pendingOrders, totalRevenue, totalUsers, totalTaskers, recentOrders, topServices, topTaskers, newUsersThisPeriod, ordersByDay,] = await Promise.all([
+            this.prisma.orders.count(),
+            this.prisma.orders.count({ where: { status: 'COMPLETED' } }),
+            this.prisma.orders.count({ where: { status: 'CANCELLED' } }),
+            this.prisma.orders.count({ where: { status: 'PENDING' } }),
+            this.prisma.orders.aggregate({ where: { status: 'COMPLETED' }, _sum: { total_price: true, platform_fee: true } }),
+            this.prisma.users.count(),
+            this.prisma.taskers.count(),
+            this.prisma.orders.findMany({
+                where: { created_at: { gte: fromDate } },
+                orderBy: { created_at: 'desc' },
+                take: 10,
+                include: {
+                    services: { select: { name: true } },
+                    customers: { include: { users: { select: { full_name: true } } } },
+                },
+            }),
+            this.prisma.orders.groupBy({
+                by: ['service_id'],
+                _count: { service_id: true },
+                _sum: { total_price: true },
+                orderBy: { _count: { service_id: 'desc' } },
+                take: 5,
+            }),
+            this.prisma.orders.groupBy({
+                by: ['tasker_id'],
+                where: { status: 'COMPLETED', tasker_id: { not: null } },
+                _count: { order_id: true },
+                _sum: { tasker_earnings: true },
+                orderBy: { _count: { order_id: 'desc' } },
+                take: 5,
+            }),
+            this.prisma.users.count({ where: { created_at: { gte: fromDate } } }),
+            this.prisma.orders.findMany({
+                where: { created_at: { gte: fromDate } },
+                select: { created_at: true, total_price: true, status: true },
+                orderBy: { created_at: 'asc' },
+            }),
+        ]);
+        const serviceIds = topServices.map(s => s.service_id);
+        const serviceNames = await this.prisma.services.findMany({
+            where: { service_id: { in: serviceIds } },
+            select: { service_id: true, name: true },
+        });
+        const svcMap = Object.fromEntries(serviceNames.map((s) => [s.service_id, s.name]));
+        const taskerIds = topTaskers.filter(t => t.tasker_id).map(t => t.tasker_id);
+        const taskerNames = await this.prisma.taskers.findMany({
+            where: { tasker_id: { in: taskerIds } },
+            include: { users: { select: { full_name: true } } },
+        });
+        const taskerMap = Object.fromEntries(taskerNames.map(t => [t.tasker_id, t.users?.full_name || 'Tasker #' + t.tasker_id]));
+        const dailyMap = {};
+        ordersByDay.forEach(o => {
+            const day = new Date(o.created_at).toISOString().slice(0, 10);
+            if (!dailyMap[day])
+                dailyMap[day] = { revenue: 0, orders: 0 };
+            dailyMap[day].orders++;
+            if (o.status === 'COMPLETED')
+                dailyMap[day].revenue += Number(o.total_price || 0);
+        });
+        const chartLabels = Object.keys(dailyMap).slice(-14);
+        const chartRevenue = chartLabels.map(d => dailyMap[d]?.revenue || 0);
+        const chartOrders = chartLabels.map(d => dailyMap[d]?.orders || 0);
+        return {
+            summary: {
+                totalOrders,
+                completedOrders,
+                cancelledOrders,
+                pendingOrders,
+                totalRevenue: Number(totalRevenue._sum.total_price || 0),
+                platformRevenue: Number(totalRevenue._sum.platform_fee || 0),
+                totalUsers,
+                totalTaskers,
+                newUsersThisPeriod,
+                completionRate: totalOrders > 0 ? Math.round((completedOrders / totalOrders) * 100) : 0,
+            },
+            chart: { labels: chartLabels, revenue: chartRevenue, orders: chartOrders },
+            topServices: topServices.map((s) => ({
+                name: svcMap[s.service_id] || 'Dich vu #' + s.service_id,
+                count: s._count.service_id,
+                revenue: Number(s._sum.total_price || 0),
+            })),
+            topTaskers: topTaskers.map((t) => ({
+                name: taskerMap[t.tasker_id] || 'Tasker #' + t.tasker_id,
+                orders: t._count.order_id,
+                earnings: Number(t._sum.tasker_earnings || 0),
+            })),
+            recentOrders: recentOrders.map((o) => ({
+                code: o.order_code,
+                service: o.services?.name,
+                customer: o.customers?.users?.full_name,
+                amount: Number(o.total_price),
+                status: o.status,
+                date: o.created_at,
+            })),
+        };
     }
     async getAvailableOrdersForTasker(taskerId) {
         const taskerServices = await this.prisma.tasker_services.findMany({
