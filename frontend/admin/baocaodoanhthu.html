@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Ch? Oi CMS - B�o c�o doanh thu</title>
+<title>Chị Ơi CMS - Báo cáo doanh thu</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -115,7 +115,7 @@
 <!-- Sidebar Navigation -->
 <aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-dim shadow-md flex flex-col py-stack_lg z-50">
 <div class="px-6 mb-8">
-<h1 class="font-display-lg text-display-lg text-primary">Ch? Oi</h1>
+<h1 class="font-display-lg text-display-lg text-primary">Chị Ơi</h1>
 <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin CMS</p>
 </div>
 <nav class="flex-1 px-3 space-y-1">
@@ -125,11 +125,11 @@
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydonhang.html">
 <span class="material-symbols-outlined">receipt_long</span>
-<span class="font-label-md text-label-md">�on h�ng</span>
+<span class="font-label-md text-label-md">Đơn hàng</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="canthiepdonhang.html">
 <span class="material-symbols-outlined">edit_note</span>
-<span class="font-label-md text-label-md">Can thi?p</span>
+<span class="font-label-md text-label-md">Can thiệp</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlytasker.html">
 <span class="material-symbols-outlined">engineering</span>
@@ -137,11 +137,11 @@
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlycudan.html">
 <span class="material-symbols-outlined">groups</span>
-<span class="font-label-md text-label-md">Cu d�n</span>
+<span class="font-label-md text-label-md">Cư dân</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
 <span class="material-symbols-outlined">account_balance_wallet</span>
-<span class="font-label-md text-label-md">Qu?n l� v�</span>
+<span class="font-label-md text-label-md">Quản lý ví</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
 <span class="material-symbols-outlined">inbox</span>
@@ -149,11 +149,11 @@
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="xulykhieunai.html">
 <span class="material-symbols-outlined">report_problem</span>
-<span class="font-label-md text-label-md">Khi?u n?i</span>
+<span class="font-label-md text-label-md">Khiếu nại</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-primary border-l-4 border-primary transition-all duration-200 ease-in-out" href="baocaodoanhthu.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
-<span class="font-label-md text-label-md">B�o c�o</span>
+<span class="font-label-md text-label-md">Báo cáo</span>
 </a>
 </nav>
 <div class="px-6 mt-auto pt-4 border-t border-outline-variant/30">
@@ -163,9 +163,9 @@
 </div>
 <div class="flex-1 min-w-0">
 <p class="font-label-md text-label-md text-on-surface truncate">Admin</p>
-<p class="text-[11px] text-on-surface-variant truncate">Qu?n tr? vi�n</p>
+<p class="text-[11px] text-on-surface-variant truncate">Quản trị viên</p>
 </div>
-<button class="text-on-surface-variant hover:text-error transition-colors" title="�ang xu?t">
+<button class="text-on-surface-variant hover:text-error transition-colors" title="Đăng xuất">
 <span class="material-symbols-outlined text-[20px]">logout</span>
 </button>
 </div>
@@ -210,7 +210,7 @@
         <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wide">Tong don hang</p>
       </div>
       <p id="kpi-orders" class="text-[22px] font-bold text-on-surface">--</p>
-      <p class="text-[11px] text-on-surface-variant mt-1">Hoan thanh: <span id="kpi-completed" class="text-green-600 font-semibold">--</span> � Huy: <span id="kpi-cancelled" class="text-error font-semibold">--</span></p>
+      <p class="text-[11px] text-on-surface-variant mt-1">Hoan thanh: <span id="kpi-completed" class="text-green-600 font-semibold">--</span> · Huy: <span id="kpi-cancelled" class="text-error font-semibold">--</span></p>
     </div>
     <div class="bg-white rounded-2xl p-5 shadow-sm border border-outline-variant/20 stat-card">
       <div class="flex items-center gap-3 mb-3">
