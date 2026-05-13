@@ -1,18 +1,21 @@
 // Chị Ơi! — Service Worker for PWA
 // Strategy:
 //   - HTML pages: network-first, fallback cache (offline page)
-//   - Static (CSS/JS/fonts/icons): cache-first, refresh background
+//   - shared/api.js + pwa-register.js: network-first (luôn lấy bản mới — chứa API_BASE)
+//   - Static khác (CSS/JS/fonts/icons): cache-first, refresh background
 //   - API calls: network-only (real-time data, không cache)
 
-const VERSION = 'chioi-v1.0.0';
+const VERSION = 'chioi-v1.0.2'; // BUMP để force update khi đổi api.js / strategy
 const CACHE_STATIC = `${VERSION}-static`;
 const CACHE_PAGES  = `${VERSION}-pages`;
 
+// File luôn fetch network trước (không bị lock cache cũ). Quan trọng cho config API.
+const NETWORK_FIRST_PATHS = ['/shared/api.js', '/pwa-register.js', '/manifest.json'];
+
 // Pre-cache shell — minimal so install không fail
+// KHÔNG precache /shared/api.js để tránh giữ bản cũ
 const PRECACHE = [
   '/',
-  '/manifest.json',
-  '/shared/api.js',
   '/khachhang/dangnhap.html',
   '/khachhang/trangchu.html',
   '/icons/icon-192.png',
@@ -51,6 +54,22 @@ self.addEventListener('fetch', (event) => {
 
   // KHÔNG cache websocket / socket.io
   if (url.pathname.includes('/socket.io/')) return;
+
+  // Network-first cho config files (api.js, pwa-register.js, manifest)
+  if (NETWORK_FIRST_PATHS.some(p => url.pathname === p)) {
+    event.respondWith(
+      fetch(req)
+        .then(resp => {
+          if (resp && resp.status === 200) {
+            const copy = resp.clone();
+            caches.open(CACHE_STATIC).then(cache => cache.put(req, copy)).catch(() => {});
+          }
+          return resp;
+        })
+        .catch(() => caches.match(req)) // fallback cache nếu offline
+    );
+    return;
+  }
 
   // HTML pages: network-first
   if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
