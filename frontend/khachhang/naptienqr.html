@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#3e3833",
+                        "secondary": "#b3272e",
+                        "secondary-fixed-dim": "#ffb3af",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#fc5d5d",
+                        "primary-fixed": "#ffdbcc",
+                        "primary": "#a04100",
+                        "inverse-surface": "#303030",
+                        "surface-dim": "#dcd9d9",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f6f3f2",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-tertiary-fixed": "#1f1b17",
+                        "inverse-primary": "#ffb693",
+                        "on-background": "#1b1c1c",
+                        "on-primary-container": "#642600",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ebe1da",
+                        "background": "#fcf9f8",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "on-primary-fixed": "#351000",
+                        "surface": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#410005",
+                        "surface-tint": "#a04100",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#8b7266",
+                        "surface-variant": "#e4e2e1",
+                        "on-surface-variant": "#584238",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#91081a",
+                        "primary-container": "#ff7e36",
+                        "outline-variant": "#dfc0b3",
+                        "tertiary-container": "#aaa19b",
+                        "tertiary-fixed-dim": "#cec5be",
+                        "on-secondary-container": "#60000c",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary": "#645d58",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-container": "#f0eded",
+                        "secondary-fixed": "#ffdad7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "container-padding": "20px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "card-gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "caption": ["Be Vietnam Pro"],
+                        "h1-display": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "h2-section": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "caption": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                        "h1-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "h2-section": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen text-on-background relative pb-32">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<!-- Header & Background Layer -->
+<!-- Top AppBar Component -->
+<header class="relative z-40 bg-transparent flex justify-between items-center w-full px-container-padding h-16 text-on-surface">
+<button onclick="window.location.href='vivalichsu.html'" class="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-all active:scale-95" onclick="window.location.href='vivalichsu.html'" style="cursor:pointer">
+<span class="material-symbols-outlined text-[28px]" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-headline-md font-headline-md font-extrabold text-primary">Nạp tiền</h1>
+<button class="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined text-[24px]" data-icon="chat_bubble">chat_bubble</span>
+</button>
+</header>
+<main class="px-container-padding mt-4 space-y-md relative z-10">
+<!-- Amount Input Card -->
+<section class="bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container">
+<label class="text-label-caps font-label-caps text-on-surface-variant mb-2 block">SỐ TIỀN MUỐN NẠP</label>
+<div class="flex items-center gap-2 border-b-2 border-primary pb-2 mb-4">
+<span class="text-display-lg font-display-lg text-primary">đ</span>
+<input id="amount-input" class="w-full bg-transparent border-none p-0 text-display-lg font-display-lg text-on-surface focus:ring-0" placeholder="Nhập số tiền" type="text" inputmode="numeric"/>
+</div>
+<div class="flex flex-wrap gap-sm" id="preset-container">
+<button data-amount="50000" class="px-4 py-2 rounded-full border border-outline-variant text-body-sm font-semibold text-secondary hover:bg-primary-fixed hover:border-primary transition-colors">50.000 đ</button>
+<button data-amount="100000" class="px-4 py-2 rounded-full border border-outline-variant text-body-sm font-semibold text-secondary hover:bg-primary-fixed hover:border-primary transition-colors">100.000 đ</button>
+<button data-amount="200000" class="px-4 py-2 rounded-full border border-outline-variant text-body-sm font-semibold text-secondary hover:bg-primary-fixed hover:border-primary transition-colors">200.000 đ</button>
+<button data-amount="500000" class="px-4 py-2 rounded-full border border-outline-variant text-body-sm font-semibold text-secondary hover:bg-primary-fixed hover:border-primary transition-colors">500.000 đ</button>
+<button data-amount="1000000" class="px-4 py-2 rounded-full border border-outline-variant text-body-sm font-semibold text-secondary hover:bg-primary-fixed hover:border-primary transition-colors">1.000.000 đ</button>
+<button data-amount="2000000" class="px-4 py-2 rounded-full border border-outline-variant text-body-sm font-semibold text-secondary hover:bg-primary-fixed hover:border-primary transition-colors">2.000.000 đ</button>
+</div>
+</section>
+<!-- Payment Method Box -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex items-center gap-md">
+<div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="qr_code_2">qr_code_2</span>
+</div>
+<div>
+<p class="text-body-sm font-semibold text-on-surface">Phương thức thanh toán</p>
+<p class="text-body-lg font-bold text-primary">Chuyển khoản ngân hàng (Quét mã QR)</p>
+</div>
+</div>
+<!-- QR Code Section -->
+<section class="bg-surface-container-lowest rounded-xl p-lg soft-shadow border border-surface-container text-center space-y-md">
+<div class="bg-white p-4 inline-block rounded-xl border-2 border-surface-container-highest">
+<img alt="VietQR Placeholder" class="w-48 h-48 mx-auto" data-alt="A detailed digital representation of a standard VietQR payment code inside a minimalist white frame. The QR code is sharp and crisp, surrounded by subtle Vietnamese banking logos and a soft orange border. The overall image has a clean, professional financial technology aesthetic with soft studio lighting and a warm, trustworthy atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2NUcn1cwz_bfEBQvJQCCF2BXU2PlgMr3TNP7WawLhlEi-wYxWwFvVtMIoRLllEmyi_zfefY-JrYSKNaecj-aWdxcRBYMqJHtf2AkFCxcSCPK0OCxaFleqtjirdWFQhOZ-gsv6TRsS4yiyISBRioBr6bQ2G1tfrslQozOafSRYSrkHO9M5W550Y4botX_ywYyxAPoVQnd45jdd6-DozASaRQkaJWG06bCySdVv7efGcXRhPTHR9esgUlJrhVc4NRdw6sy_DMs9guI"/>
+</div>
+<p class="text-body-sm text-on-surface-variant italic">Mở ứng dụng Ngân hàng của bạn và quét mã này để thanh toán nhanh chóng</p>
+</section>
+<!-- Detailed Transfer Info Card -->
+<section class="bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container space-y-md">
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant">SỐ TÀI KHOẢN</p>
+<p class="text-body-lg font-bold text-on-surface">1234567890123</p>
+</div>
+<button class="text-primary p-2 hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant">TÊN TÀI KHOẢN</p>
+<p class="text-body-lg font-bold text-on-surface">CONG TY TNHH CLEAN SERVICE</p>
+</div>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant">NỘI DUNG CHUYỂN KHOẢN</p>
+<p class="text-body-lg font-bold text-primary">NAPVI 0987654321</p>
+</div>
+<button class="text-primary p-2 hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+<div class="bg-error-container/30 p-md rounded-lg flex gap-sm items-start">
+<span class="material-symbols-outlined text-error text-[20px] mt-0.5" data-icon="info">info</span>
+<p class="text-body-sm text-on-error-container leading-tight">
+<span class="font-bold">Bắt buộc</span> nhập đúng nội dung để được cộng tiền tự động vào ví của bạn ngay lập tức.
+                </p>
+</div>
+</section>
+<!-- Action Button Above Footer -->
+<div class="py-md">
+<button class="w-full h-14 bg-primary text-white text-title-sm font-title-sm rounded-full shadow-lg active:scale-95 transition-all">
+                Tôi đã chuyển khoản
+            </button>
+</div>
+</main>
+<!-- Floating Navigation Bar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<!-- Trang chủ -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-transform" href="trangchu.html">
+<span class="material-symbols-outlined text-[28px]">home</span>
+<span class="text-label-sm font-label-sm font-medium">Trang chủ</span>
+</a>
+<!-- Hoạt động -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="lichsuhoatdong.html">
+<span class="material-symbols-outlined text-[28px]">assignment</span>
+<span class="text-label-sm font-label-sm font-medium">Hoạt động</span>
+</a>
+<!-- Thông báo (UC-KH-15) → M11 -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
+<span class="material-symbols-outlined text-[28px]">notifications</span>
+<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span class="text-label-sm font-label-sm font-medium">Thông báo</span>
+</a>
+<!-- Tài khoản -->
+<a class="flex flex-col items-center justify-center text-primary transition-colors active:scale-95" href="taikhoan.html">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-label-sm font-label-sm">Tài khoản</span>
+</a>
+</nav>
+
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
+
+  var user = ChiOiAuth.getUser();
+  var amountInput = document.getElementById('amount-input');
+  var currentAmount = 0;
+
+  // ===== Update transfer content with user phone =====
+  if (user && user.phone) {
+    var transferContent = document.querySelector('.text-body-lg.font-bold.text-primary');
+    if (transferContent && transferContent.textContent.includes('NAPVI')) {
+      transferContent.textContent = 'NAPVI ' + user.phone;
+    }
+  }
+
+  // ===== Amount Presets =====
+  var presetBtns = document.querySelectorAll('#preset-container button');
+  var inactiveClass = 'px-4 py-2 rounded-full border border-outline-variant text-body-sm font-semibold text-secondary hover:bg-primary-fixed hover:border-primary transition-colors';
+  var activeClass = 'px-4 py-2 rounded-full bg-primary text-white text-body-sm font-semibold soft-shadow';
+
+  presetBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      currentAmount = parseInt(btn.getAttribute('data-amount')) || 0;
+      if (amountInput) amountInput.value = currentAmount.toLocaleString('vi-VN');
+      presetBtns.forEach(function(b) { b.className = inactiveClass; });
+      btn.className = activeClass;
+    });
+  });
+
+  // ===== Manual Amount Input =====
+  if (amountInput) {
+    amountInput.addEventListener('input', function() {
+      var raw = this.value.replace(/\D/g, '');
+      currentAmount = parseInt(raw) || 0;
+      this.value = currentAmount > 0 ? currentAmount.toLocaleString('vi-VN') : '';
+      // Bỏ highlight preset khi nhập tay
+      presetBtns.forEach(function(b) { b.className = inactiveClass; });
+    });
+  }
+
+  // ===== Copy buttons =====
+  document.querySelectorAll('button').forEach(function(btn) {
+    var icon = btn.querySelector('[data-icon="content_copy"]');
+    if (icon) {
+      btn.addEventListener('click', function() {
+        var textEl = btn.closest('.flex').querySelector('.text-body-lg.font-bold');
+        if (textEl) {
+          navigator.clipboard.writeText(textEl.textContent.trim()).then(function() {
+            showToastMsg('📋 Đã sao chép');
+          });
+        }
+      });
+    }
+  });
+
+  // ===== Confirm Deposit =====
+  var confirmBtn = document.querySelector('.py-md button');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', async function() {
+      if (currentAmount < 10000) { showToastMsg('Số tiền tối thiểu là 10.000 đ'); return; }
+
+      showLoading();
+      try {
+        var result = await apiFetch('/api/wallets/deposit', {
+          method: 'POST',
+          body: { amount: currentAmount }
+        });
+        hideLoading();
+        var newBalance = result && result.wallet ? formatVND(result.wallet.balance) : '';
+        showToastMsg('✅ Nạp ' + formatVND(currentAmount) + ' thành công!' + (newBalance ? ' Số dư: ' + newBalance : ''));
+        setTimeout(function() { window.location.href = 'vivalichsu.html'; }, 2000);
+      } catch (e) {
+        hideLoading();
+        showToastMsg('❌ ' + e.message);
+      }
+    });
+  }
+})();
+</script>
+</body></html>

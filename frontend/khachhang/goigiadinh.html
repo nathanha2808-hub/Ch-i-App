@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gói gia đình - Chị Ơi!</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#3e3833",
+                        "secondary": "#b3272e",
+                        "secondary-fixed-dim": "#ffb3af",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#fc5d5d",
+                        "primary-fixed": "#ffdbcc",
+                        "primary": "#a04100",
+                        "inverse-surface": "#303030",
+                        "surface-dim": "#dcd9d9",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f6f3f2",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-tertiary-fixed": "#1f1b17",
+                        "inverse-primary": "#ffb693",
+                        "on-background": "#1b1c1c",
+                        "on-primary-container": "#642600",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ebe1da",
+                        "background": "#fcf9f8",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "on-primary-fixed": "#351000",
+                        "surface": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#410005",
+                        "surface-tint": "#a04100",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#8b7266",
+                        "surface-variant": "#e4e2e1",
+                        "on-surface-variant": "#584238",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#91081a",
+                        "primary-container": "#ff7e36",
+                        "outline-variant": "#dfc0b3",
+                        "tertiary-container": "#aaa19b",
+                        "tertiary-fixed-dim": "#cec5be",
+                        "on-secondary-container": "#60000c",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary": "#645d58",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-container": "#f0eded",
+                        "secondary-fixed": "#ffdad7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "container-padding": "20px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "card-gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "caption": ["Be Vietnam Pro"],
+                        "h1-display": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "h2-section": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "caption": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                        "h1-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "h2-section": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Modal overlay */
+        .modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; }
+        .modal-box { background:#fff; border-radius:24px; width:90%; max-width:380px; padding:24px; animation: scaleIn 0.25s ease-out; }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen pb-32">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<!-- Header -->
+<header class="relative z-10 flex justify-between items-center w-full px-container-padding h-16 pt-4">
+<div class="flex items-center gap-3">
+<button onclick="window.location.href='taikhoan.html'" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 text-white active:scale-95 transition-all backdrop-blur-sm" style="cursor:pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-[18px] font-extrabold text-white">Gói gia đình</h1>
+</div>
+</header>
+<main class="relative z-10 mt-4 px-container-padding space-y-lg max-w-md mx-auto">
+<!-- Hero Banner -->
+<section class="orange-gradient p-6 rounded-2xl text-white relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings:'FILL' 1;">family_restroom</span>
+<h2 class="text-[22px] font-extrabold">Gói gia đình</h2>
+</div>
+<p class="text-white/80 text-body-sm">Tiết kiệm hơn khi đăng ký dịch vụ theo gói hàng tháng</p>
+</div>
+<div class="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full"></div>
+<div class="absolute right-12 -top-4 w-20 h-20 bg-white/5 rounded-full"></div>
+</section>
+<!-- Package Options -->
+<section class="space-y-sm">
+<h2 class="font-title-sm text-on-surface px-1">Chọn gói</h2>
+<div id="package-list" class="space-y-3">
+<!-- Rendered by JS -->
+</div>
+</section>
+<!-- Benefits -->
+<section class="bg-white p-md rounded-2xl soft-shadow border border-outline-variant/20 space-y-md">
+<h3 class="font-title-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">stars</span> Quyền lợi gói gia đình
+</h3>
+<div class="space-y-sm">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings:'FILL' 1;">check_circle</span>
+<p class="text-body-sm text-on-surface-variant">Giảm <span class="font-bold text-on-surface">15%</span> phí dịch vụ dọn dẹp định kỳ</p>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings:'FILL' 1;">check_circle</span>
+<p class="text-body-sm text-on-surface-variant">Ưu tiên xếp Tasker <span class="font-bold text-on-surface">quen</span></p>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings:'FILL' 1;">check_circle</span>
+<p class="text-body-sm text-on-surface-variant">Miễn phí <span class="font-bold text-on-surface">1 lần trông trẻ/tháng</span></p>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings:'FILL' 1;">check_circle</span>
+<p class="text-body-sm text-on-surface-variant">Hỗ trợ khách hàng <span class="font-bold text-on-surface">24/7 ưu tiên</span></p>
+</div>
+</div>
+</section>
+<!-- Terms -->
+<section class="bg-surface-container-low p-md rounded-2xl space-y-xs">
+<p class="text-body-sm text-on-surface-variant">• Gói tự động gia hạn hàng tháng.</p>
+<p class="text-body-sm text-on-surface-variant">• Hủy gói trước 7 ngày trước khi hết hạn.</p>
+<p class="text-body-sm text-on-surface-variant">• Thanh toán trực tiếp từ Ví Chị Ơi.</p>
+</section>
+<!-- Lỗi 5 FIX: Thanh toán đặt trong flow, không đè lên nội dung -->
+<section class="bg-white border border-surface-container rounded-2xl soft-shadow px-container-padding py-4 flex items-center justify-between">
+<div>
+<p class="text-caption text-on-surface-variant">Tổng cộng</p>
+<p id="total-price" class="text-[20px] font-bold text-primary">1.500.000 đ</p>
+</div>
+<button id="register-btn" class="orange-gradient text-white font-bold py-3 px-8 rounded-full shadow-lg active:scale-95 transition-transform flex items-center gap-2">
+Đăng ký ngay
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-transform" href="trangchu.html">
+<span class="material-symbols-outlined text-[28px]">home</span>
+<span class="text-label-sm font-label-sm font-medium">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="lichsuhoatdong.html">
+<span class="material-symbols-outlined text-[28px]">assignment</span>
+<span class="text-label-sm font-label-sm font-medium">Hoạt động</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
+<span class="material-symbols-outlined text-[28px]">notifications</span>
+<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span class="text-label-sm font-label-sm font-medium">Thông báo</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="taikhoan.html">
+<span class="material-symbols-outlined text-[28px]">person</span>
+<span class="text-label-sm font-label-sm font-medium">Tài khoản</span>
+</a>
+</nav>
+
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
+
+  var packages = [
+    { id: 1, name: 'Gói Cơ bản', price: 500000, duration: '1 tháng', desc: 'Dọn dẹp 4 lần/tháng' },
+    { id: 2, name: 'Gói Tiêu chuẩn', price: 1000000, duration: '1 tháng', desc: 'Dọn dẹp 8 lần + 1 lần trông trẻ', popular: true },
+    { id: 3, name: 'Gói Cao cấp', price: 1500000, duration: '1 tháng', desc: 'Dọn dẹp 12 lần + 2 lần trông trẻ + 2 lần mua hộ' }
+  ];
+
+  // Try to load packages from API
+  try {
+    var apiPkgs = await apiFetch('/api/packages');
+    if (apiPkgs && apiPkgs.length > 0) {
+      packages = apiPkgs.map(function(p) {
+        return { id: p.package_id, name: p.name, price: p.price, duration: p.duration_text || '1 tháng', desc: p.description || '' };
+      });
+    }
+  } catch (e) { console.warn('[Gói] Không load được packages:', e.message); }
+
+  var selectedPkg = packages[1] || packages[0]; // default Tiêu chuẩn
+
+  function renderPackages() {
+    var el = document.getElementById('package-list');
+    el.innerHTML = '';
+    packages.forEach(function(pkg) {
+      var active = pkg.id === selectedPkg.id;
+      var div = document.createElement('div');
+      div.className = active
+        ? 'relative bg-white border-2 border-primary p-md rounded-2xl soft-shadow cursor-pointer transition-all'
+        : 'relative bg-white border border-outline-variant/30 p-md rounded-2xl soft-shadow cursor-pointer transition-all hover:border-orange-200';
+      div.innerHTML = (pkg.popular ? '<span class="absolute -top-2.5 right-4 bg-primary-container text-white text-[10px] font-bold px-3 py-0.5 rounded-full">Phổ biến</span>' : '') +
+        '<div class="flex justify-between items-start">' +
+        '<div><h3 class="font-title-sm ' + (active ? 'text-primary' : 'text-on-surface') + '">' + pkg.name + '</h3>' +
+        '<p class="text-body-sm text-on-surface-variant mt-1">' + pkg.desc + '</p></div>' +
+        '<div class="text-right"><p class="text-[18px] font-extrabold ' + (active ? 'text-primary' : 'text-on-surface') + '">' + formatVND(pkg.price) + '</p>' +
+        '<p class="text-caption text-on-surface-variant">/' + pkg.duration + '</p></div></div>' +
+        '<div class="flex items-center gap-2 mt-2"><span class="material-symbols-outlined text-[18px] ' + (active ? 'text-primary' : 'text-outline-variant') + '">' + (active ? 'check_circle' : 'radio_button_unchecked') + '</span>' +
+        '<span class="text-body-sm ' + (active ? 'text-primary font-bold' : 'text-on-surface-variant') + '">' + (active ? 'Đã chọn' : 'Chọn gói này') + '</span></div>';
+      div.addEventListener('click', function() {
+        selectedPkg = pkg;
+        renderPackages();
+        updateTotal();
+      });
+      el.appendChild(div);
+    });
+  }
+
+  function updateTotal() {
+    document.getElementById('total-price').textContent = formatVND(selectedPkg.price);
+  }
+
+  // ===== Lỗi 14 FIX: Đăng ký trừ tiền ví, nếu không đủ thì hỏi nạp thêm =====
+  document.getElementById('register-btn').addEventListener('click', async function() {
+    showLoading();
+    try {
+      // Kiểm tra số dư ví
+      var wallet = await apiFetch('/api/wallets/balance');
+      var balance = wallet ? Number(wallet.balance || 0) : 0;
+      var price = Number(selectedPkg.price || 0);
+
+      hideLoading();
+
+      if (balance < price) {
+        // Không đủ tiền -> hiện modal hỏi nạp thêm
+        showInsufficientModal(balance, price);
+      } else {
+        // Đủ tiền -> xác nhận đăng ký
+        showConfirmModal();
+      }
+    } catch (e) {
+      hideLoading();
+      showToastMsg('❌ ' + e.message);
+    }
+  });
+
+  // ===== Modal không đủ tiền =====
+  function showInsufficientModal(balance, price) {
+    var shortage = Math.abs(price - balance);
+    var overlay = document.createElement('div');
+    overlay.id = 'pkg-modal';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal-box">' +
+      '<div class="text-center mb-4"><span class="material-symbols-outlined text-[48px] text-yellow-500">account_balance_wallet</span></div>' +
+      '<h3 class="text-title-sm font-bold text-center mb-2">Số dư không đủ</h3>' +
+      '<p class="text-body-sm text-on-surface-variant text-center mb-1">Số dư hiện tại: <span class="font-bold text-on-surface">' + formatVND(balance) + '</span></p>' +
+      '<p class="text-body-sm text-on-surface-variant text-center mb-1">Giá gói: <span class="font-bold text-on-surface">' + formatVND(price) + '</span></p>' +
+      '<p class="text-body-sm text-on-surface-variant text-center mb-4">Cần nạp thêm: <span class="font-bold text-error">' + formatVND(shortage) + '</span></p>' +
+      '<p class="text-body-sm text-center text-on-surface mb-4">Quý khách có muốn nạp thêm tiền vào ví không?</p>' +
+      '<div class="flex gap-3">' +
+      '<button id="modal-cancel" class="flex-1 py-3 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95 transition-all">Không</button>' +
+      '<button id="modal-topup" class="flex-1 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95 transition-all">Nạp tiền</button>' +
+      '</div></div>';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closePkgModal(); });
+    document.body.appendChild(overlay);
+
+    document.getElementById('modal-cancel').addEventListener('click', function() {
+      closePkgModal();
+    });
+    document.getElementById('modal-topup').addEventListener('click', function() {
+      closePkgModal();
+      window.location.href = 'naptienqr.html';
+    });
+  }
+
+  // ===== Modal xác nhận đăng ký =====
+  function showConfirmModal() {
+    var overlay = document.createElement('div');
+    overlay.id = 'pkg-modal';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal-box">' +
+      '<div class="text-center mb-4"><span class="material-symbols-outlined text-[48px] text-primary" style="font-variation-settings:\'FILL\' 1;">family_restroom</span></div>' +
+      '<h3 class="text-title-sm font-bold text-center mb-2">Xác nhận đăng ký</h3>' +
+      '<p class="text-body-sm text-on-surface-variant text-center mb-1">Gói: <span class="font-bold text-on-surface">' + selectedPkg.name + '</span></p>' +
+      '<p class="text-body-sm text-on-surface-variant text-center mb-4">Trừ từ Ví Chị Ơi: <span class="font-bold text-primary">' + formatVND(selectedPkg.price) + '</span></p>' +
+      '<div class="flex gap-3">' +
+      '<button id="modal-cancel" class="flex-1 py-3 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95 transition-all">Hủy</button>' +
+      '<button id="modal-confirm" class="flex-1 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95 transition-all">Xác nhận</button>' +
+      '</div></div>';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closePkgModal(); });
+    document.body.appendChild(overlay);
+
+    document.getElementById('modal-cancel').addEventListener('click', closePkgModal);
+    document.getElementById('modal-confirm').addEventListener('click', async function() {
+      closePkgModal();
+      showLoading();
+      try {
+        await apiFetch('/api/packages/subscribe', {
+          method: 'POST',
+          body: { package_id: selectedPkg.id }
+        });
+        hideLoading();
+        showToastMsg('✅ Đăng ký gói thành công! Đã trừ ' + formatVND(selectedPkg.price) + ' từ ví.');
+        setTimeout(function() { window.location.href = 'taikhoan.html'; }, 2500);
+      } catch (e) {
+        hideLoading();
+        showToastMsg('❌ ' + e.message);
+      }
+    });
+  }
+
+  function closePkgModal() {
+    var m = document.getElementById('pkg-modal');
+    if (m) m.remove();
+  }
+
+  renderPackages();
+  updateTotal();
+})();
+</script>
+</body></html>

@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quên mật khẩu - Chị Ơi!</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#ffb693",
+                    "on-surface": "#241914",
+                    "inverse-surface": "#3b2e28",
+                    "on-surface-variant": "#584238",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#001f28",
+                    "surface-tint": "#a04100",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#ffeae1",
+                    "background": "#fff8f6",
+                    "outline-variant": "#dfc0b3",
+                    "on-tertiary-container": "#003f4f",
+                    "on-secondary-fixed": "#351000",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#f4ded5",
+                    "on-tertiary-fixed-variant": "#004d61",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#351000",
+                    "tertiary-fixed": "#b8eaff",
+                    "primary-fixed-dim": "#ffb693",
+                    "on-primary-fixed-variant": "#7a3000",
+                    "surface-container-high": "#fae4da",
+                    "on-secondary-container": "#794226",
+                    "inverse-on-surface": "#ffede6",
+                    "tertiary-fixed-dim": "#52d5ff",
+                    "primary-container": "#ff7e36",
+                    "surface": "#fff8f6",
+                    "on-secondary-fixed-variant": "#6d391d",
+                    "secondary-fixed": "#ffdbcc",
+                    "secondary-container": "#feb28e",
+                    "surface-container-low": "#fff1eb",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#ffb693",
+                    "outline": "#8b7266",
+                    "on-primary-container": "#642600",
+                    "primary": "#a04100",
+                    "surface-bright": "#fff8f6",
+                    "secondary": "#895032",
+                    "surface-dim": "#ecd6cc",
+                    "primary-fixed": "#ffdbcc",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#00b1da",
+                    "tertiary": "#006780",
+                    "surface-container-highest": "#f4ded5",
+                    "on-background": "#241914"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "xl": "32px",
+                    "stack-gap": "12px",
+                    "md": "16px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "container-padding": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Be Vietnam Pro"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "label-caps": ["Be Vietnam Pro"],
+                    "headline-md": ["Be Vietnam Pro"],
+                    "title-sm": ["Be Vietnam Pro"],
+                    "body-lg": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #FF7E36 0%, #a04100 100%);
+        }
+        .{
+            background: linear-gradient(180deg, #FF7E36 0%, rgba(255, 126, 54, 0) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+          body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .teal-gradient {
+            background: linear-gradient(135deg, #00b1da 0%, #006780 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth transitions */
+        a, button { transition: all 0.2s ease; }
+        /* Card hover effect */
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body class="bg-background font-body-lg text-on-surface min-h-screen flex flex-col">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0" style="background: linear-gradient(180deg, rgba(255,126,54,0.9) 0%, rgba(255,126,54,0) 100%); pointer-events: none;"></div>
+
+<!-- Top Header Gradient Layer (absolute positioned behind content) -->
+<div class="absolute top-0 left-0 right-0 h-[300px] -z-10"></div>
+<!-- Top AppBar Component -->
+<header class="flex justify-between items-center w-full px-container-padding h-16 fixed top-0 z-50 bg-transparent relative z-40">
+<button class="w-10 h-10 flex items-center justify-start text-white active:scale-95 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-headline-md font-headline-md font-extrabold text-white">Quên mật khẩu</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 pb-32 px-md space-y-xl relative z-10">
+<!-- Request OTP Section -->
+<section class="space-y-md">
+<div class="space-y-xs">
+<label class="text-label-caps font-label-caps text-on-surface-variant px-xs">SỐ ĐIỆN THOẠI</label>
+<div class="flex items-center bg-surface-container-lowest rounded-xl p-md shadow-sm border border-transparent focus-within:border-primary-container transition-all">
+<span class="material-symbols-outlined text-outline mr-sm" data-icon="phone">phone</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-body-lg placeholder:text-outline-variant" placeholder="090 123 4567" type="tel"/>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-md border border-secondarybg-surface-container/30">
+<div class="flex gap-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="info">info</span>
+<p class="text-body-sm text-on-surface-variant italic">
+                        Giới hạn: Bạn chỉ được yêu cầu gửi lại mã tối đa 3 lần / 30 phút.
+                    </p>
+</div>
+</div>
+<button class="w-full primary-gradient text-on-surface py-md rounded-full font-title-sm shadow-md active:scale-95 transition-all">
+                Nhận mã OTP
+            </button>
+</section>
+<!-- OTP Verification Section -->
+<section class="space-y-md">
+<div class="text-center space-y-xs">
+<p class="text-body-lg">
+                    Mã OTP đã được gửi đến số <span class="font-bold">090****123</span>.
+                </p>
+<p class="text-body-sm text-on-surface-variant">(Hiệu lực: 5 phút)</p>
+</div>
+<!-- OTP Input Grid -->
+<div class="grid grid-cols-6 gap-sm max-w-sm mx-auto">
+<input class="w-full aspect-square text-center text-headline-md font-bold bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary-container transition-all" maxlength="1" type="text" value="4"/>
+<input class="w-full aspect-square text-center text-headline-md font-bold bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary-container transition-all" maxlength="1" type="text" value="8"/>
+<input class="w-full aspect-square text-center text-headline-md font-bold bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary-container transition-all" maxlength="1" type="text"/>
+<input class="w-full aspect-square text-center text-headline-md font-bold bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary-container transition-all" maxlength="1" type="text"/>
+<input class="w-full aspect-square text-center text-headline-md font-bold bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary-container transition-all" maxlength="1" type="text"/>
+<input class="w-full aspect-square text-center text-headline-md font-bold bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary-container transition-all" maxlength="1" type="text"/>
+</div>
+<div class="flex justify-center items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="schedule">schedule</span>
+<p class="text-body-sm font-semibold text-primary">Gửi lại mã sau 04:59s</p>
+</div>
+</section>
+<!-- New Password Section -->
+<section class="space-y-stack-gap">
+<div class="space-y-xs">
+<label class="text-label-caps font-label-caps text-on-surface-variant px-xs">MẬT KHẨU MỚI</label>
+<div class="flex items-center bg-surface-container-lowest rounded-xl p-md shadow-sm border border-transparent focus-within:border-primary-container transition-all">
+<span class="material-symbols-outlined text-outline mr-sm" data-icon="lock">lock</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-body-lg placeholder:text-outline-variant" placeholder="Nhập mật khẩu mới" type="password"/>
+<button class="text-outline-variant active:text-primary">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="text-label-caps font-label-caps text-on-surface-variant px-xs">NHẬP LẠI MẬT KHẨU MỚI</label>
+<div class="flex items-center bg-surface-container-lowest rounded-xl p-md shadow-sm border border-transparent focus-within:border-primary-container transition-all">
+<span class="material-symbols-outlined text-outline mr-sm" data-icon="lock">lock</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-body-lg placeholder:text-outline-variant" placeholder="Xác nhận mật khẩu" type="password"/>
+<button class="text-outline-variant active:text-primary">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Action Area -->
+<footer class="fixed bottom-0 left-0 right-0 p-md /80 backdrop-blur-md">
+<button class="w-full primary-gradient text-on-surface h-14 rounded-full font-title-sm shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-sm">
+            Lưu mật khẩu &amp; Đăng nhập
+        </button>
+</footer>
+<!-- Decorative Illustration for context (Bento Grid Style Background Element) -->
+<div class="fixed bottom-32 -left-20 w-64 h-64 /10 rounded-full blur-3xl -z-10"></div>
+<div class="fixed top-60 -right-20 w-48 h-48 bg-secondarybg-surface-container/20 rounded-full blur-2xl -z-10"></div>
+</body></html>

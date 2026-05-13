@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#3e3833",
+                        "secondary": "#b3272e",
+                        "secondary-fixed-dim": "#ffb3af",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#fc5d5d",
+                        "primary-fixed": "#ffdbcc",
+                        "primary": "#a04100",
+                        "inverse-surface": "#303030",
+                        "surface-dim": "#dcd9d9",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f6f3f2",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-tertiary-fixed": "#1f1b17",
+                        "inverse-primary": "#ffb693",
+                        "on-background": "#1b1c1c",
+                        "on-primary-container": "#642600",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ebe1da",
+                        "background": "#fcf9f8",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "on-primary-fixed": "#351000",
+                        "surface": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#410005",
+                        "surface-tint": "#a04100",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#8b7266",
+                        "surface-variant": "#e4e2e1",
+                        "on-surface-variant": "#584238",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#91081a",
+                        "primary-container": "#ff7e36",
+                        "outline-variant": "#dfc0b3",
+                        "tertiary-container": "#aaa19b",
+                        "tertiary-fixed-dim": "#cec5be",
+                        "on-secondary-container": "#60000c",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary": "#645d58",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-container": "#f0eded",
+                        "secondary-fixed": "#ffdad7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "container-padding": "20px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "card-gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "caption": ["Be Vietnam Pro"],
+                        "h1-display": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "h2-section": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "caption": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                        "h1-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "h2-section": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .message-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+    </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col relative">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<!-- Background Gradient Overlay -->
+<div class="fixed inset-0 pointer-events-none top-gradient z-0"></div>
+<!-- Top AppBar (Transparent) -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-transparent h-16 px-container-padding flex justify-between items-center">
+<div class="flex items-center gap-3">
+<button onclick="window.location.href='trangchu.html'" class="text-on-primary active:scale-95 transition-all duration-200" onclick="window.location.href='trangchu.html'" style="cursor:pointer">
+<span class="material-symbols-outlined text-[28px]">arrow_back</span>
+</button>
+<div class="flex items-center gap-2">
+<div class="relative">
+<img alt="Nguyễn Lan" class="w-10 h-10 rounded-full object-cover border-2 border-white/20" data-alt="A professional headshot of a friendly female home service provider with a warm smile, set against a soft, clean interior background. The image has high-key lighting, emphasizing a bright and trustworthy atmosphere that aligns with a premium cleaning service application aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJttHSEkguhTyzRh5F2ob_sSOVWpJBMVixISI7gtZTKFB19e_taBaPGdgEXGUG64JrvzME-w2Jem_nBDlsiWgD6AoprmNiRMY1Rx6RwyODOw8pDbPImhTOe_3qcksFnWIMm3R2QmHwaI6lMrAFcZ7Xf-NjbZc4rtV7rAjDLG9mgsO6kR-9oTi0BEylOWot8csFv8DFW6AY5J2VtZqIbPjveRbvCDX-g48qTwVuqmCtm2UqL-KJpLicg5H07-pCWmePm5rCSdqWdww"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-primary rounded-full"></div>
+</div>
+<div>
+<h1 class="text-on-primary font-headline-md text-title-sm leading-tight">Nguyễn Lan</h1>
+<p class="text-on-primary/80 text-label-caps font-label-caps">Đang trực tuyến</p>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-on-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined">call</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 mt-16 mb-44 flex flex-col relative z-10">
+<!-- Pinned Order Card -->
+<div class="sticky top-0 z-40 bg-white/90 backdrop-blur-sm px-container-padding py-3 shadow-sm flex items-center justify-between mx-md mt-sm rounded-xl border border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-2 rounded-lg">
+<span class="material-symbols-outlined text-on-primary text-[20px]">cleaning_services</span>
+</div>
+<span class="text-on-surface font-title-sm text-[14px]">Đơn: Dọn nhà · 20/10 · Đang TH</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<!-- Chat Area -->
+<div class="flex-1 p-container-padding space-y-stack-gap">
+<!-- Timestamp -->
+<div class="flex justify-center my-lg">
+<span class="bg-surface-variant text-on-surface-variant text-label-caps font-label-caps px-3 py-1 rounded-full">HÔM NAY, 10:12</span>
+</div>
+<!-- Tasker Message -->
+<div class="flex items-end gap-2 max-w-[85%]">
+<div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+<img alt="Tasker Avatar" data-alt="Close up portrait of a helpful service staff member, professionally dressed, representing trust and quality. The lighting is soft and warm, highlighting the friendly facial features of the provider." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp0AMkdp9J-tNcIUJtwnOMBfpX51COrXyODojRYUp6GLxzr4a3vFDpdrNtJANGZRzXmQh1yRf60KIdC0jx54Xoc76RAEliZk8bY8VoMluPv8uIy3FYuQuxWO76Yry1aTURwYn_ncCcGlfnxFYFZL-jPNxWn41Hj1XXKT81bLHdDWDw3bqz8v-X6Ewhr7ZoHLPeZXiSf-gDiQ_Dl4HkQn7ZyPCupvXjLSGyPeqeA-14ceRtMpVN2Tou8jvjmXJR5aG5m2VSbEnEzJU"/>
+</div>
+<div class="bg-surface-container-high text-on-surface p-3 rounded-2xl rounded-bl-none shadow-sm">
+<p class="text-body-lg">Chào chị, em đang trên đường đến ạ!</p>
+<p class="text-[10px] text-on-surface-variant mt-1">10:12</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end gap-1">
+<div class="message-gradient text-on-primary p-3 rounded-2xl rounded-br-none shadow-md max-w-[80%]">
+<p class="text-body-lg">Dạ, chị chờ em nhé</p>
+<div class="flex items-center justify-end gap-1 mt-1">
+<p class="text-[10px] text-on-primary/80">10:15</p>
+<span class="material-symbols-outlined text-[14px]">done_all</span>
+</div>
+</div>
+</div>
+<!-- Tasker Message (Text) -->
+<div class="flex items-end gap-2 max-w-[85%]">
+<div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 opacity-0"></div>
+<div class="bg-surface-container-high text-on-surface p-3 rounded-2xl shadow-sm">
+<p class="text-body-lg">Em đến rồi ạ!</p>
+<p class="text-[10px] text-on-surface-variant mt-1">10:20</p>
+</div>
+</div>
+<!-- Tasker Message (Image) -->
+<div class="flex items-end gap-2 max-w-[85%]">
+<div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+<img alt="Tasker Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmfBKWggIUrBwJYSIed5ZPY1uh-SddyWqg1ysInhfnrfoFDQResefYh5e0yYbH9bscEP3C3y2XN9pjlTE79oT_k6W-1x3e5SRgfk5FYRGu8C8bOJa4nkAii1z7gvevNA4gMIVPdu3cKznTDImBK6qRmCIoE19A8EsYdQPmGvDwx288w0FmF5XV9VNFBJN2K4aEI0j9XYj-K-zcrSHqIr9h3UL1yh1clvZM2hVaJaFrkzI_NYBkJZ6tTvBAQh-t9jUqrpWUBho6x6A"/>
+</div>
+<div class="bg-surface-container-high p-2 rounded-2xl rounded-bl-none shadow-sm">
+<div class="rounded-xl overflow-hidden mb-1">
+<img alt="Arrival Photo" class="w-48 h-32 object-cover" data-alt="A brightly lit, modern apartment hallway with clean wooden floors and white walls, symbolizing the arrival of a cleaning service at a professional residential location. High-key natural lighting fills the space, creating a fresh and welcoming vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAqWLDt8QFYJn8lVyDaDCMoiOb86FHYGPmPABp-A_bplb-egkTjMSU6ke3dhv4GtAKd__qsL6ovcAM_que-z05kWUo88iAYoUBDQM4Z3LA_jFne_mNC48PVit9TyCZkcWjgI3UoiDA4cZUJ7ln9syKTT2XWCYykiqpynOpP3RRgbYYvnSk-PZyHQwcWuAlIF-SBZWFjX1Y89sKHnQ0GKdW9kXDTVXyR43ksr2DHOtS64Ff5pH79vL8YDYQ-37Cbp5UkdgQ08evlfw"/>
+</div>
+<p class="text-[10px] text-on-surface-variant text-right">10:20</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end gap-1">
+<div class="message-gradient text-on-primary p-3 rounded-2xl rounded-br-none shadow-md max-w-[80%]">
+<p class="text-body-lg">Ok em, chị ra mở cửa</p>
+<div class="flex items-center justify-end gap-1 mt-1">
+<p class="text-[10px] text-on-primary/80">10:21</p>
+<span class="material-symbols-outlined text-[14px]">done_all</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Message Input Bar (Fixed above bottom nav) -->
+<div class="fixed bottom-[100px] left-0 right-0 px-md py-sm z-50">
+<div class="bg-surface-container-lowest shadow-lg rounded-full flex items-center p-2 gap-2 border border-outline-variant/20">
+<button id="btn-pick-image" class="w-10 h-10 flex items-center justify-center text-outline active:scale-95 transition-all">
+<span class="material-symbols-outlined">image</span>
+</button>
+<button id="btn-camera" class="w-10 h-10 flex items-center justify-center text-outline active:scale-95 transition-all">
+<span class="material-symbols-outlined">photo_camera</span>
+</button>
+<input type="file" id="image-picker" accept="image/*" class="hidden" />
+<input type="file" id="camera-capture" accept="image/*" capture="environment" class="hidden" />
+<div class="flex-1 h-10">
+<input class="w-full h-full bg-transparent border-none focus:ring-0 text-body-lg px-2 placeholder:text-outline-variant" placeholder="Nhập tin nhắn..." type="text"/>
+</div>
+<button class="w-10 h-10 flex items-center justify-center bg-primary text-on-primary rounded-full shadow-md active:scale-90 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+<!-- Floating Pill Bottom Navigation (From Homepage style) -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<!-- Trang chủ -->
+<a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="trangchu.html">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-label-sm font-label-sm">Trang chủ</span>
+</a>
+<!-- Hoạt động -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="lichsuhoatdong.html">
+<span class="material-symbols-outlined text-[28px]">assignment</span>
+<span class="text-label-sm font-label-sm font-medium">Hoạt động</span>
+</a>
+<!-- Thông báo (UC-KH-15) → M11 -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
+<span class="material-symbols-outlined text-[28px]">notifications</span>
+<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span class="text-label-sm font-label-sm font-medium">Thông báo</span>
+</a>
+<!-- Tài khoản -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="taikhoan.html">
+<span class="material-symbols-outlined text-[28px]">person</span>
+<span class="text-label-sm font-label-sm font-medium">Tài khoản</span>
+</a>
+</nav>
+
+<!-- Socket.IO + API -->
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
+  var user = ChiOiAuth.getUser();
+
+  // Lấy orderId từ URL params (ví dụ: chatvoitasker.html?orderId=5)
+  var params = new URLSearchParams(window.location.search);
+  var orderId = params.get('orderId');
+
+  // Load lịch sử chat nếu có orderId
+  if (orderId) {
+    try {
+      var messages = await apiFetch('/api/orders/chat/' + orderId);
+      var chatArea = document.querySelector('.flex-1.p-container-padding');
+      if (chatArea && messages && messages.length > 0) {
+        // Giữ lại timestamp header, xóa các tin nhắn mẫu
+        var timestampDiv = chatArea.querySelector('.flex.justify-center');
+        chatArea.innerHTML = '';
+        if (timestampDiv) chatArea.appendChild(timestampDiv);
+
+        messages.forEach(function(msg) {
+          var isMine = msg.sender_id === user.user_id;
+          var div = document.createElement('div');
+          if (isMine) {
+            div.className = 'flex flex-col items-end gap-1';
+            div.innerHTML = '<div class="message-gradient text-on-primary p-3 rounded-2xl rounded-br-none shadow-md max-w-[80%]">' +
+              '<p class="text-body-lg">' + msg.content + '</p>' +
+              '<div class="flex items-center justify-end gap-1 mt-1">' +
+              '<p class="text-[10px] text-on-primary/80">' + formatDateTime(msg.created_at) + '</p>' +
+              '<span class="material-symbols-outlined text-[14px]">done_all</span></div></div>';
+          } else {
+            div.className = 'flex items-end gap-2 max-w-[85%]';
+            div.innerHTML = '<div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-surface-variant"></div>' +
+              '<div class="bg-surface-container-high text-on-surface p-3 rounded-2xl rounded-bl-none shadow-sm">' +
+              '<p class="text-body-lg">' + msg.content + '</p>' +
+              '<p class="text-[10px] text-on-surface-variant mt-1">' + formatDateTime(msg.created_at) + '</p></div>';
+          }
+          chatArea.appendChild(div);
+        });
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+    } catch (e) {
+      console.warn('[Chat] Không thể load lịch sử:', e.message);
+    }
+  }
+
+  // Kết nối Socket
+  var socket = connectSocket();
+  if (socket) {
+    // Nhận tin nhắn realtime
+    socket.on('receive_message', function(msg) {
+      var chatArea = document.querySelector('.flex-1.p-container-padding');
+      if (chatArea) {
+        var div = document.createElement('div');
+        div.className = 'flex items-end gap-2 max-w-[85%]';
+        div.innerHTML = '<div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-surface-variant"></div>' +
+          '<div class="bg-surface-container-high text-on-surface p-3 rounded-2xl rounded-bl-none shadow-sm">' +
+          '<p class="text-body-lg">' + msg.content + '</p>' +
+          '<p class="text-[10px] text-on-surface-variant mt-1">Vừa xong</p></div>';
+        chatArea.appendChild(div);
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+    });
+  }
+
+  // Gửi tin nhắn
+  var sendBtn = document.querySelector('.bg-primary.text-on-primary.rounded-full');
+  var input = document.querySelector('input[placeholder="Nhập tin nhắn..."]');
+  if (sendBtn && input) {
+    function sendChatMessage() {
+      var text = input.value.trim();
+      if (!text) return;
+
+      // Hiển thị trên UI ngay
+      var chatArea = document.querySelector('.flex-1.p-container-padding');
+      var div = document.createElement('div');
+      div.className = 'flex flex-col items-end gap-1';
+      div.innerHTML = '<div class="message-gradient text-on-primary p-3 rounded-2xl rounded-br-none shadow-md max-w-[80%]">' +
+        '<p class="text-body-lg">' + text + '</p>' +
+        '<div class="flex items-center justify-end gap-1 mt-1">' +
+        '<p class="text-[10px] text-on-primary/80">Vừa xong</p>' +
+        '<span class="material-symbols-outlined text-[14px]">done</span></div></div>';
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+
+      // Gửi qua socket
+      if (socket && orderId) {
+        socket.emit('send_message', {
+          orderId: parseInt(orderId),
+          receiverId: parseInt(params.get('receiverId') || 0),
+          content: text
+        });
+      }
+
+      input.value = '';
+    }
+
+    sendBtn.addEventListener('click', sendChatMessage);
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') sendChatMessage();
+    });
+  }
+
+  // ===== Lỗi 6 FIX: Chụp ảnh & up ảnh =====
+  var btnPickImage = document.getElementById('btn-pick-image');
+  var btnCamera = document.getElementById('btn-camera');
+  var imagePicker = document.getElementById('image-picker');
+  var cameraCapture = document.getElementById('camera-capture');
+
+  if (btnPickImage && imagePicker) {
+    btnPickImage.addEventListener('click', function() { imagePicker.click(); });
+    imagePicker.addEventListener('change', function() { handleImageFile(this.files[0]); this.value = ''; });
+  }
+  if (btnCamera && cameraCapture) {
+    btnCamera.addEventListener('click', function() { cameraCapture.click(); });
+    cameraCapture.addEventListener('change', function() { handleImageFile(this.files[0]); this.value = ''; });
+  }
+
+  function handleImageFile(file) {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { showToastMsg('Chỉ chấp nhận file ảnh'); return; }
+    if (file.size > 5 * 1024 * 1024) { showToastMsg('Ảnh tối đa 5MB'); return; }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var chatArea = document.querySelector('.flex-1.p-container-padding');
+      if (!chatArea) return;
+      var div = document.createElement('div');
+      div.className = 'flex flex-col items-end gap-1';
+      div.innerHTML = '<div class="message-gradient p-2 rounded-2xl rounded-br-none shadow-md max-w-[80%]">' +
+        '<div class="rounded-xl overflow-hidden"><img src="' + e.target.result + '" class="w-48 h-32 object-cover" alt="Ảnh gửi" /></div>' +
+        '<div class="flex items-center justify-end gap-1 mt-1">' +
+        '<p class="text-[10px] text-on-primary/80">Vừa xong</p>' +
+        '<span class="material-symbols-outlined text-[14px] text-on-primary">done</span></div></div>';
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+      showToastMsg('📷 Đã gửi ảnh');
+
+      // Gửi qua socket nếu có
+      if (socket && orderId) {
+        socket.emit('send_message', {
+          orderId: parseInt(orderId),
+          receiverId: parseInt(params.get('receiverId') || 0),
+          content: '[Hình ảnh]',
+          type: 'IMAGE'
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+})();
+</script>
+</body></html>

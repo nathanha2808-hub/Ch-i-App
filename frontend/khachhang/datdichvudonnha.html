@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Đặt dịch vụ dọn nhà</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#3e3833",
+                        "secondary": "#b3272e",
+                        "secondary-fixed-dim": "#ffb3af",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#fc5d5d",
+                        "primary-fixed": "#ffdbcc",
+                        "primary": "#a04100",
+                        "inverse-surface": "#303030",
+                        "surface-dim": "#dcd9d9",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f6f3f2",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-tertiary-fixed": "#1f1b17",
+                        "inverse-primary": "#ffb693",
+                        "on-background": "#1b1c1c",
+                        "on-primary-container": "#642600",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ebe1da",
+                        "background": "#fcf9f8",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "on-primary-fixed": "#351000",
+                        "surface": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#410005",
+                        "surface-tint": "#a04100",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#8b7266",
+                        "surface-variant": "#e4e2e1",
+                        "on-surface-variant": "#584238",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#91081a",
+                        "primary-container": "#ff7e36",
+                        "outline-variant": "#dfc0b3",
+                        "tertiary-container": "#aaa19b",
+                        "tertiary-fixed-dim": "#cec5be",
+                        "on-secondary-container": "#60000c",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary": "#645d58",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-container": "#f0eded",
+                        "secondary-fixed": "#ffdad7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "container-padding": "20px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "card-gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "caption": ["Be Vietnam Pro"],
+                        "h1-display": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "h2-section": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "caption": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                        "h1-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "h2-section": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Mobile-friendly inputs */
+        input[type="date"], input[type="time"] {
+            min-height: 48px;
+            font-size: 16px;
+            border-radius: 16px;
+            padding-left: 16px;
+            padding-right: 40px;
+            color: #1b1c1c;
+            -webkit-appearance: none;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            position: absolute;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen pb-32">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<!-- Lỗi 5 FIX: Header có background khi scroll, chữ luôn rõ ràng -->
+<header id="topHeader" class="sticky top-0 z-50 flex justify-between items-center w-full px-container-padding h-16 transition-all duration-300" style="background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);">
+<div class="flex items-center gap-4">
+<button onclick="window.location.href='trangchu.html'" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 text-white active:scale-95 transition-all backdrop-blur-sm" style="cursor:pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-[18px] font-extrabold text-white">Dọn dẹp nhà</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 text-white active:scale-95 transition-all backdrop-blur-sm">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+</header>
+<main class="px-container-padding py-md space-y-lg max-w-md mx-auto relative z-10">
+    <!-- Loại dọn dẹp -->
+    <section class="space-y-sm">
+        <h2 class="text-title-sm font-bold text-on-surface/80 px-1">Loại dọn dẹp</h2>
+        <div class="grid grid-cols-2 gap-3">
+            <button id="btn-standard" class="service-type-btn py-3 px-4 rounded-2xl border-2 border-primary-container bg-orange-50 text-primary-container font-bold shadow-sm transition-all flex items-center justify-center text-center">
+                Dọn tiêu chuẩn
+            </button>
+            <button id="btn-deep" class="service-type-btn py-3 px-4 rounded-2xl border-2 border-transparent bg-white text-on-surface-variant font-medium shadow-sm hover:border-orange-100 transition-all flex items-center justify-center text-center">
+                Dọn tổng vệ sinh
+            </button>
+        </div>
+    </section>
+<!-- Lỗi 1 FIX: Thay grid 3 nút giờ bằng input time picker -->
+<section class="space-y-sm">
+<h2 class="text-title-sm font-title-sm">Ngày &amp; giờ</h2>
+<div class="space-y-3">
+<div class="relative group">
+<input id="dateInput" class="w-full h-12 px-4 rounded-2xl border-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary-container bg-white text-body-lg" type="date"/>
+<span class="material-symbols-outlined absolute right-4 top-3 text-on-surface-variant pointer-events-none">calendar_today</span>
+</div>
+<div class="relative group">
+<input id="timeInput" class="w-full h-12 px-4 rounded-2xl border-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary-container bg-white text-body-lg" type="time" value="10:00"/>
+<span class="material-symbols-outlined absolute right-4 top-3 text-on-surface-variant pointer-events-none">schedule</span>
+</div>
+</div>
+</section>
+<!-- Thông báo phụ phí -->
+<div class="bg-[#FFFBEB] border-l-4 border-yellow-500 p-4 rounded-xl flex items-start gap-3">
+<span class="material-symbols-outlined text-yellow-600">warning</span>
+<p class="text-body-sm font-medium text-yellow-800">Phụ phí cuối tuần/lễ sẽ được áp dụng</p>
+</div>
+<!-- Lỗi 2 FIX: Nút +/- hoạt động đúng, fix CSS tràn viền -->
+<section class="flex items-center justify-between p-4 bg-white rounded-2xl soft-shadow border border-[#FFF1EB]">
+    <div>
+        <h2 class="text-title-sm font-bold">Số giờ</h2>
+        <p id="temp-price-display" class="text-body-sm text-primary-container font-bold">Tạm tính: 450.000 đ</p>
+    </div>
+    <div class="flex items-center gap-3 bg-orange-50 rounded-full px-3 py-1.5 border border-orange-100">
+        <button id="hour-minus" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary-container shadow-sm active:scale-90 border border-orange-100 flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">remove</span>
+        </button>
+        <span id="hour-display" class="text-title-sm font-bold w-8 text-center text-primary-container flex-shrink-0">3</span>
+        <button id="hour-plus" class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-white shadow-sm active:scale-90 flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">add</span>
+        </button>
+    </div>
+</section>
+<!-- Ghi chú -->
+<section class="space-y-sm">
+<h2 class="text-title-sm font-title-sm">Ghi chú</h2>
+<textarea id="noteInput" class="w-full h-24 p-4 rounded-2xl border-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary-container bg-white text-body-lg resize-none" placeholder="VD: Mang theo dụng cụ..."></textarea>
+</section>
+<!-- Lỗi 3 FIX: Cảnh báo trùng đơn - chỉ hiện khi có đơn trùng trong DB -->
+<div id="duplicate-warning" class="bg-[#FFFBEB] border-l-4 border-yellow-500 p-4 rounded-2xl space-y-3" style="display:none;">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-yellow-600">event_busy</span>
+<p id="duplicate-text" class="text-body-sm text-on-surface"></p>
+</div>
+<div class="flex gap-2">
+<button id="btn-continue-order" class="flex-1 py-2 rounded-full bg-yellow-600 text-white text-label-caps font-label-caps active:scale-95 transition-all">Tiếp tục đặt</button>
+<button onclick="window.location.href='lichsuhoatdong.html'" class="flex-1 py-2 rounded-full border border-yellow-600 text-yellow-700 text-label-caps font-label-caps active:scale-95 transition-all">Xem đơn cũ</button>
+</div>
+</div>
+<!-- Lỗi 4 FIX: Tổng kết đơn hàng hiển thị đúng thông tin từ state -->
+<section class="bg-white p-container-padding rounded-2xl soft-shadow border border-[#FFF1EB] space-y-md">
+<div class="flex items-center justify-between border-b border-surface-variant pb-2">
+<h3 class="text-title-sm font-title-sm">Tổng kết</h3>
+<span class="material-symbols-outlined text-primary-container">receipt_long</span>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Dịch vụ</span>
+<span id="summary-service" class="font-semibold">Dọn tiêu chuẩn</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Thời gian</span>
+<span id="summary-time" class="font-semibold">—</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Số lượng</span>
+<span id="summary-hours" class="font-semibold">3 giờ</span>
+</div>
+<div class="flex justify-between pt-2 border-t border-surface-variant">
+<span class="text-title-sm font-bold">Tổng cộng</span>
+<span id="summary-total" class="text-title-sm font-bold text-primary-container">450.000 đ</span>
+</div>
+</div>
+</section>
+<!-- Thanh toán -->
+<section class="flex items-center justify-between p-4 bg-white rounded-2xl soft-shadow border border-[#FFF1EB]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<div>
+<p class="text-body-sm text-on-surface-variant">Thanh toán</p>
+<p class="font-bold">Ví Chị Ơi</p>
+</div>
+</div>
+<button class="text-primary-container font-bold text-body-sm px-3 py-1 rounded-full hover:bg-primary-container/10">Thay đổi</button>
+</section>
+<!-- Lỗi 6 FIX: Nút đặt dịch vụ nằm ngay dưới phần thanh toán, không gắn cứng -->
+<button id="main-submit-btn" class="orange-gradient w-full py-4 rounded-2xl text-white font-bold text-body-lg shadow-lg shadow-orange-500/30 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+    <span>Đặt dịch vụ — 450.000 đ</span>
+</button>
+</main>
+<!-- Navigation Shell -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<!-- Trang chủ -->
+<a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="trangchu.html">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-label-sm font-label-sm">Trang chủ</span>
+</a>
+<!-- Hoạt động -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="lichsuhoatdong.html">
+<span class="material-symbols-outlined text-[28px]">assignment</span>
+<span class="text-label-sm font-label-sm font-medium">Hoạt động</span>
+</a>
+<!-- Thông báo -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
+<span class="material-symbols-outlined text-[28px]">notifications</span>
+<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span class="text-label-sm font-label-sm font-medium">Thông báo</span>
+</a>
+<!-- Tài khoản -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="taikhoan.html">
+<span class="material-symbols-outlined text-[28px]">person</span>
+<span class="text-label-sm font-label-sm font-medium">Tài khoản</span>
+</a>
+</nav>
+
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
+
+  // ===== State =====
+  var state = {
+    serviceType: 'Dọn tiêu chuẩn',
+    serviceId: null,
+    date: '',
+    time: '10:00',
+    hours: 3,
+    pricePerHour: 150000,
+    note: ''
+  };
+
+  // ===== Load service_id from URL or services API =====
+  try {
+    var params = new URLSearchParams(window.location.search);
+    state.serviceId = params.get('service_id') ? parseInt(params.get('service_id')) : null;
+    if (!state.serviceId) {
+      var services = await apiFetch('/api/services');
+      if (services && services.length > 0) {
+        state.serviceId = services[0].service_id;
+        state.pricePerHour = services[0].base_price || 150000;
+      }
+    }
+  } catch (e) { console.warn('[Đặt DV] Không load được services:', e.message); }
+
+  // ===== Date Input =====
+  var dateInput = document.getElementById('dateInput');
+  if (dateInput) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+    state.date = dateInput.value;
+    dateInput.addEventListener('change', function() { 
+      state.date = this.value; 
+      updateSummary(); 
+      checkDuplicateOrders();
+    });
+  }
+
+  // ===== Time Input (Lỗi 1 FIX) =====
+  var timeInput = document.getElementById('timeInput');
+  if (timeInput) {
+    state.time = timeInput.value;
+    timeInput.addEventListener('change', function() { 
+      state.time = this.value; 
+      updateSummary(); 
+    });
+  }
+
+  // ===== Service Type Buttons =====
+  var typeButtons = document.querySelectorAll('.service-type-btn');
+  typeButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      typeButtons.forEach(function(b) {
+        b.className = 'service-type-btn py-3 px-4 rounded-2xl border-2 border-transparent bg-white text-on-surface-variant font-medium shadow-sm hover:border-orange-100 transition-all flex items-center justify-center text-center';
+      });
+      btn.className = 'service-type-btn py-3 px-4 rounded-2xl border-2 border-primary-container bg-orange-50 text-primary-container font-bold shadow-sm transition-all flex items-center justify-center text-center';
+      state.serviceType = btn.textContent.trim();
+      updateSummary();
+    });
+  });
+
+  // ===== Hour +/- Buttons (Lỗi 2 FIX) =====
+  var hourDisplay = document.getElementById('hour-display');
+  var minusBtn = document.getElementById('hour-minus');
+  var plusBtn = document.getElementById('hour-plus');
+  if (minusBtn) minusBtn.addEventListener('click', function(e) { 
+    e.preventDefault();
+    if (state.hours > 1) { state.hours--; updateSummary(); } 
+  });
+  if (plusBtn) plusBtn.addEventListener('click', function(e) { 
+    e.preventDefault();
+    if (state.hours < 12) { state.hours++; updateSummary(); } 
+  });
+
+  // ===== Lỗi 3 FIX: Check duplicate orders from DB =====
+  async function checkDuplicateOrders() {
+    try {
+      var orders = await apiFetch('/api/orders/my');
+      var warningEl = document.getElementById('duplicate-warning');
+      var textEl = document.getElementById('duplicate-text');
+      if (!orders || !orders.length || !warningEl) { 
+        if (warningEl) warningEl.style.display = 'none'; 
+        return; 
+      }
+      // Tìm đơn trùng ngày
+      var selectedDate = state.date;
+      var duplicateOrder = null;
+      for (var i = 0; i < orders.length; i++) {
+        var o = orders[i];
+        if (o.status === 'CANCELLED') continue;
+        if (o.scheduled_time && o.scheduled_time.startsWith(selectedDate)) {
+          duplicateOrder = o;
+          break;
+        }
+      }
+      if (duplicateOrder) {
+        var d = new Date(duplicateOrder.scheduled_time);
+        var dateStr = d.toLocaleDateString('vi-VN');
+        var timeStr = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        textEl.innerHTML = 'Bạn đã có đơn dọn nhà vào <span class="font-bold">' + dateStr + '</span> lúc <span class="font-bold">' + timeStr + '</span>. Bạn có chắc muốn đặt thêm?';
+        warningEl.style.display = 'block';
+      } else {
+        warningEl.style.display = 'none';
+      }
+    } catch (e) {
+      console.warn('[Đặt DV] Không kiểm tra được đơn trùng:', e.message);
+    }
+  }
+  checkDuplicateOrders();
+
+  // ===== Lỗi 4 FIX: Update Summary hiển thị đúng thông tin =====
+  function updateSummary() {
+    var total = state.hours * state.pricePerHour;
+    if (hourDisplay) hourDisplay.textContent = state.hours;
+
+    // Update "Tạm tính" in Number section
+    var tempPrice = document.getElementById('temp-price-display');
+    if (tempPrice) tempPrice.textContent = 'Tạm tính: ' + formatVND(total);
+
+    // Update Summary Section
+    var summaryService = document.getElementById('summary-service');
+    var summaryTime = document.getElementById('summary-time');
+    var summaryHours = document.getElementById('summary-hours');
+    var summaryTotal = document.getElementById('summary-total');
+
+    if (summaryService) summaryService.textContent = state.serviceType;
+    if (summaryTime) {
+      var dateFormatted = state.date ? new Date(state.date).toLocaleDateString('vi-VN') : '—';
+      summaryTime.textContent = dateFormatted + ' - ' + state.time;
+    }
+    if (summaryHours) summaryHours.textContent = state.hours + ' giờ';
+    if (summaryTotal) summaryTotal.textContent = formatVND(total);
+
+    // Bottom button
+    var submitBtn = document.getElementById('main-submit-btn');
+    if (submitBtn) {
+        submitBtn.innerHTML = '<span>Đặt dịch vụ — ' + formatVND(total) + '</span>';
+    }
+  }
+
+  // ===== Submit Order =====
+  var submitBtn = document.getElementById('main-submit-btn');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', async function() {
+      if (!state.date) { showToastMsg('Vui lòng chọn ngày'); return; }
+      if (!state.serviceId) { showToastMsg('Không tìm thấy dịch vụ'); return; }
+
+      var textarea = document.getElementById('noteInput');
+      state.note = textarea ? textarea.value.trim() : '';
+
+      var scheduledTime = state.date + 'T' + state.time + ':00';
+      var totalPrice = state.hours * state.pricePerHour;
+
+      showLoading();
+      try {
+        var result = await apiFetch('/api/orders/book', {
+          method: 'POST',
+          body: {
+            service_id: state.serviceId,
+            scheduled_time: scheduledTime,
+            address: 'Địa chỉ từ ứng dụng',
+            total_price: totalPrice,
+            longitude: 106.6297,
+            latitude: 10.8231,
+            note: state.note
+          }
+        });
+        hideLoading();
+        showToastMsg('✅ Đặt đơn thành công! Đang tìm Tasker...');
+        setTimeout(function() { window.location.href = 'lichsuhoatdong.html'; }, 2000);
+      } catch (e) {
+        hideLoading();
+        showToastMsg('❌ ' + e.message);
+      }
+    });
+  }
+
+  // Btn continue order (lỗi 3)
+  var btnContinue = document.getElementById('btn-continue-order');
+  if (btnContinue) {
+    btnContinue.addEventListener('click', function() {
+      document.getElementById('duplicate-warning').style.display = 'none';
+    });
+  }
+
+  updateSummary();
+})();
+</script>
+</body></html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Trang chủ Tasker</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#ffdad6",
+                    "inverse-on-surface": "#ffede6",
+                    "secondary": "#895032",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-container": "#642600",
+                    "on-tertiary-fixed": "#001f28",
+                    "on-tertiary-fixed-variant": "#004d61",
+                    "on-surface": "#241914",
+                    "surface-container-highest": "#f4ded5",
+                    "primary-container": "#ff7e36",
+                    "tertiary-container": "#00b1da",
+                    "on-background": "#241914",
+                    "tertiary-fixed": "#b8eaff",
+                    "primary": "#a04100",
+                    "secondary-fixed": "#ffdbcc",
+                    "on-secondary-container": "#794226",
+                    "surface-variant": "#f4ded5",
+                    "background": "#fff8f6",
+                    "surface-bright": "#fff8f6",
+                    "surface-tint": "#a04100",
+                    "outline-variant": "#dfc0b3",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#351000",
+                    "tertiary": "#006780",
+                    "outline": "#8b7266",
+                    "on-primary-fixed-variant": "#7a3000",
+                    "on-surface-variant": "#584238",
+                    "surface-container-low": "#fff1eb",
+                    "primary-fixed-dim": "#ffb693",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#fae4da",
+                    "surface": "#fff8f6",
+                    "surface-dim": "#ecd6cc",
+                    "inverse-primary": "#ffb693",
+                    "on-tertiary-container": "#003f4f",
+                    "inverse-surface": "#3b2e28",
+                    "on-error": "#ffffff",
+                    "surface-container": "#ffeae1",
+                    "primary-fixed": "#ffdbcc",
+                    "tertiary-fixed-dim": "#52d5ff",
+                    "on-secondary-fixed": "#351000",
+                    "on-secondary-fixed-variant": "#6d391d",
+                    "secondary-fixed-dim": "#ffb693",
+                    "secondary-container": "#feb28e",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "container-padding": "16px",
+                    "sm": "8px",
+                    "stack-gap": "12px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Be Vietnam Pro"],
+                    "headline-md": ["Be Vietnam Pro"],
+                    "display-lg": ["Be Vietnam Pro"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "title-sm": ["Be Vietnam Pro"],
+                    "body-sm": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f8f9fa; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .blur-bg { backdrop-filter: blur(8px); background-color: rgba(255, 255, 255, 0.4); }
+        .gradient-primary { background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); }
+        /* Leaflet custom marker */
+        .tasker-marker {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .tasker-marker::after {
+            content: '';
+            width: 14px; height: 14px;
+            background: white;
+            border-radius: 50%;
+        }
+        .pulse-ring {
+            position: absolute;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,126,54,0.5);
+            top: -13px; left: -13px;
+            animation: pulseRing 2s ease-out infinite;
+        }
+        @keyframes pulseRing {
+            0% { transform: scale(0.6); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="text-on-surface min-h-screen">
+
+<!-- Fullscreen Map Background (Leaflet) -->
+<div class="fixed inset-0 z-0">
+    <div id="leaflet-map" style="width:100%;height:100%;"></div>
+</div>
+
+<!-- Top Gradient Overlay removed per Bug 2 -->
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-40 px-4 h-20 flex justify-between items-center bg-transparent">
+    <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-full border-2 border-white/50 overflow-hidden shadow-sm">
+            <img alt="Lan Nguyễn" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdx_l7OLqkJhx3t8XNX3oPsNEZ_ogskiGRnrfncigojiUmOhgUgCBnzOtjAoqTw0VT8UhEJeg1dX9XGQ4Bv8H31CgwgWYchWXUkhmmRML2MH3UPlx8xcg7dwkz6qPuZ01IJyV4QcESVQIkgQGRLOgvy5_M9Iog2G7TdbmVv4W8YhbHeWC-14TUAIAeQf2cR_E1-AFVlyhYV578lUAfzmC9A7difRggk60mNGZ5r1AuzpEC7WSjzVzYTLk_lUCDfPp6S7TStIoHLIs"/>
+        </div>
+        <div>
+            <span class="text-white/90 text-xs font-medium block leading-tight">Chào buổi sáng,</span>
+            <h1 class="text-white font-bold text-lg tracking-tight leading-tight">Lan Nguyễn 👋</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-4">
+        <!-- Online/Offline Toggle -->
+        <label class="relative inline-flex items-center cursor-pointer shadow-sm rounded-full">
+            <input type="checkbox" class="sr-only peer" checked>
+            <div class="w-12 h-6 bg-white/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00b1da]"></div>
+        </label>
+        <!-- Chat -->
+        <a href="chatvoikhachhang.html" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white backdrop-blur-md active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-[22px]">chat_bubble</span>
+        </a>
+    </div>
+</header>
+
+<!-- Main Content Area -->
+<main class="relative z-20 flex flex-col justify-center items-center h-screen pt-20 pb-24 px-4 pointer-events-none z-10">
+    
+    <!-- ACTIVE ORDER MODAL -->
+    <div id="modal-don-moi" class="w-full max-w-sm pointer-events-auto transition-all duration-300">
+        <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100">
+            <!-- Header -->
+            <div class="bg-[#a04100] px-4 py-3 flex justify-center items-center gap-2 relative">
+                <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 10px 10px;"></div>
+                <span class="material-symbols-outlined text-white text-xl animate-pulse">notifications_active</span>
+                <h2 class="text-white font-bold tracking-wide relative z-10">ĐƠN DỌN NHÀ MỚI</h2>
+            </div>
+            <!-- Body -->
+            <div class="p-5 flex flex-col gap-4">
+                <div class="flex gap-3">
+                    <span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                    <div>
+                        <p class="font-bold text-gray-800">Vinhomes Central Park</p>
+                        <p class="text-sm text-gray-500">Cách bạn 1.2km</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">schedule</span>
+                    <div>
+                        <p class="font-bold text-gray-800">Hôm nay, 14:00 (3 giờ)</p>
+                    </div>
+                </div>
+                <!-- Price -->
+                <div class="mt-2 flex items-center justify-between border-t border-b border-gray-100 py-3">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Thu nhập</span>
+                    <span class="text-3xl font-bold text-[#a04100]">150.000 đ</span>
+                </div>
+                <!-- Timer -->
+                <div class="flex flex-col gap-2 mt-1">
+                    <p class="text-red-600 font-semibold text-sm flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">timer</span>
+                        Tự động bỏ qua sau: <span id="countdown">00:58</span>
+                    </p>
+                    <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-red-500 h-full w-[80%] rounded-full animate-pulse"></div>
+                    </div>
+                </div>
+                <!-- Actions -->
+                <div class="flex gap-3 pt-2">
+                    <button onclick="boQuaDon()" class="flex-1 py-3 px-4 rounded-full border border-gray-300 text-gray-600 font-bold hover:bg-gray-50 transition-all active:scale-95">
+                        BỎ QUA
+                    </button>
+                    <button onclick="nhanDon()" class="flex-1 py-3 px-4 rounded-full gradient-primary text-white font-bold shadow-lg hover:brightness-110 transition-all active:scale-95">
+                        NHẬN ĐƠN
+                    </button>
+                </div>
+                <p class="text-center text-[11px] text-gray-400 italic">
+                    * Bỏ qua >30% sẽ giảm đơn.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- IDLE STATE (Hidden initially) -->
+    <div id="idle-state" class="absolute bottom-28 w-full max-w-sm px-4 hidden pointer-events-auto transition-all duration-500 translate-y-10 opacity-0">
+        <div class="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-[#e6f7fc] flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[#00b1da] animate-spin-slow">radar</span>
+                </div>
+                <div>
+                    <p class="font-bold text-gray-800">Đang tìm đơn hàng...</p>
+                    <p class="text-xs text-gray-500">Bạn đang ở chế độ trực tuyến</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+    <!-- Trang chủ -->
+    <a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="trangchutasker.html">
+        <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
+        <span class="text-label-sm font-label-sm">Trang chủ</span>
+    </a>
+    <!-- Lịch sử -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-colors" href="lichsudonhang.html">
+        <span class="material-symbols-outlined text-[28px]" >history</span>
+        <span class="text-label-sm font-label-sm font-medium">Lịch sử</span>
+    </a>
+    <!-- Thống kê -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-colors" href="thunhapvathongke.html">
+        <span class="material-symbols-outlined text-[28px]" >monitoring</span>
+        <span class="text-label-sm font-label-sm font-medium">Thống kê</span>
+    </a>
+    <!-- Tài khoản -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-colors" href="hosocanhan.html">
+        <span class="material-symbols-outlined text-[28px]" >person</span>
+        <span class="text-label-sm font-label-sm font-medium">Cá nhân</span>
+    </a>
+</nav>
+
+<!-- Toast Notification -->
+<div id="toast-notify" class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl text-sm flex items-center gap-2 transition-all">
+    <span class="material-symbols-outlined text-green-400" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+    <span id="toast-msg">Thành công</span>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="../shared/api.js"></script>
+<script>
+(function() {
+  // ===== 1. Kiểm tra đăng nhập =====
+  if (!ChiOiAuth.requireAuth('dangnhaptasker.html')) return;
+
+  var user = ChiOiAuth.getUser();
+  var currentOrder = null; // Đơn hàng hiện tại đang hiển thị trên modal
+  var countdownTimer = null;
+
+  // ===== 2. Hiển thị tên user lên Header =====
+  if (user && user.full_name) {
+    var nameEl = document.querySelector('header h1');
+    if (nameEl) nameEl.textContent = user.full_name + ' 👋';
+
+    var greetEl = document.querySelector('header span.text-white\\/90');
+    if (greetEl) {
+      var hour = new Date().getHours();
+      if (hour < 12) greetEl.textContent = 'Chào buổi sáng,';
+      else if (hour < 18) greetEl.textContent = 'Chào buổi chiều,';
+      else greetEl.textContent = 'Chào buổi tối,';
+    }
+  }
+
+  // ===== 3. Online/Offline Toggle — Bug 7 FIX: persist trạng thái =====
+  var toggleInput = document.querySelector('header input[type="checkbox"]');
+  if (toggleInput) {
+    // Bug 7 FIX: Khôi phục trạng thái từ localStorage
+    var savedOnline = localStorage.getItem('chioi_tasker_online');
+    if (savedOnline !== null) {
+      toggleInput.checked = savedOnline === 'true';
+    }
+
+    toggleInput.addEventListener('change', async function() {
+      try {
+        await apiFetch('/api/taskers/status', {
+          method: 'PATCH',
+          body: { is_online: toggleInput.checked }
+        });
+        // Bug 7 FIX: Lưu trạng thái vào localStorage
+        localStorage.setItem('chioi_tasker_online', String(toggleInput.checked));
+        showToast(toggleInput.checked ? '🟢 Đã bật nhận việc' : '🔴 Đã tắt nhận việc');
+      } catch (err) {
+        showToast('Lỗi: ' + err.message);
+        toggleInput.checked = !toggleInput.checked; // revert
+      }
+    });
+  }
+
+  // ===== 4. Ẩn modal đơn mới ban đầu, hiện trạng thái Idle =====
+  var modal = document.getElementById('modal-don-moi');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.style.opacity = '1';
+    modal.style.transform = 'scale(1)';
+  }
+  showIdleState();
+
+  // ===== 5. Khởi tạo Leaflet Map =====
+  var defaultLat = 10.7769; // Fallback nếu GPS không có
+  var defaultLng = 106.7009;
+  var map = L.map('leaflet-map', { zoomControl: false, attributionControl: false }).setView([defaultLat, defaultLng], 16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
+
+  // Custom icon cho Tasker
+  var taskerIcon = L.divIcon({
+    className: '',
+    html: '<div class="tasker-marker"><div class="pulse-ring"></div></div>',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20]
+  });
+  var taskerMarker = L.marker([defaultLat, defaultLng], { icon: taskerIcon }).addTo(map);
+  // Không bindPopup — Bug 5: bỏ popup "Vị trí của bạn"
+
+  // Lấy vị trí GPS thực của Tasker ngay khi load — Bug 5
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      map.setView([lat, lng], 16);
+      taskerMarker.setLatLng([lat, lng]);
+    }, function() {
+      console.warn('[Map] Không lấy được vị trí, dùng vị trí mặc định.');
+    }, { enableHighAccuracy: true, timeout: 10000 });
+  }
+
+  // ===== 6. Kết nối Socket Realtime =====
+  var socket = connectSocket();
+  if (socket) {
+    // Nhận đơn hàng mới
+    socket.on('new_order', function(data) {
+      currentOrder = data.order;
+      showNewOrderModal(data.order);
+    });
+
+    // Gửi GPS mỗi 30 giây + cập nhật marker
+    if (navigator.geolocation) {
+      setInterval(function() {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          var lat = pos.coords.latitude;
+          var lng = pos.coords.longitude;
+          taskerMarker.setLatLng([lat, lng]);
+          map.panTo([lat, lng]);
+          socket.emit('update_gps', {
+            latitude: lat,
+            longitude: lng
+          });
+        }, function() {}, { enableHighAccuracy: true });
+      }, 30000);
+    }
+
+    // Nhận tin nhắn
+    socket.on('receive_message', function(msg) {
+      showToast('💬 Tin nhắn mới từ khách hàng');
+    });
+
+    // Đơn bị hủy
+    socket.on('order_cancelled', function(data) {
+      showToast('⚠️ ' + data.message);
+      if (currentOrder && currentOrder.order_id === data.orderId) {
+        hideModal();
+        showIdleState();
+        currentOrder = null;
+      }
+    });
+  }
+
+  // ===== 10. Bug 8 FIX: Kiểm tra đơn đang thực hiện trước khi hiện đơn mới =====
+  var isHandlingOrder = false; // Flag: đang xử lý đơn
+
+  (async function loadAvailableOrders() {
+    try {
+      // Bug 8 FIX: Check đơn hàng đang thực hiện (ACCEPTED / IN_PROGRESS / TASKER_ARRIVED)
+      var history = await apiFetch('/api/taskers/order-history');
+      if (history && history.length > 0) {
+        var activeOrder = history.find(function(o) {
+          return ['ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'].indexOf(o.status) > -1;
+        });
+        if (activeOrder) {
+          isHandlingOrder = true;
+          showActiveOrderCard(activeOrder);
+          return; // Không hiện đơn mới
+        }
+      }
+    } catch (e) {
+      console.warn('[Tasker] Không check được đơn đang xử lý:', e.message);
+    }
+
+    // Nếu không có đơn đang xử lý, load đơn pending
+    try {
+      var orders = await apiFetch('/api/taskers/available-orders');
+      if (orders && orders.length > 0) {
+        currentOrder = orders[0];
+        showNewOrderModal(orders[0]);
+      }
+    } catch (e) {
+      console.warn('[Tasker] Không load được đơn hàng có sẵn:', e.message);
+    }
+  })();
+
+  // Bug 8 FIX: Hiển thị card đơn đang thực hiện (khóa nhận đơn mới)
+  function showActiveOrderCard(order) {
+    var modal = document.getElementById('modal-don-moi');
+    var idle = document.getElementById('idle-state');
+    if (idle) { idle.classList.add('hidden'); idle.classList.add('translate-y-10', 'opacity-0'); }
+
+    var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ';
+    var customerName = (order.customers && order.customers.users && order.customers.users.full_name) ? order.customers.users.full_name : 'Khách hàng';
+    var statusLabel = { 'ACCEPTED': 'Đã nhận đơn', 'TASKER_ARRIVED': 'Đã đến nơi', 'IN_PROGRESS': 'Đang thực hiện' };
+
+    if (modal) {
+      modal.innerHTML = '<div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100">' +
+        '<div class="bg-[#00b1da] px-4 py-3 flex justify-center items-center gap-2">' +
+        '<span class="material-symbols-outlined text-white text-xl">assignment</span>' +
+        '<h2 class="text-white font-bold tracking-wide">ĐANG XỬ LÝ ĐƠN</h2></div>' +
+        '<div class="p-5 flex flex-col gap-3">' +
+        '<div class="flex gap-3"><span class="material-symbols-outlined text-[#00b1da]" style="font-variation-settings: \'FILL\' 1;">person</span>' +
+        '<p class="font-bold text-gray-800">' + customerName + '</p></div>' +
+        '<div class="flex gap-3"><span class="material-symbols-outlined text-[#ff7e36]" style="font-variation-settings: \'FILL\' 1;">location_on</span>' +
+        '<p class="text-sm text-gray-600">' + (order.address || 'Chưa cập nhật') + '</p></div>' +
+        '<div class="flex gap-3"><span class="material-symbols-outlined text-[#ff7e36]" style="font-variation-settings: \'FILL\' 1;">cleaning_services</span>' +
+        '<p class="font-bold text-gray-800">' + serviceName + '</p></div>' +
+        '<div class="mt-2 flex items-center justify-between border-t border-gray-100 pt-3">' +
+        '<span class="text-xs font-bold text-gray-400 uppercase">Trạng thái</span>' +
+        '<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold">' + (statusLabel[order.status] || order.status) + '</span></div>' +
+        '<div class="flex items-center justify-between border-t border-gray-100 pt-3">' +
+        '<span class="text-xs font-bold text-gray-400 uppercase">Thu nhập</span>' +
+        '<span class="text-2xl font-bold text-[#a04100]">' + formatVND(order.total_price) + '</span></div>' +
+        '<p class="text-center text-[11px] text-gray-400 italic">Hoàn thành đơn này trước khi nhận đơn mới</p></div></div>';
+      modal.style.display = 'block';
+      modal.style.opacity = '1';
+      modal.style.transform = 'scale(1)';
+    }
+  }
+
+  // ===== 6. Hiển thị Modal đơn mới từ Socket =====
+  function showNewOrderModal(order) {
+    var modal = document.getElementById('modal-don-moi');
+    var idle = document.getElementById('idle-state');
+    if (idle) {
+      idle.classList.add('hidden');
+      idle.classList.add('translate-y-10', 'opacity-0');
+    }
+
+    // Cập nhật nội dung modal
+    var addressEl = modal.querySelector('.font-bold.text-gray-800');
+    if (addressEl) addressEl.textContent = order.address || 'Địa chỉ đơn hàng';
+
+    var priceEl = modal.querySelector('.text-3xl.font-bold');
+    if (priceEl) priceEl.textContent = formatVND(order.total_price);
+
+    var timeEl = modal.querySelectorAll('.font-bold.text-gray-800');
+    if (timeEl[1]) {
+      var date = new Date(order.scheduled_time);
+      timeEl[1].textContent = formatDateTime(order.scheduled_time);
+    }
+
+    // Hiện modal
+    modal.style.display = 'block';
+    modal.style.opacity = '1';
+    modal.style.transform = 'scale(1)';
+
+    // Bắt đầu countdown 60s
+    startCountdown(60);
+  }
+
+  // ===== 7. Countdown Timer =====
+  function startCountdown(seconds) {
+    clearInterval(countdownTimer);
+    var remaining = seconds;
+    var countdownEl = document.getElementById('countdown');
+    var progressBar = modal.querySelector('.bg-red-500');
+
+    countdownTimer = setInterval(function() {
+      remaining--;
+      if (countdownEl) {
+        var mins = Math.floor(remaining / 60);
+        var secs = remaining % 60;
+        countdownEl.textContent = (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+      }
+      if (progressBar) {
+        progressBar.style.width = ((remaining / seconds) * 100) + '%';
+      }
+      if (remaining <= 0) {
+        clearInterval(countdownTimer);
+        // Tự động bỏ qua
+        boQuaDon();
+      }
+    }, 1000);
+  }
+
+  // ===== 8. Nhận đơn — Gọi API (Bug 8: block nếu đang có đơn) =====
+  window.nhanDon = async function() {
+    if (!currentOrder) return;
+    if (isHandlingOrder) {
+      showToast('⚠️ Bạn đang có đơn, hoàn thành trước khi nhận đơn mới!');
+      return;
+    }
+    try {
+      showToast('Đang nhận đơn...');
+      var result = await apiFetch('/api/orders/' + currentOrder.order_id + '/accept', {
+        method: 'PATCH'
+      });
+      clearInterval(countdownTimer);
+      isHandlingOrder = true;
+      hideModal();
+      showToast('✅ Đã nhận đơn! Bắt đầu di chuyển tới điểm dọn dẹp.');
+      // Bug 8 FIX: Show active order card instead of idle
+      showActiveOrderCard(Object.assign({}, currentOrder, { status: 'ACCEPTED' }));
+      currentOrder = null;
+    } catch (err) {
+      showToast('❌ ' + err.message);
+    }
+  };
+
+  // ===== 9. Bỏ qua đơn =====
+  window.boQuaDon = function() {
+    clearInterval(countdownTimer);
+    hideModal();
+    showToast('Đã bỏ qua đơn hàng. Chú ý tỷ lệ nhận đơn!');
+    showIdleState();
+    currentOrder = null;
+  };
+
+})();
+
+// ===== Utility functions (giữ nguyên cấu trúc cũ) =====
+function hideModal() {
+  var modal = document.getElementById('modal-don-moi');
+  if (modal) {
+    modal.style.opacity = '0';
+    modal.style.transform = 'scale(0.95)';
+    setTimeout(function() { modal.style.display = 'none'; }, 300);
+  }
+}
+
+function showIdleState() {
+  var idle = document.getElementById('idle-state');
+  idle.classList.remove('hidden');
+  setTimeout(function() {
+    idle.classList.remove('translate-y-10', 'opacity-0');
+  }, 50);
+}
+
+function showToast(msg) {
+  var toast = document.getElementById('toast-notify');
+  document.getElementById('toast-msg').innerText = msg;
+  toast.classList.remove('hidden');
+  setTimeout(function() { toast.classList.add('hidden'); }, 4000);
+}
+</script>
+<style>
+    .animate-spin-slow {
+        animation: spin 3s linear infinite;
+    }
+</style>
+</body>
+</html>

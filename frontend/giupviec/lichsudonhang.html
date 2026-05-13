@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#ffdad6",
+                    "inverse-on-surface": "#ffede6",
+                    "secondary": "#895032",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-container": "#642600",
+                    "on-tertiary-fixed": "#001f28",
+                    "on-tertiary-fixed-variant": "#004d61",
+                    "on-surface": "#241914",
+                    "surface-container-highest": "#f4ded5",
+                    "primary-container": "#ff7e36",
+                    "tertiary-container": "#00b1da",
+                    "on-background": "#241914",
+                    "tertiary-fixed": "#b8eaff",
+                    "primary": "#a04100",
+                    "secondary-fixed": "#ffdbcc",
+                    "on-secondary-container": "#794226",
+                    "surface-variant": "#f4ded5",
+                    "background": "#fff8f6",
+                    "surface-bright": "#fff8f6",
+                    "surface-tint": "#a04100",
+                    "outline-variant": "#dfc0b3",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#351000",
+                    "tertiary": "#006780",
+                    "outline": "#8b7266",
+                    "on-primary-fixed-variant": "#7a3000",
+                    "on-surface-variant": "#584238",
+                    "surface-container-low": "#fff1eb",
+                    "primary-fixed-dim": "#ffb693",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#fae4da",
+                    "surface": "#fff8f6",
+                    "surface-dim": "#ecd6cc",
+                    "inverse-primary": "#ffb693",
+                    "on-tertiary-container": "#003f4f",
+                    "inverse-surface": "#3b2e28",
+                    "on-error": "#ffffff",
+                    "surface-container": "#ffeae1",
+                    "primary-fixed": "#ffdbcc",
+                    "tertiary-fixed-dim": "#52d5ff",
+                    "on-secondary-fixed": "#351000",
+                    "on-secondary-fixed-variant": "#6d391d",
+                    "secondary-fixed-dim": "#ffb693",
+                    "secondary-container": "#feb28e",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "container-padding": "16px",
+                    "sm": "8px",
+                    "stack-gap": "12px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Be Vietnam Pro"],
+                    "headline-md": ["Be Vietnam Pro"],
+                    "display-lg": ["Be Vietnam Pro"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "title-sm": ["Be Vietnam Pro"],
+                    "body-sm": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .{
+            background: linear-gradient(to right, #a04100, #ff7e36);
+            height: 300px;
+        }
+        .order-card {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            border: 1px solid #ffdbcc;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+          body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .teal-gradient {
+            background: linear-gradient(135deg, #00b1da 0%, #006780 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth transitions */
+        a, button { transition: all 0.2s ease; }
+        /* Card hover effect */
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body class="bg-background min-h-screen pb-24">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0" style="background: linear-gradient(180deg, rgba(255,126,54,0.9) 0%, rgba(255,126,54,0) 100%); pointer-events: none;"></div>
+
+<!-- Header Section -->
+<header class="relative w-full pt-12 px-md overflow-hidden bg-transparent relative z-40">
+<div class="flex justify-between items-center w-full px-md h-16">
+<h1 class="text-headline-md font-headline-md font-bold text-white">Lịch sử đơn hàng</h1>
+<div class="flex gap-4">
+<button class="text-white-variant hover:opacity-90 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-white-variant hover:opacity-90 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</div>
+<!-- Abstract Decoration for Premium Feel -->
+<div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+</header>
+<!-- Main Content -->
+<main class="pt-6 px-md relative z-10">
+<!-- Filter Row -->
+<div class="flex gap-sm overflow-x-auto pb-4 no-scrollbar">
+<button class="flex items-center gap-1 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors whitespace-nowrap">
+                Tháng này
+                <span class="material-symbols-outlined text-[16px]" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+<button class="flex items-center gap-1 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors whitespace-nowrap">
+                Tất cả dịch vụ
+                <span class="material-symbols-outlined text-[16px]" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+<button class="flex items-center gap-1 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors whitespace-nowrap">
+                Đánh giá
+                <span class="material-symbols-outlined text-[16px]" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Orders List -->
+<div class="flex flex-col gap-md mt-2">
+<!-- Card 1 -->
+<div class="order-card bg-surface-container-lowest rounded-xl p-md flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-title-sm font-title-sm text-on-surface">Dọn dẹp nhà cửa</h3>
+<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+                            14:00 - 12/05/2026
+                        </p>
+</div>
+<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-label-caps font-bold">Hoàn thành</span>
+</div>
+<div class="flex items-center justify-between border-t border-dashed border-outline-variant pt-3">
+<span class="text-headline-md font-headline-md text-primary">150.000 đ</span>
+<div class="flex items-center gap-2">
+<img class="w-8 h-8 rounded-full border-2 border-primary-fixed" data-alt="A professional cleaning specialist profile photo, a friendly woman in her 30s wearing a clean professional polo shirt against a bright, warm domestic background. The lighting is soft and natural, emphasizing trust and cleanliness with warm orange color accents in the environment. Modern app aesthetic with professional photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs-vgupGcfQLmB1ihPersCk1KVVdi30uRObCXf-TGBHo3xY0jdA5s_dUq1VWZjp9Uc5A3pPZOUDJHpaCJ8RMqkY9GjwoloBea3EmvlUhF8YqNLG2D_5YnSCPhG6yg-4eNT0mwBiTx8LPf8Ise-DfGnxw3fiMX5P0nxnL3M2C0hmruAb2r86KLdXyYrSIranbFJ2j1IGeV71zVaJl-MVJU2M63xenJIR3ub4vRB6XEzl4rgSBhHqh2FnMapsRw10Nebqnb-oVGDgAA"/>
+<span class="text-body-sm text-on-surface-variant">Chị Lan</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 mt-1">
+<p class="text-body-sm text-on-surface flex items-center gap-1 italic">
+<span class="text-yellow-500 font-bold tracking-tight">⭐⭐⭐⭐⭐</span>
+                        "Làm rất sạch sẽ"
+                    </p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="order-card bg-surface-container-lowest rounded-xl p-md flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-title-sm font-title-sm text-on-surface">Trông trẻ (2 giờ)</h3>
+<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+                            09:00 - 10/05/2026
+                        </p>
+</div>
+<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-label-caps font-bold">Hoàn thành</span>
+</div>
+<div class="flex items-center justify-between border-t border-dashed border-outline-variant pt-3">
+<span class="text-headline-md font-headline-md text-primary">200.000 đ</span>
+<div class="flex items-center gap-2">
+<img class="w-8 h-8 rounded-full border-2 border-primary-fixed" data-alt="A warm and caring childcare provider profile portrait. A middle-aged person with a kind smile, dressed in comfortable casual wear. The setting is a cozy, brightly lit nursery with soft orange and peach tones, maintaining a professional yet approachable atmosphere for a service app. High-quality portrait photography with a gentle blur in the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmcq4llYwgcK9uMi7t9odKFk6HYfnLm6o6rOhjImWfY6noFv4MnuweeZLz2_bevtLx9J7YDiVAHRgsp_jijCbNadEWF3m3LlhhjX_nvzF0FyZECDfeP99Uhw4UKeipP8a5EiG_MFE5z3zeJK6EB80KR-a2-O0UZY_29KblffthIKYyZhWWDqf6RO3bYDeU4gUcvXg8QJ6m88gJyh_7bg5jTwf3t2xVbSBHNuUrwQOov_4r8UfqCXIhqDPlUIui1Pb-GCpZC6ZU1uA"/>
+<span class="text-body-sm text-on-surface-variant">Chị Mai</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 mt-1">
+<p class="text-body-sm text-on-surface flex items-center gap-1 italic">
+<span class="text-yellow-500 font-bold tracking-tight">⭐⭐⭐⭐</span>
+                        "Tốt, đúng giờ"
+                    </p>
+</div>
+</div>
+<!-- Empty space for better layout rhythm -->
+<div class="h-4"></div>
+<!-- Service Banner -->
+
+</div>
+</main>
+<!-- Bottom Navigation Bar (Floating Pill Layout) -->
+
+<!-- Navigation Shell -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+    <!-- Trang chủ -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-transform" href="trangchutasker.html">
+        <span class="material-symbols-outlined text-[28px]" >home</span>
+        <span class="text-label-sm font-label-sm">Trang chủ</span>
+    </a>
+    <!-- Lịch sử -->
+    <a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-colors" href="lichsudonhang.html">
+        <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">history</span>
+        <span class="text-label-sm font-label-sm font-medium">Lịch sử</span>
+    </a>
+    <!-- Thống kê -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-colors" href="thunhapvathongke.html">
+        <span class="material-symbols-outlined text-[28px]" >monitoring</span>
+        <span class="text-label-sm font-label-sm font-medium">Thống kê</span>
+    </a>
+    <!-- Tài khoản -->
+    <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-colors" href="hosocanhan.html">
+        <span class="material-symbols-outlined text-[28px]" >person</span>
+        <span class="text-label-sm font-label-sm font-medium">Cá nhân</span>
+    </a>
+</nav>
+
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhaptasker.html')) return;
+
+  var ordersList = document.querySelector('.flex.flex-col.gap-md');
+  if (!ordersList) return;
+
+  showLoading();
+  try {
+    var orders = await apiFetch('/api/taskers/history');
+    hideLoading();
+
+    if (!orders || orders.length === 0) {
+      ordersList.innerHTML = '<div class="text-center py-12"><span class="material-symbols-outlined text-[48px] text-outline-variant">inbox</span><p class="text-on-surface-variant mt-2">Chưa có đơn hàng nào</p></div>';
+      return;
+    }
+
+    // Clear static cards
+    ordersList.innerHTML = '';
+
+    var statusMap = {
+      'COMPLETED': { label: 'Hoàn thành', bg: 'bg-green-100', text: 'text-green-700' },
+      'IN_PROGRESS': { label: 'Đang thực hiện', bg: 'bg-blue-100', text: 'text-blue-700' },
+      'PENDING': { label: 'Chờ xử lý', bg: 'bg-yellow-100', text: 'text-yellow-700' },
+      'CANCELLED': { label: 'Đã hủy', bg: 'bg-red-100', text: 'text-red-700' },
+      'ACCEPTED': { label: 'Đã nhận', bg: 'bg-blue-100', text: 'text-blue-700' },
+      'TASKER_ARRIVED': { label: 'Đã tới nơi', bg: 'bg-blue-100', text: 'text-blue-700' }
+    };
+
+    orders.forEach(function(order) {
+      var s = statusMap[order.status] || statusMap['PENDING'];
+      var serviceName = (order.service && order.service.name) || 'Dịch vụ';
+      var customerName = (order.customer && order.customer.full_name) || 'Khách hàng';
+      var rating = order.review ? order.review.rating : 0;
+      var comment = order.review ? order.review.comment : '';
+      var starStr = '';
+      for (var i = 0; i < rating; i++) starStr += '⭐';
+
+      var card = document.createElement('div');
+      card.className = 'order-card bg-surface-container-lowest rounded-xl p-md flex flex-col gap-3';
+      card.innerHTML =
+        '<div class="flex justify-between items-start">' +
+          '<div><h3 class="text-title-sm font-title-sm text-on-surface">' + serviceName + '</h3>' +
+          '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px]">schedule</span>' + formatDateTime(order.scheduled_time) + '</p></div>' +
+          '<span class="' + s.bg + ' ' + s.text + ' px-3 py-1 rounded-full text-label-caps font-bold">' + s.label + '</span></div>' +
+        '<div class="flex items-center justify-between border-t border-dashed border-outline-variant pt-3">' +
+          '<span class="text-headline-md font-headline-md text-primary">' + formatVND(order.total_price) + '</span>' +
+          '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">person</span>' +
+          '<span class="text-body-sm text-on-surface-variant">' + customerName + '</span></div></div>' +
+        (rating > 0 ? '<div class="bg-surface-container-low rounded-lg p-3 mt-1"><p class="text-body-sm text-on-surface flex items-center gap-1 italic"><span class="text-yellow-500 font-bold tracking-tight">' + starStr + '</span>"' + (comment || 'Tốt') + '"</p></div>' : '');
+
+      ordersList.appendChild(card);
+    });
+  } catch (e) {
+    hideLoading();
+    console.warn('[Tasker History] Lỗi:', e.message);
+    ordersList.innerHTML = '<div class="text-center py-12 text-on-surface-variant">Không thể tải lịch sử đơn hàng</div>';
+  }
+})();
+</script>
+</body></html>

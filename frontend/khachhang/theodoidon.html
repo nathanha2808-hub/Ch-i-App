@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#3e3833",
+                        "secondary": "#b3272e",
+                        "secondary-fixed-dim": "#ffb3af",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#fc5d5d",
+                        "primary-fixed": "#ffdbcc",
+                        "primary": "#a04100",
+                        "inverse-surface": "#303030",
+                        "surface-dim": "#dcd9d9",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f6f3f2",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-tertiary-fixed": "#1f1b17",
+                        "inverse-primary": "#ffb693",
+                        "on-background": "#1b1c1c",
+                        "on-primary-container": "#642600",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ebe1da",
+                        "background": "#fcf9f8",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "on-primary-fixed": "#351000",
+                        "surface": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#410005",
+                        "surface-tint": "#a04100",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#8b7266",
+                        "surface-variant": "#e4e2e1",
+                        "on-surface-variant": "#584238",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#91081a",
+                        "primary-container": "#ff7e36",
+                        "outline-variant": "#dfc0b3",
+                        "tertiary-container": "#aaa19b",
+                        "tertiary-fixed-dim": "#cec5be",
+                        "on-secondary-container": "#60000c",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary": "#645d58",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-container": "#f0eded",
+                        "secondary-fixed": "#ffdad7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "container-padding": "20px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "card-gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "caption": ["Be Vietnam Pro"],
+                        "h1-display": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "h2-section": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "caption": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                        "h1-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "h2-section": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .orange-gradient {
+            background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen text-on-background relative overflow-x-hidden">
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<!-- Background Gradient -->
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 flex justify-between items-center w-full px-container-padding h-16 bg-transparent">
+<button onclick="window.location.href='trangchu.html'" class="flex items-center justify-center w-10 h-10 text-on-primary hover:bg-white/10 rounded-full active:scale-95 transition-all duration-200" style="cursor:pointer">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-headline-md font-headline-md font-extrabold text-on-primary">Theo dõi đơn</h1>
+<button onclick="window.location.href='chatvoitasker.html'" class="flex items-center justify-center w-10 h-10 text-on-primary hover:bg-white/10 rounded-full active:scale-95 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</button>
+</header>
+<main class="relative z-10 px-md pt-4 pb-32 space-y-stack-gap">
+<!-- Section: Tasker Card -->
+<section class="bg-surface-container-lowest rounded-[24px] p-md flex items-center gap-md shadow-[0px_4px_20px_0px_rgba(160,65,0,0.08)] border border-surface-container-low">
+<div class="relative w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container shrink-0">
+<img alt="Nguyễn Lan" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZVSugv299UqahXmjAPFAeviYxHR9yZsRhqGPurWxflfnS6a8k03SsM5HUwAhydanxXz8XpstBesIZq35k6LqVmDNqRa336tBTQs3FV7h1zCSBcvfmBH9WcbiJrpilAAMFWXwkfxttryr-tw3b7S1vvUYRqDBCDgoyBx0ZoP20oN7Jp8kaoaoiNmFeNeoo_zfBSwe2Sde9WvngDXtP-oXC4e6YKlEoLkK6ak_t4aXk_sLKDDvfKdho8h7JDnXgnXRGSoTuktsg8NQ"/>
+</div>
+<div class="flex-1">
+<h3 class="text-title-sm font-title-sm text-on-background">Nguyễn Lan</h3>
+<div class="flex items-center gap-xs mt-1">
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">4.8</span>
+<span class="mx-1 text-outline-variant">•</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Dọn dẹp nhà</span>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-container-high p-3 rounded-full text-primary hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+</button>
+</div>
+</section>
+<!-- Section: Order Stepper -->
+<section class="bg-surface-container-lowest rounded-[24px] p-md shadow-[0px_4px_20px_0px_rgba(0,0,0,0.04)] border border-surface-container-low">
+<h4 class="text-label-caps font-label-caps text-outline mb-md">TIẾN TRÌNH THỰC HIỆN</h4>
+<div class="space-y-0 relative">
+<!-- Step 1: Completed -->
+<div class="flex gap-md min-h-[64px] relative step-line step-line-completed">
+<div class="z-10 bg-primary text-on-primary w-6 h-6 rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] font-bold" data-icon="check">check</span>
+</div>
+<div class="pb-lg flex-1">
+<div class="flex justify-between items-start">
+<span class="text-body-lg font-semibold text-on-background">Đã đặt đơn</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">10:00</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Đơn hàng của bạn đã được tiếp nhận</p>
+</div>
+</div>
+<!-- Step 2: Completed -->
+<div class="flex gap-md min-h-[64px] relative step-line step-line-completed">
+<div class="z-10 bg-primary text-on-primary w-6 h-6 rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] font-bold" data-icon="check">check</span>
+</div>
+<div class="pb-lg flex-1">
+<div class="flex justify-between items-start">
+<span class="text-body-lg font-semibold text-on-background">Đã tìm Tasker</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">10:02</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Tasker Nguyễn Lan đã nhận việc</p>
+</div>
+</div>
+<!-- Step 3: Completed -->
+<div class="flex gap-md min-h-[64px] relative step-line step-line-completed">
+<div class="z-10 bg-primary text-on-primary w-6 h-6 rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] font-bold" data-icon="check">check</span>
+</div>
+<div class="pb-lg flex-1">
+<div class="flex justify-between items-start">
+<span class="text-body-lg font-semibold text-on-background">Tasker đang đến</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">10:15</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Đang di chuyển tới địa chỉ của bạn</p>
+</div>
+</div>
+<!-- Step 4: Active -->
+<div class="flex gap-md min-h-[64px] relative step-line">
+<div class="z-10 bg-primary text-on-primary w-6 h-6 rounded-full flex items-center justify-center shrink-0 pulse-orange">
+<div class="w-2 h-2 bg-on-primary rounded-full"></div>
+</div>
+<div class="pb-lg flex-1">
+<div class="flex justify-between items-start">
+<span class="text-body-lg font-bold text-primary">Đang thực hiện</span>
+<span class="text-body-sm font-bold text-primary">Hiện tại</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Tasker đang tiến hành dọn dẹp</p>
+</div>
+</div>
+<!-- Step 5: Upcoming -->
+<div class="flex gap-md">
+<div class="z-10 bg-outline-variant text-white w-6 h-6 rounded-full flex items-center justify-center shrink-0">
+<div class="w-2 h-2 bg-white rounded-full"></div>
+</div>
+<div class="flex-1">
+<span class="text-body-lg font-semibold text-outline">Hoàn thành</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Dịch vụ kết thúc</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Order Details -->
+<section class="bg-surface-container-lowest rounded-[24px] p-md shadow-[0px_4px_20px_0px_rgba(0,0,0,0.04)] border border-surface-container-low space-y-md">
+<h4 class="text-label-caps font-label-caps text-outline">CHI TIẾT ĐƠN HÀNG</h4>
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<span class="text-body-sm text-on-surface-variant">Mã đơn</span>
+<span class="text-body-sm font-semibold text-on-background">#DH20261020-001</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-body-sm text-on-surface-variant">Dịch vụ</span>
+<span class="text-body-sm font-semibold text-on-background">Dọn dẹp nhà</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-body-sm text-on-surface-variant">Thời gian</span>
+<span class="text-body-sm font-semibold text-on-background">20/10/2026 - 10:00</span>
+</div>
+<div class="pt-sm mt-sm border-t border-outline-variant flex justify-between items-center">
+<span class="text-body-lg font-bold text-on-background">Tổng tiền</span>
+<span class="text-headline-md font-bold text-primary">450.000 đ</span>
+</div>
+</div>
+</section>
+<!-- Action Buttons -->
+<section class="grid grid-cols-3 gap-sm pt-md">
+<button onclick="window.location.href='chatvoitasker.html'" class="flex flex-col items-center justify-center gap-1 py-3 px-2 bg-surface-container-high rounded-[16px] text-primary hover:bg-primary/10 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="text-label-caps font-label-caps">Chat</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 py-3 px-2 bg-surface-container-high rounded-[16px] text-primary hover:bg-primary/10 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+<span class="text-label-caps font-label-caps">Gọi</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 py-3 px-2 bg-red-50 rounded-[16px] text-error hover:bg-error/10 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="cancel">cancel</span>
+<span class="text-label-caps font-label-caps">Hủy đơn</span>
+</button>
+</section>
+</main>
+<!-- BottomNavBar (Floating Pill) -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<!-- Trang chủ -->
+<a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="trangchu.html">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-label-sm font-label-sm">Trang chủ</span>
+</a>
+<!-- Hoạt động -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="lichsuhoatdong.html">
+<span class="material-symbols-outlined text-[28px]">assignment</span>
+<span class="text-label-sm font-label-sm font-medium">Hoạt động</span>
+</a>
+<!-- Thông báo (UC-KH-15) → M11 -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
+<span class="material-symbols-outlined text-[28px]">notifications</span>
+<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span class="text-label-sm font-label-sm font-medium">Thông báo</span>
+</a>
+<!-- Tài khoản -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="taikhoan.html">
+<span class="material-symbols-outlined text-[28px]">person</span>
+<span class="text-label-sm font-label-sm font-medium">Tài khoản</span>
+</a>
+</nav>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="../shared/api.js"></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
+
+  var params = new URLSearchParams(window.location.search);
+  var orderId = params.get('orderId');
+  if (!orderId) return;
+
+  // Bug 2 FIX: Stepper steps mapping
+  var STEPS = [
+    { key: 'PENDING', label: 'Đã đặt đơn', desc: 'Đơn hàng của bạn đã được tiếp nhận' },
+    { key: 'ACCEPTED', label: 'Đã tìm Tasker', desc: 'Tasker đã nhận việc' },
+    { key: 'TASKER_ARRIVED', label: 'Tasker đang đến', desc: 'Đang di chuyển tới địa chỉ của bạn' },
+    { key: 'IN_PROGRESS', label: 'Đang thực hiện', desc: 'Tasker đang tiến hành dịch vụ' },
+    { key: 'COMPLETED', label: 'Hoàn thành', desc: 'Dịch vụ kết thúc' }
+  ];
+
+  function getStepIndex(status) {
+    for (var i = 0; i < STEPS.length; i++) {
+      if (STEPS[i].key === status) return i;
+    }
+    return 0;
+  }
+
+  function renderStepper(status) {
+    var currentIdx = getStepIndex(status);
+    var container = document.querySelector('.space-y-0.relative');
+    if (!container) return;
+    container.innerHTML = '';
+
+    STEPS.forEach(function(step, idx) {
+      var isCompleted = idx < currentIdx;
+      var isActive = idx === currentIdx;
+      var isLast = idx === STEPS.length - 1;
+
+      var div = document.createElement('div');
+      div.className = 'flex gap-md' + (isLast ? '' : ' min-h-[64px] relative step-line' + (isCompleted ? ' step-line-completed' : ''));
+
+      var iconHTML = '';
+      if (isCompleted) {
+        iconHTML = '<div class="z-10 bg-primary text-on-primary w-6 h-6 rounded-full flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[16px] font-bold">check</span></div>';
+      } else if (isActive) {
+        iconHTML = '<div class="z-10 bg-primary text-on-primary w-6 h-6 rounded-full flex items-center justify-center shrink-0 pulse-orange"><div class="w-2 h-2 bg-on-primary rounded-full"></div></div>';
+      } else {
+        iconHTML = '<div class="z-10 bg-outline-variant text-white w-6 h-6 rounded-full flex items-center justify-center shrink-0"><div class="w-2 h-2 bg-white rounded-full"></div></div>';
+      }
+
+      var textClass = isActive ? 'text-body-lg font-bold text-primary' : (isCompleted ? 'text-body-lg font-semibold text-on-background' : 'text-body-lg font-semibold text-outline');
+      var timeText = isActive ? 'Hiện tại' : '';
+
+      var contentHTML = '<div class="' + (isLast ? 'flex-1' : 'pb-lg flex-1') + '">' +
+        '<div class="flex justify-between items-start"><span class="' + textClass + '">' + step.label + '</span>' +
+        (timeText ? '<span class="text-body-sm font-bold text-primary">' + timeText + '</span>' : '') +
+        '</div><p class="text-body-sm font-body-sm text-on-surface-variant">' + step.desc + '</p></div>';
+
+      div.innerHTML = iconHTML + contentHTML;
+      container.appendChild(div);
+    });
+  }
+
+  // ===== Fetch Order Detail =====
+  try {
+    var order = await apiFetch('/api/orders/' + orderId);
+
+    var taskerName = (order.taskers && order.taskers.users && order.taskers.users.full_name) ? order.taskers.users.full_name : 'Chưa có Tasker';
+    var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ';
+
+    var h3 = document.querySelector('section:first-of-type h3');
+    if (h3) h3.textContent = taskerName;
+
+    var detailSpans = document.querySelectorAll('.space-y-sm .flex.justify-between span:last-child');
+    if (detailSpans.length >= 4) {
+      detailSpans[0].textContent = '#DH' + order.order_id;
+      detailSpans[1].textContent = serviceName;
+      detailSpans[2].textContent = formatDateTime(order.scheduled_time);
+      detailSpans[3].textContent = formatVND(order.total_price);
+    }
+
+    // Bug 2 FIX: Render stepper based on actual status
+    renderStepper(order.status || 'PENDING');
+
+    // Update chat buttons with proper orderId and receiverId
+    var chatBtns = document.querySelectorAll('[onclick*="chatvoitasker"]');
+    chatBtns.forEach(function(btn) {
+      var tid = order.tasker_id || 0;
+      btn.setAttribute('onclick', "window.location.href='chatvoitasker.html?orderId=" + order.order_id + "&receiverId=" + tid + "'");
+    });
+  } catch (e) {
+    console.warn('[TheoDoi] Lỗi load đơn hàng:', e.message);
+  }
+
+  // ===== SOCKET.IO REAL-TIME UPDATES =====
+  var socket = connectSocket();
+  if (socket) {
+    socket.on('order_status_updated', function(data) {
+      if (String(data.order.order_id) === String(orderId)) {
+        showToastMsg('🔔 Trạng thái đơn: ' + data.order.status);
+        renderStepper(data.order.status);
+      }
+    });
+
+    socket.on('order_accepted', function(data) {
+      if (String(data.order.order_id) === String(orderId)) {
+        showToastMsg('🎉 Tasker đã nhận đơn!');
+        renderStepper('ACCEPTED');
+      }
+    });
+  }
+})();
+</script>
+</body></html>
