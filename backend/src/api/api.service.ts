@@ -191,15 +191,65 @@ export class ApiService {
   }
 
   async getAdminDashboard() {
-    const totalOrders = await this.prisma.orders.count();
-    const totalRevenueResult = await this.prisma.orders.aggregate({
-      _sum: { total_price: true },
-      where: { status: 'COMPLETED' },
-    });
-    
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfYesterday = new Date(startOfToday.getTime() - 24 * 60 * 60 * 1000);
+
+    const [
+      totalOrders,
+      todayOrders,
+      yesterdayOrders,
+      todayRevenueResult,
+      totalRevenueResult,
+      processingOrders,
+      attentionOrders,
+      openComplaints,
+    ] = await Promise.all([
+      this.prisma.orders.count(),
+      this.prisma.orders.count({ where: { created_at: { gte: startOfToday } } }),
+      this.prisma.orders.count({ where: { created_at: { gte: startOfYesterday, lt: startOfToday } } }),
+      this.prisma.orders.aggregate({
+        _sum: { total_price: true, platform_fee: true },
+        where: { status: 'COMPLETED', created_at: { gte: startOfToday } },
+      }),
+      this.prisma.orders.aggregate({
+        _sum: { total_price: true },
+        where: { status: 'COMPLETED' },
+      }),
+      // Đơn đang xử lý (PENDING, ACCEPTED, IN_PROGRESS)
+      this.prisma.orders.count({
+        where: { status: { in: ['PENDING', 'ACCEPTED', 'IN_PROGRESS', 'SEARCHING'] } },
+      }),
+      // Đơn cần chú ý: PENDING quá 8 phút
+      this.prisma.orders.count({
+        where: {
+          status: 'PENDING',
+          created_at: { lt: new Date(now.getTime() - 8 * 60 * 1000) },
+        },
+      }),
+      // Khiếu nại chưa xử lý
+      this.prisma.support_tickets.count({ where: { status: 'OPEN' } }),
+    ]);
+
+    // Tính % thay đổi so với hôm qua
+    const orderChange = yesterdayOrders > 0
+      ? Math.round(((todayOrders - yesterdayOrders) / yesterdayOrders) * 100)
+      : (todayOrders > 0 ? 100 : 0);
+
+    const todayRevenue = Number(todayRevenueResult._sum.total_price || 0);
+    const platformFee = Number(todayRevenueResult._sum.platform_fee || 0);
+
     return {
       total_orders: totalOrders,
-      total_revenue: totalRevenueResult._sum.total_price || 0,
+      total_revenue: Number(totalRevenueResult._sum.total_price || 0),
+      today_orders: todayOrders,
+      yesterday_orders: yesterdayOrders,
+      order_change_pct: orderChange,
+      today_revenue: todayRevenue,
+      platform_fee: platformFee,
+      processing_orders: processingOrders,
+      attention_orders: attentionOrders,
+      open_complaints: openComplaints,
     };
   }
 
@@ -241,11 +291,25 @@ export class ApiService {
 
   // --- Admin APIs ---
   async approveTaskerKyc(adminId: number, taskerId: number, status: string) {
+    // Map APPROVED → VERIFIED cho consistency
+    const finalStatus = status === 'APPROVED' ? 'VERIFIED' : status;
     const tasker = await this.prisma.taskers.update({
       where: { tasker_id: taskerId },
-      data: { kyc_status: status }, // 'VERIFIED' or 'REJECTED'
+      data: { kyc_status: finalStatus }, // 'VERIFIED' or 'REJECTED'
     });
     
+    // Nếu duyệt → tự động approve tất cả dịch vụ PENDING_APPROVAL + set user ACTIVE
+    if (finalStatus === 'VERIFIED') {
+      await this.prisma.tasker_services.updateMany({
+        where: { tasker_id: taskerId, status: 'PENDING_APPROVAL' },
+        data: { status: 'APPROVED' },
+      });
+      await this.prisma.users.update({
+        where: { user_id: taskerId },
+        data: { status: 'ACTIVE' },
+      });
+    }
+
     // Log admin action
     await this.prisma.admin_audit_logs.create({
       data: {
@@ -253,7 +317,7 @@ export class ApiService {
         action: 'APPROVE_KYC',
         target_table: 'taskers',
         target_id: taskerId,
-        new_data: { kyc_status: status }
+        new_data: { kyc_status: finalStatus }
       }
     });
 
@@ -738,12 +802,54 @@ export class ApiService {
       throw new BadRequestException('Bạn đã đăng ký dịch vụ này rồi');
     }
 
+    // Auto-approve nếu tasker đã VERIFIED KYC
+    const tasker = await this.prisma.taskers.findUnique({ where: { tasker_id: taskerId } });
+    const autoApprove = tasker?.kyc_status === 'VERIFIED' || tasker?.kyc_status === 'APPROVED';
+
     return this.prisma.tasker_services.create({
       data: {
         tasker_id: taskerId,
         service_id: serviceId,
-        status: 'PENDING_APPROVAL',
+        status: autoApprove ? 'APPROVED' : 'PENDING_APPROVAL',
       },
     });
+  }
+
+  // --- Tasker: Toggle (bật/tắt) dịch vụ đã đăng ký ---
+  async toggleTaskerService(taskerId: number, serviceId: number) {
+    if (!serviceId || isNaN(serviceId)) {
+      throw new BadRequestException('Service ID không hợp lệ');
+    }
+
+    const existing = await this.prisma.tasker_services.findUnique({
+      where: { tasker_id_service_id: { tasker_id: taskerId, service_id: serviceId } },
+    });
+
+    if (existing) {
+      // Đã đăng ký → xóa (tắt dịch vụ)
+      await this.prisma.tasker_services.delete({
+        where: { tasker_id_service_id: { tasker_id: taskerId, service_id: serviceId } },
+      });
+      return { toggled: false, message: 'Đã tắt dịch vụ' };
+    } else {
+      // Chưa đăng ký → thêm mới
+      const service = await this.prisma.services.findUnique({ where: { service_id: serviceId } });
+      if (!service || !service.is_active) {
+        throw new BadRequestException('Dịch vụ không tồn tại hoặc đã ngưng');
+      }
+
+      // Auto-approve nếu tasker đã VERIFIED KYC
+      const tasker = await this.prisma.taskers.findUnique({ where: { tasker_id: taskerId } });
+      const autoApprove = tasker?.kyc_status === 'VERIFIED' || tasker?.kyc_status === 'APPROVED';
+
+      await this.prisma.tasker_services.create({
+        data: {
+          tasker_id: taskerId,
+          service_id: serviceId,
+          status: autoApprove ? 'APPROVED' : 'PENDING_APPROVAL',
+        },
+      });
+      return { toggled: true, status: autoApprove ? 'APPROVED' : 'PENDING_APPROVAL', message: autoApprove ? 'Đã bật dịch vụ' : 'Đã đăng ký, chờ Admin duyệt' };
+    }
   }
 }
