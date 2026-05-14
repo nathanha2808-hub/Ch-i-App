@@ -489,7 +489,7 @@
 
       // TC-KH07-013: Kiểm tra số dư ví trước khi đặt
       try {
-        var wallet = await apiFetch('/api/wallets/me');
+        var wallet = await apiFetch('/api/wallets/balance');
         if (wallet && typeof wallet.balance === 'number' && wallet.balance < totalPrice) {
           // Hiển thị thông báo không đủ số dư + nút nạp tiền
           var insufficientMsg = 'Số dư ví không đủ (' + formatVND(wallet.balance) + '). Cần ' + formatVND(totalPrice) + ' để đặt dịch vụ.';
@@ -522,7 +522,7 @@
             total_price: totalPrice,
             longitude: 106.6297,
             latitude: 10.8231,
-            note: state.note
+            notes: state.note
           }
         });
         hideLoading();
