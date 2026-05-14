@@ -1,2 +1,14 @@
 /dist/
 backend/dist/
+
+# Team data exports (PII, không commit)
+CHIOI*.csv
+CHIOI*.xlsx
+CHIOI*.xls
+admingit/
+
+# Build output
+backend/dist/
+
+# One-off scripts
+convert_excel.py
