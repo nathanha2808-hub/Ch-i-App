@@ -116,6 +116,9 @@ workflows:
     cache: *cache_cfg
 
     environment:
+      ios_signing:
+        distribution_type: development
+        bundle_identifier: vn.chioi.app
       vars:
         BUNDLE_ID: "vn.chioi.app"
         XCODE_WORKSPACE: "mobile-ios/ios/App/App.xcworkspace"
@@ -135,14 +138,10 @@ workflows:
           include: true
 
     scripts:
-      - name: Setup keychain + signing
-        script: |
-          keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_DEVELOPMENT \
-            --create
-          keychain add-certificates
-          xcode-project use-profiles
+      # NOTE: Signing handled declaratively via `environment.ios_signing` block above.
+      # Codemagic tự fetch/create cert + profile, import keychain, patch pbxproj
+      # (CODE_SIGN_STYLE=Manual + PROVISIONING_PROFILE_SPECIFIER + DEVELOPMENT_TEAM).
+      # KHÔNG cần script `keychain initialize` / `fetch-signing-files` / `use-profiles` thủ công nữa.
 
       - name: Install deps + sync
         script: |
@@ -194,6 +193,9 @@ workflows:
     cache: *cache_cfg
 
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: vn.chioi.app
       vars:
         BUNDLE_ID: "vn.chioi.app"
         XCODE_WORKSPACE: "mobile-ios/ios/App/App.xcworkspace"
@@ -214,14 +216,13 @@ workflows:
           include: true
 
     scripts:
-      - name: Setup keychain + production signing
-        script: |
-          keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
-          keychain add-certificates
-          xcode-project use-profiles
+      # NOTE: Signing handled declaratively via `environment.ios_signing` block above.
+      # Codemagic tự fetch/create Distribution Certificate + App Store Provisioning
+      # Profile cho bundle_identifier, import keychain, patch pbxproj
+      # (CODE_SIGN_STYLE=Manual + PROVISIONING_PROFILE_SPECIFIER + DEVELOPMENT_TEAM).
+      # Đây là cách Codemagic khuyên dùng từ 2024 — thay thế cho script thủ công
+      # `keychain initialize` / `fetch-signing-files --create` / `use-profiles`
+      # vì cách thủ công flaky khi cert hoặc profile chưa tồn tại (silent fail).
 
       - name: Install Capacitor deps
         script: |
