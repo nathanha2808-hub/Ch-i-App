@@ -142,17 +142,23 @@ workflows:
           echo "Bundle ID: $BUNDLE_ID"
           keychain initialize
 
-          # Cùng pattern với ios-release-store: force create cert via API
-          # trước khi fetch profile, tránh CLI cố reuse cert không có private key.
-          echo "----- Force creating new Development certificate -----"
+          # Cùng pattern với ios-release-store: sinh private key trước, rồi
+          # pass vào lệnh certificates create (CLI không tự gen key).
+          CERT_KEY_PATH=/tmp/development_cert_key.pem
+          echo "----- Generating RSA 2048 private key -----"
+          openssl genrsa -out "$CERT_KEY_PATH" 2048
+
+          echo "----- Creating Development certificate với key vừa sinh -----"
           app-store-connect certificates create \
             --type IOS_DEVELOPMENT \
+            --certificate-key=@file:"$CERT_KEY_PATH" \
             --save \
             --verbose
 
           echo "----- Fetching/creating profile cho bundle ID -----"
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_DEVELOPMENT \
+            --certificate-key=@file:"$CERT_KEY_PATH" \
             --create \
             --verbose
 
@@ -241,31 +247,32 @@ workflows:
           echo "App Store Apple ID: $APP_STORE_APPLE_ID"
           keychain initialize
 
-          # CHẨN ĐOÁN turn trước:
-          # `fetch-signing-files --create` tìm thấy cert LAM TRAN TUNG có sẵn
-          # → cố lưu vào keychain → fail vì không có private key (key nằm Mac
-          # của LAM TRAN TUNG, Codemagic build runner không có).
-          # Lỗi: "Cannot save Signing Certificates without certificate private key"
+          # CHẨN ĐOÁN turn này:
+          # `certificates create --save` báo "Cannot create resource without
+          # certificate private key" — Codemagic CLI KHÔNG tự sinh private key,
+          # phải cấp file private key qua `--certificate-key`.
           #
-          # GIẢI PHÁP:
-          # Step 1 → FORCE tạo Distribution Certificate MỚI qua command riêng
-          #          `certificates create --save`. Apple cho phép tối đa 2-3
-          #          Distribution Certs/team, nếu đã đủ thì fail rõ ràng.
-          # Step 2 → fetch-signing-files với cert vừa tạo (giờ Codemagic có
-          #          private key trong keychain) → tạo profile + import vào project.
+          # FIX: sinh RSA 2048 key bằng openssl trước, rồi pass vào lệnh.
 
-          echo "----- Listing existing Distribution certs -----"
+          CERT_KEY_PATH=/tmp/distribution_cert_key.pem
+          echo "----- Generating RSA 2048 private key tại $CERT_KEY_PATH -----"
+          openssl genrsa -out "$CERT_KEY_PATH" 2048
+          ls -l "$CERT_KEY_PATH"
+
+          echo "----- Listing existing Distribution certs (debug) -----"
           app-store-connect certificates list --type IOS_DISTRIBUTION --json | head -100 || true
 
-          echo "----- Force creating new Distribution certificate -----"
+          echo "----- Creating Distribution certificate với key vừa sinh -----"
           app-store-connect certificates create \
             --type IOS_DISTRIBUTION \
+            --certificate-key=@file:"$CERT_KEY_PATH" \
             --save \
             --verbose
 
           echo "----- Fetching/creating profile cho bundle ID -----"
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
+            --certificate-key=@file:"$CERT_KEY_PATH" \
             --create \
             --verbose
 
