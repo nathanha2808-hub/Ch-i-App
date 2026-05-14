@@ -95,7 +95,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - admin@chioi.vn   # ⚠️ THAY email
+          - nathanha.2808@gmail.com
         notify:
           success: true
           failure: true
@@ -171,7 +171,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - admin@chioi.vn
+          - nathanha.2808@gmail.com
         notify:
           success: true
           failure: true
@@ -198,7 +198,7 @@ workflows:
         BUNDLE_ID: "vn.chioi.app"
         XCODE_WORKSPACE: "mobile-ios/ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
-        APP_STORE_APPLE_ID: "0000000000"   # ⚠️ THAY: numeric 10-digit từ App Store Connect → App Info
+        APP_STORE_APPLE_ID: "6769330882"   # App Store Connect → Chị Ơi! → App Info
       node: 20.20.2
       xcode: latest
       cocoapods: default
@@ -266,7 +266,7 @@ workflows:
 
       email:
         recipients:
-          - admin@chioi.vn              # ⚠️ THAY email
+          - nathanha.2808@gmail.com
         notify:
           success: true
           failure: true

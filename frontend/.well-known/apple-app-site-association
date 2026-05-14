@@ -1,0 +1,30 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["J96LG552B6.vn.chioi.app"],
+        "components": [
+          {
+            "/": "/khachhang/*",
+            "comment": "Khách hàng deep links"
+          },
+          {
+            "/": "/giupviec/*",
+            "comment": "Tasker deep links"
+          },
+          {
+            "/": "/admin/*",
+            "comment": "Admin CMS deep links"
+          },
+          {
+            "/": "/order/*",
+            "comment": "Order tracking deep links"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["J96LG552B6.vn.chioi.app"]
+  }
+}
