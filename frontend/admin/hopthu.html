@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
@@ -551,15 +551,6 @@
 
   await loadTickets();
 })();
-</script>
-var chatPanel = document.getElementById('chat-panel');
-var panels = document.querySelectorAll('[id*="chat"], [id*="message-view"], [class*="chat-detail"]');
-panels.forEach(function(p) { if(!p.id.includes('empty')) p.classList.add('hidden'); });
-// Mark first conversation as clickable example
-var firstConv = document.querySelector('[data-conversation]');
-if (firstConv) {
-  firstConv.click(); // simulate click so something shows
-}
 </script>
 
 </body></html>
