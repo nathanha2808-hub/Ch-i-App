@@ -15,6 +15,8 @@ import { throttlerConfig } from './common/throttler.config';
 
 @Module({
   imports: [
+    // FIX: Throttler có 4 configs nhưng APP_GUARD chỉ nên check 'short' (300 req/min)
+    // Auth/register/otp routes tự apply @Throttle() decorator riêng
     ThrottlerModule.forRoot(throttlerConfig),
     PrismaModule,
     AuthModule,
@@ -28,7 +30,10 @@ import { throttlerConfig } from './common/throttler.config';
   controllers: [AppController],
   providers: [
     AppService,
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    // FIX DB CONNECT: Xóa APP_GUARD toàn cục vì nó áp TẤT CẢ throttlers (register:3, otp:3)
+    // lên MỌI route → block user sau 3 request. Auth routes tự dùng @Throttle() decorator.
+    // { provide: APP_GUARD, useClass: ThrottlerGuard },  // ← ĐÃ XÓA
   ],
 })
 export class AppModule {}
+
