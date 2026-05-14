@@ -1,12 +1,13 @@
 name: Deploy to VPS
 
-# Tự động deploy lên VPS chioi.vn khi push lên branch main hoặc fix/*
+# Tự động deploy lên VPS chioi.vn khi push lên branch main
 # YÊU CẦU SECRETS (Settings → Secrets and variables → Actions):
-#   - VPS_HOST           : 45.119.83.233 (hoặc chioi.vn)
+#   - VPS_HOST           : 42.96.16.197 (IP) hoặc chioi.vn (domain)
 #   - VPS_USER           : root
 #   - VPS_SSH_PORT       : 22
-#   - VPS_SSH_PRIVATE_KEY: nội dung file private key (xem deploy/SETUP_GITHUB_DEPLOY.md)
-#   - VPS_DEPLOY_PATH    : /opt/chioi (default)
+#   - VPS_SSH_PRIVATE_KEY: ed25519 private key (xem docs/CODEMAGIC_SETUP.md hoặc
+#                          deploy/SETUP_GITHUB_DEPLOY.md cho cách generate)
+#   - VPS_DEPLOY_PATH    : /opt/chioi (default, không cần set)
 #
 # Workflow chạy: pull code → npm ci → build → prisma generate → pm2 restart → verify
 
