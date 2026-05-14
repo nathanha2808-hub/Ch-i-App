@@ -189,8 +189,12 @@ workflows:
             --scheme App \
             --config Debug
 
+    # IPA thực tế export ở `mobile-ios/build/ios/ipa/App.ipa` (không phải
+    # `mobile-ios/ios/App/build/...`). Path trước đó sai khiến artifacts
+    # không gom IPA → publishing skip "no IPAs or PKGs found".
     artifacts:
-      - mobile-ios/ios/App/build/ios/ipa/*.ipa
+      - mobile-ios/build/ios/ipa/*.ipa
+      - mobile-ios/build/ios/xcarchive/**/dSYMs/*.dSYM
       - /tmp/xcodebuild_logs/*.log
 
     publishing:
@@ -311,9 +315,13 @@ workflows:
             --scheme App \
             --config Release
 
+    # IPA xuất ở `mobile-ios/build/ios/ipa/App.ipa` (xác nhận từ build log
+    # "Successfully exported ipa to build/ios/ipa/App.ipa"). dSYMs nằm trong
+    # xcarchive. Path trước đó sai → publishing skip "no IPAs or PKGs found"
+    # → TestFlight không nhận build mặc dù IPA đã build OK.
     artifacts:
-      - mobile-ios/ios/App/build/ios/ipa/*.ipa
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app.dSYM.zip
+      - mobile-ios/build/ios/ipa/*.ipa
+      - mobile-ios/build/ios/xcarchive/**/dSYMs/*.dSYM
       - /tmp/xcodebuild_logs/*.log
 
     publishing:
