@@ -41,6 +41,23 @@
 - **TC-T12-022:** Loading skeleton animation
 - **TC-T12-024/025:** Nút rút tiền + disable khi số dư = 0
 
+### 💰 UC_13 — Yêu cầu rút tiền Tasker (25 TCs)
+
+#### Added
+- **Backend:** Cập nhật `WithdrawDto` thêm `bank_name`, `account_number`, `account_holder` + min 100k.
+- **Frontend:** Withdraw Modal đầy đủ form (chọn ngân hàng, STK, tên chủ TK, số tiền).
+
+#### Fixed
+- **TC-T13-001~003:** Submit rút tiền thành công + thông báo + disable khi balance=0
+- **TC-T13-004~007:** Validation: số tiền > balance, =0, âm, trống
+- **TC-T13-008~010:** Dropdown 15 ngân hàng + validate chưa chọn
+- **TC-T13-011/012:** Chống spam/double click bằng `isSubmitting` flag
+- **TC-T13-013/014:** Error handling khi mất mạng/timeout
+- **TC-T13-016:** Đồng bộ số dư sau khi tạo request (auto reload)
+- **TC-T13-018:** Hiển thị danh sách yêu cầu "Chờ duyệt"
+- **TC-T13-021:** Loading state khi gửi request
+- **TC-T13-024/025:** Format tiền VND + chỉ cho nhập số
+
 ---
 
 ## [1.3.0] — 2026-05-13
