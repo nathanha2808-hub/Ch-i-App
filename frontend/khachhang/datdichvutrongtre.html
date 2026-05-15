@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -129,6 +129,14 @@
             font-size: 16px;
             border-radius: 12px;
         }
+        /* TC-KH08-013 FIX: Icon alignment in date/time & age sections */
+        .child-age-select, input[type="date"], input[type="time"] {
+            vertical-align: middle;
+        }
+        section .flex.items-center .material-symbols-outlined {
+            flex-shrink: 0;
+            line-height: 1;
+        }
     </style>
 </head>
 <body class="text-on-surface antialiased bg-surface pb-32">
@@ -223,6 +231,15 @@
 </div>
 </div>
 </section>
+<!-- TC-KH08-001 FIX: Trường nhập địa chỉ -->
+<section class="flex flex-col gap-sm">
+<label class="font-label-caps text-on-surface-variant uppercase tracking-wider px-1">Địa chỉ</label>
+<div class="relative">
+<input id="addressInput" class="w-full h-12 px-4 pr-12 rounded-xl border border-outline-variant/30 bg-white text-body-sm focus:ring-2 focus:ring-primary-container" type="text" placeholder="Nhập địa chỉ của bạn..." />
+<span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant pointer-events-none text-[20px]">location_on</span>
+</div>
+<p id="addressError" class="text-error text-[12px] px-1 leading-tight" style="display:none;"></p>
+</section>
 <!-- Payment Row -->
 <div class="flex justify-between items-center p-md bg-surface-container-lowest rounded-xl soft-shadow border border-surface-container">
 <div class="flex items-center gap-sm">
@@ -275,18 +292,44 @@
     '5 tuổi', '6 tuổi', '7 tuổi', '8 tuổi', '9 tuổi', '10 tuổi'
   ];
 
-  // ===== Date Input =====
+  // ===== Date Input - TC-KH08-007 FIX: Set min to today =====
   var dateInput = document.getElementById('dateInput');
+  var todayStr = new Date().toISOString().split('T')[0];
   if (dateInput) {
-    dateInput.value = new Date().toISOString().split('T')[0];
+    dateInput.value = todayStr;
+    dateInput.setAttribute('min', todayStr); // Chặn chọn ngày quá khứ
     state.date = dateInput.value;
-    dateInput.addEventListener('change', function() { state.date = this.value; updateSummary(); });
+    dateInput.addEventListener('change', function() {
+      if (this.value < todayStr) {
+        showToastMsg('Không thể chọn ngày trong quá khứ');
+        this.value = todayStr;
+      }
+      state.date = this.value;
+      updateSummary();
+    });
   }
 
+  // ===== Time Input - Set current time =====
   var timeInput = document.getElementById('timeInput');
   if (timeInput) {
+    var nowInit = new Date();
+    var hhInit = ('0' + nowInit.getHours()).slice(-2);
+    var mmInit = ('0' + nowInit.getMinutes()).slice(-2);
+    timeInput.value = hhInit + ':' + mmInit;
+    state.time = timeInput.value;
     timeInput.addEventListener('change', function() { state.time = this.value; updateSummary(); });
   }
+
+  // ===== TC-KH08-001: Pre-fill address from user profile =====
+  (async function() {
+    try {
+      var profile = await apiFetch('/api/users/profile');
+      var addressInput = document.getElementById('addressInput');
+      if (profile && profile.address && addressInput) {
+        addressInput.value = profile.address;
+      }
+    } catch (e) { console.warn('[Trông trẻ] Không lấy được profile:', e.message); }
+  })();
 
   // ===== Render children list (Lỗi 9 FIX) =====
   function renderChildren() {
@@ -355,16 +398,61 @@
     document.getElementById('submit-btn').textContent = 'Đặt dịch vụ — ' + formatVND(total);
   }
 
-  // ===== Lỗi 3 FIX: Submit order to API =====
+  // ===== Submit order to API =====
+  var isSubmitting = false;
   document.getElementById('submit-btn').addEventListener('click', async function() {
+    if (isSubmitting) return;
     if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
     if (!state.date) { showToastMsg('Vui lòng chọn ngày'); return; }
+
+    // TC-KH08-007 FIX: Validate ngày quá khứ
+    var todayCheck = new Date().toISOString().split('T')[0];
+    if (state.date < todayCheck) {
+      showToastMsg('Không thể chọn ngày trong quá khứ');
+      return;
+    }
+    // FIX: Validate giờ quá khứ khi ngày = hôm nay
+    if (state.date === todayCheck) {
+      var nowCheck = new Date();
+      var timeParts = state.time.split(':');
+      if (parseInt(timeParts[0]) < nowCheck.getHours() ||
+          (parseInt(timeParts[0]) === nowCheck.getHours() && parseInt(timeParts[1]) < nowCheck.getMinutes())) {
+        showToastMsg('Không thể chọn giờ trong quá khứ');
+        return;
+      }
+    }
+
+    // TC-KH08-001 FIX: Validate địa chỉ
+    var addressEl = document.getElementById('addressInput');
+    var addressErrEl = document.getElementById('addressError');
+    var userAddress = addressEl ? addressEl.value.trim() : '';
+    if (!userAddress) {
+      if (addressErrEl) { addressErrEl.textContent = 'Vui lòng nhập địa chỉ.'; addressErrEl.style.display = 'block'; }
+      showToastMsg('Vui lòng nhập địa chỉ');
+      return;
+    }
+    if (addressErrEl) addressErrEl.style.display = 'none';
 
     var scheduledTime = state.date + 'T' + state.time + ':00';
     var totalPrice = state.hours * state.pricePerHour;
     var agesStr = state.childAges.map(function(a) { return ageOptions[a] || a + ' tuổi'; }).join(', ');
     var noteText = (document.getElementById('noteInput') || {}).value || '';
     var note = state.childCount + ' trẻ (' + agesStr + '). ' + noteText;
+
+    // TC-KH08-002 FIX: Kiểm tra số dư ví trước khi đặt
+    try {
+      var wallet = await apiFetch('/api/wallets/balance');
+      if (wallet && typeof wallet.balance === 'number' && wallet.balance < totalPrice) {
+        var insufficientMsg = 'Số dư ví không đủ (' + formatVND(wallet.balance) + '). Cần ' + formatVND(totalPrice) + ' để đặt dịch vụ.';
+        showToastMsg(insufficientMsg, 5000);
+        if (confirm(insufficientMsg + '\n\nBạn có muốn nạp tiền không?')) {
+          window.location.href = 'naptienqr.html';
+        }
+        return;
+      }
+    } catch (walletErr) {
+      console.warn('[Ví] Không kiểm tra được số dư:', walletErr.message);
+    }
 
     // Tìm service_id cho Trông trẻ
     var serviceId = null;
@@ -383,6 +471,13 @@
 
     if (!serviceId) { showToastMsg('Không tìm thấy dịch vụ Trông trẻ'); return; }
 
+    // Khóa nút
+    isSubmitting = true;
+    var submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.classList.add('opacity-50');
+    submitBtn.textContent = 'Đang đặt đơn...';
+
     showLoading();
     try {
       var result = await apiFetch('/api/orders/book', {
@@ -390,11 +485,11 @@
         body: {
           service_id: serviceId,
           scheduled_time: scheduledTime,
-          address: 'Địa chỉ từ ứng dụng',
+          address: userAddress,
           total_price: totalPrice,
           longitude: 106.6297,
           latitude: 10.8231,
-          note: note
+          notes: note
         }
       });
       hideLoading();
@@ -403,6 +498,10 @@
     } catch (e) {
       hideLoading();
       showToastMsg('❌ ' + e.message);
+      isSubmitting = false;
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('opacity-50');
+      submitBtn.textContent = 'Đặt dịch vụ — ' + formatVND(totalPrice);
     }
   });
 

@@ -158,6 +158,30 @@
 <div class="text-center mt-md">
 <h2 id="profileName" class="font-title-sm text-title-sm text-on-surface">--</h2>
 <p id="profilePhone" class="font-body-sm text-body-sm text-on-surface-variant">--</p>
+<!-- TC-T14-005 FIX: Hiển thị rating sao -->
+<div id="profileRating" class="flex items-center justify-center gap-1 mt-2">
+  <span class="material-symbols-outlined text-yellow-500 text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+  <span id="ratingValue" class="font-body-sm text-body-sm font-bold text-on-surface">--</span>
+  <span id="ratingCount" class="font-body-sm text-body-sm text-on-surface-variant">(0 đánh giá)</span>
+</div>
+</div>
+</section>
+<!-- TC-T14-008 FIX: Form chỉnh sửa thông tin cá nhân -->
+<section class="space-y-md">
+<h3 class="font-title-sm text-title-sm text-on-surface">Thông tin cá nhân</h3>
+<div class="space-y-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Họ và tên</label>
+<div class="relative">
+  <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-primary">person</span>
+  <input id="editFullName" class="w-full level-1-card rounded-xl pl-12 pr-md py-3 font-body-lg text-body-lg focus:ring-1.5 focus:ring-primary focus:outline-none border-none" type="text" placeholder="Nhập họ tên..."/>
+</div>
+</div>
+<div class="space-y-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Số điện thoại</label>
+<div class="relative">
+  <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-primary">phone</span>
+  <input id="editPhone" class="w-full level-1-card rounded-xl pl-12 pr-md py-3 font-body-lg text-body-lg focus:outline-none border-none bg-surface-container-high/50" type="tel" readonly/>
+</div>
 </div>
 </section>
 <!-- Edit Form Section -->
@@ -185,9 +209,9 @@
 <span class="material-symbols-outlined" data-icon="add">add</span>
                 Thêm dịch vụ mới
             </button>
-<div class="flex items-start gap-sm bg-error-container/20 p-md rounded-xl border border-errorbg-surface-container/40">
-<span class="material-symbols-outlined text-primary text-[20px]" data-icon="warning">warning</span>
-<p class="font-body-sm text-body-sm text-on-secondarybg-surface-container">Dịch vụ mới cần Admin phê duyệt.</p>
+<div class="flex items-start gap-sm bg-primary-fixed/30 p-md rounded-xl border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="info">info</span>
+<p id="service-note" class="font-body-sm text-body-sm text-on-surface-variant">Tasker đã duyệt KYC có thể tự do bật/tắt dịch vụ.</p>
 </div>
 
 <!-- Modal chọn dịch vụ mới -->
@@ -285,16 +309,37 @@
 
     if (user) {
         if (nameEl) nameEl.textContent = user.full_name || 'Chưa cập nhật';
+        // TC-T14-003 FIX: Hiển thị SĐT đầy đủ, KHÔNG che
         if (phoneEl) {
-            var phone = user.phone || '';
-            if (phone.length > 6) {
-                phoneEl.textContent = phone.substring(0, 4) + '***' + phone.substring(phone.length - 3);
-            } else {
-                phoneEl.textContent = phone;
-            }
+            phoneEl.textContent = user.phone || 'Chưa cập nhật';
         }
         if (bioEl && user.bio) bioEl.value = user.bio;
         if (areaEl && user.address) areaEl.value = user.address;
+        // TC-T14-008 FIX: Điền thông tin vào form edit
+        var editNameEl = document.getElementById('editFullName');
+        var editPhoneEl = document.getElementById('editPhone');
+        if (editNameEl) editNameEl.value = user.full_name || '';
+        if (editPhoneEl) editPhoneEl.value = user.phone || '';
+    }
+
+    // TC-T14-005 FIX: Tải rating từ API
+    try {
+        var profileData = await apiFetch('/api/users/profile');
+        if (profileData) {
+            var ratingVal = document.getElementById('ratingValue');
+            var ratingCount = document.getElementById('ratingCount');
+            var avgRating = profileData.average_rating || profileData.rating || 0;
+            var totalReviews = profileData.total_reviews || profileData.review_count || 0;
+            if (ratingVal) ratingVal.textContent = avgRating > 0 ? parseFloat(avgRating).toFixed(1) : 'Chưa có';
+            if (ratingCount) ratingCount.textContent = '(' + totalReviews + ' đánh giá)';
+            // Cập nhật lại name/phone từ server (chính xác hơn localStorage)
+            if (profileData.full_name && nameEl) nameEl.textContent = profileData.full_name;
+            if (profileData.phone && phoneEl) phoneEl.textContent = profileData.phone;
+            var editNameEl2 = document.getElementById('editFullName');
+            if (editNameEl2 && profileData.full_name) editNameEl2.value = profileData.full_name;
+        }
+    } catch(e) {
+        console.warn('[Profile] Không tải được rating:', e.message);
     }
 
     // ===== 2. Nút Back =====
@@ -321,11 +366,10 @@
             saveBtn.textContent = 'Đang lưu...';
 
             try {
-                // Bug 6 FIX: Gửi cả bio lên API
                 var result = await apiFetch('/api/users/profile', {
                     method: 'PUT',
                     body: {
-                        full_name: user ? user.full_name : fullName,
+                        full_name: document.getElementById('editFullName') ? document.getElementById('editFullName').value.trim() : (user ? user.full_name : fullName),
                         address: area,
                         bio: bio
                     }
@@ -385,80 +429,68 @@
 
     function renderRegisteredServices() {
       if (!registeredList) return;
-      var registered = allServicesData.filter(function(s) { return s.is_registered; });
-      if (registered.length === 0) {
-        registeredList.innerHTML = '<p class="text-body-sm text-on-surface-variant text-center py-md">Chưa đăng ký dịch vụ nào.</p>';
+      // Hiện tất cả dịch vụ (đã đăng ký và chưa đăng ký) dưới dạng toggle
+      registeredList.innerHTML = '';
+      if (allServicesData.length === 0) {
+        registeredList.innerHTML = '<p class="text-body-sm text-on-surface-variant text-center py-md">Không có dịch vụ nào.</p>';
         return;
       }
-      registeredList.innerHTML = '';
-      registered.forEach(function(s) {
-        var statusText = s.registration_status === 'APPROVED' ? 'Đã duyệt' : (s.registration_status === 'PENDING_APPROVAL' ? 'Chờ duyệt' : s.registration_status);
-        var statusColor = s.registration_status === 'APPROVED' ? 'text-primary' : 'text-secondary';
+      allServicesData.forEach(function(s) {
+        var isOn = s.is_registered && s.registration_status === 'APPROVED';
+        var isPending = s.is_registered && s.registration_status === 'PENDING_APPROVAL';
+        var isRejected = s.is_registered && s.registration_status === 'REJECTED';
         var div = document.createElement('div');
-        div.className = 'level-1-card rounded-xl p-md flex justify-between items-center transition-all active:scale-[0.98]';
-        div.innerHTML = '<div class="flex items-center gap-md">' +
-          '<span class="material-symbols-outlined text-primary" style="font-variation-settings: \'FILL\' 1;">check_circle</span>' +
-          '<div><span class="font-body-lg text-body-lg">' + (s.name || 'Dịch vụ') + '</span>' +
-          '<p class="text-[11px] ' + statusColor + ' font-medium">' + statusText + '</p></div>' +
-        '</div>';
+        div.className = 'level-1-card rounded-xl p-md flex justify-between items-center transition-all';
+        var statusBadge = '';
+        if (isPending) {
+          statusBadge = '<span class="text-[11px] text-secondary font-medium bg-secondary-fixed/50 px-2 py-0.5 rounded-full">Chờ duyệt</span>';
+        } else if (isRejected) {
+          statusBadge = '<span class="text-[11px] text-error font-medium bg-error-container/50 px-2 py-0.5 rounded-full">Từ chối</span>';
+        }
+        div.innerHTML = '<div class="flex items-center gap-md flex-1">' +
+          '<span class="material-symbols-outlined ' + (isOn ? 'text-primary' : 'text-on-surface-variant/40') + '" style="font-variation-settings: \'FILL\' ' + (isOn ? '1' : '0') + ';">' + (isOn ? 'check_circle' : 'radio_button_unchecked') + '</span>' +
+          '<div class="flex-1"><span class="font-body-lg text-body-lg">' + (s.name || 'Dịch vụ') + '</span>' +
+          (statusBadge ? '<br>' + statusBadge : '') +
+          '</div></div>' +
+          (isPending ? '' : '<label class="relative inline-flex items-center cursor-pointer">' +
+          '<input type="checkbox" class="sr-only peer toggle-service" data-sid="' + s.service_id + '" ' + (isOn ? 'checked' : '') + '>' +
+          '<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>' +
+          '</label>');
         registeredList.appendChild(div);
+      });
+
+      // Gắn event toggle
+      registeredList.querySelectorAll('.toggle-service').forEach(function(toggle) {
+        toggle.addEventListener('change', async function() {
+          var serviceId = parseInt(toggle.getAttribute('data-sid'));
+          var label = toggle.closest('label');
+          toggle.disabled = true;
+          try {
+            var result = await apiFetch('/api/taskers/toggle-service', {
+              method: 'PATCH',
+              body: { service_id: serviceId }
+            });
+            showToastMsg('✅ ' + result.message);
+            await loadServices();
+          } catch (e) {
+            showToastMsg('❌ ' + e.message);
+            toggle.checked = !toggle.checked; // revert
+            toggle.disabled = false;
+          }
+        });
       });
     }
 
     loadServices();
 
-    // ===== 6. Nút "Thêm dịch vụ mới" — Bug 4 FIX =====
+    // ===== 6. Ẩn nút "Thêm dịch vụ mới" vì tất cả dịch vụ đã hiển thị dạng toggle =====
     var addServiceBtn = document.getElementById('btnAddService');
     if (addServiceBtn) {
-        addServiceBtn.addEventListener('click', function() {
-            var modal = document.getElementById('service-modal');
-            var listEl = document.getElementById('available-services-list');
-            if (!modal || !listEl) return;
-
-            // Lọc dịch vụ chưa đăng ký
-            var unregistered = allServicesData.filter(function(s) { return !s.is_registered; });
-            listEl.innerHTML = '';
-
-            if (unregistered.length === 0) {
-              listEl.innerHTML = '<p class="text-body-sm text-on-surface-variant text-center py-4">Bạn đã đăng ký tất cả dịch vụ.</p>';
-            } else {
-              unregistered.forEach(function(s) {
-                var card = document.createElement('div');
-                card.className = 'level-1-card rounded-xl p-md flex justify-between items-center';
-                card.innerHTML = '<div>' +
-                  '<p class="font-body-lg text-body-lg text-on-surface">' + s.name + '</p>' +
-                  '<p class="text-[12px] text-on-surface-variant">' + (s.description || '') + '</p>' +
-                '</div>' +
-                '<button class="btn-register-service px-4 py-2 bg-primary text-white rounded-full text-sm font-bold active:scale-95 transition-all" data-sid="' + s.service_id + '">Đăng ký</button>';
-                listEl.appendChild(card);
-              });
-
-              // Gắn sự kiện cho nút đăng ký
-              listEl.querySelectorAll('.btn-register-service').forEach(function(btn) {
-                btn.addEventListener('click', async function() {
-                  var serviceId = parseInt(btn.getAttribute('data-sid'));
-                  btn.disabled = true;
-                  btn.textContent = 'Đang gửi...';
-                  try {
-                    await apiFetch('/api/taskers/register-service', {
-                      method: 'POST',
-                      body: { service_id: serviceId }
-                    });
-                    showToastMsg('✅ Đã đăng ký! Chờ Admin duyệt.');
-                    modal.classList.add('hidden');
-                    // Reload services
-                    await loadServices();
-                  } catch (e) {
-                    showToastMsg('❌ ' + e.message);
-                    btn.disabled = false;
-                    btn.textContent = 'Đăng ký';
-                  }
-                });
-              });
-            }
-
-            modal.classList.remove('hidden');
-        });
+        addServiceBtn.style.display = 'none';
+    }
+    var serviceModal = document.getElementById('service-modal');
+    if (serviceModal) {
+        serviceModal.style.display = 'none';
     }
 
     // ===== 7. Nút Đăng xuất (giữ nguyên) =====
@@ -477,5 +509,24 @@
         });
     }
 })();
+
+function showToastMsg(msg) {
+    var toast = document.getElementById('toast-notify');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-notify';
+        toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 z-[200] bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl text-sm flex items-center gap-2 transition-all';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-20px)';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-20px)';
+    }, 3000);
+}
 </script>
 </body></html>

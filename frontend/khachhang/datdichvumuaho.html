@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -145,26 +145,31 @@
 <!-- Rendered by JS -->
 </div>
 </section>
-<!-- Delivery Address -->
-<section class="bg-white p-md rounded-xl border border-outline-variant/30 soft-shadow flex justify-between items-center">
-<div class="flex items-start gap-sm">
-<span class="material-symbols-outlined text-primary mt-1">location_on</span>
-<div>
-<p class="text-body-sm text-on-surface-variant">Địa chỉ giao hàng</p>
-<p class="font-title-sm text-on-surface">Căn A1-2003, Vinhomes</p>
+<!-- TC-KH09-001 FIX: Delivery Address - editable input -->
+<section class="space-y-sm">
+<h2 class="font-title-sm text-on-surface">Địa chỉ giao hàng</h2>
+<div class="relative">
+<input id="addressInput" type="text" class="w-full h-12 px-4 pr-12 rounded-xl border border-outline-variant/30 bg-white text-body-sm focus:ring-2 focus:ring-primary-container" placeholder="Nhập địa chỉ giao hàng..." />
+<span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant pointer-events-none text-[20px]">location_on</span>
 </div>
-</div>
-<button class="text-primary font-bold text-body-sm">Thay đổi</button>
+<p id="addressError" class="text-error text-[12px] px-1 leading-tight" style="display:none;"></p>
 </section>
 <!-- Budget & Fees -->
 <section class="space-y-sm">
 <h2 class="font-title-sm text-on-surface">Ngân sách dự kiến</h2>
-<div class="bg-white p-md rounded-xl border border-outline-variant/30 flex items-center justify-between">
+<div class="bg-white p-md rounded-xl border border-outline-variant/30 space-y-2">
+<div class="flex items-center justify-between">
 <span class="text-on-surface-variant">Ngân sách tối đa</span>
 <div class="flex items-center gap-2">
 <button id="budget-minus" class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant active:scale-90 border border-outline-variant/30"><span class="material-symbols-outlined text-[18px]">remove</span></button>
 <span id="budget-display" class="font-bold text-on-surface min-w-[90px] text-center">500.000 đ</span>
 <button id="budget-plus" class="w-7 h-7 rounded-full bg-primary-container flex items-center justify-center text-white active:scale-90"><span class="material-symbols-outlined text-[18px]">add</span></button>
+</div>
+</div>
+<!-- TC-KH09-006 FIX: Cho phép nhập số tiền tùy chỉnh -->
+<div class="flex items-center gap-2">
+<span class="text-body-sm text-on-surface-variant">Hoặc nhập số tiền:</span>
+<input id="budgetCustomInput" type="number" min="50000" max="10000000" step="10000" class="flex-1 px-3 py-1.5 rounded-lg border border-outline-variant/30 text-body-sm focus:ring-2 focus:ring-primary-container bg-surface-container-low" placeholder="VD: 800000" />
 </div>
 </div>
 <div class="bg-primary-fixed-dim/20 p-md rounded-xl flex gap-sm border border-primary/10">
@@ -342,6 +347,20 @@
     if (state.budget < 5000000) { state.budget += 100000; updateSummary(); }
   });
 
+  // TC-KH09-006 FIX: Custom budget input
+  var budgetCustomInput = document.getElementById('budgetCustomInput');
+  if (budgetCustomInput) {
+    budgetCustomInput.addEventListener('change', function() {
+      var val = parseInt(this.value);
+      if (val && val >= 50000 && val <= 10000000) {
+        state.budget = val;
+        updateSummary();
+      } else if (val) {
+        showToastMsg('Ngân sách từ 50.000 đến 10.000.000 đ');
+      }
+    });
+  }
+
   // ===== Update Summary =====
   function updateSummary() {
     var total = state.budget + FEE;
@@ -351,7 +370,21 @@
     document.getElementById('summary-budget').textContent = formatVND(state.budget);
     document.getElementById('summary-total').textContent = formatVND(total);
     document.getElementById('submit-btn').textContent = 'Đặt mua hộ — ' + formatVND(total);
+    // Sync custom input
+    var budgetInput = document.getElementById('budgetCustomInput');
+    if (budgetInput) budgetInput.value = state.budget;
   }
+
+  // ===== TC-KH09-001: Pre-fill address from user profile =====
+  (async function() {
+    try {
+      var profile = await apiFetch('/api/users/profile');
+      var addressInput = document.getElementById('addressInput');
+      if (profile && profile.address && addressInput) {
+        addressInput.value = profile.address;
+      }
+    } catch (e) { console.warn('[Mua hộ] Không lấy được profile:', e.message); }
+  })();
 
   // ===== Submit — Bug 2 FIX (report13): Chống bấm nhiều lần =====
   var isSubmitting = false;
@@ -392,18 +425,34 @@
       return; 
     }
 
-    // Bug 4 FIX (report13): Lấy địa chỉ từ profile user thay vì hardcode
-    var userAddress = 'Căn A1-2003, Vinhomes';
-    try {
-      var profile = await apiFetch('/api/users/profile');
-      if (profile && profile.address) {
-        userAddress = profile.address;
-      }
-    } catch (e) {
-      console.warn('[Mua hộ] Không lấy được profile:', e.message);
+    // TC-KH09-001 FIX: Validate địa chỉ
+    var addressEl = document.getElementById('addressInput');
+    var addressErrEl = document.getElementById('addressError');
+    var userAddress = addressEl ? addressEl.value.trim() : '';
+    if (!userAddress) {
+      if (addressErrEl) { addressErrEl.textContent = 'Vui lòng nhập địa chỉ giao hàng.'; addressErrEl.style.display = 'block'; }
+      showToastMsg('Vui lòng nhập địa chỉ giao hàng');
+      isSubmitting = false; btn.disabled = false; btn.classList.remove('opacity-50'); updateSummary();
+      return;
     }
+    if (addressErrEl) addressErrEl.style.display = 'none';
 
+    // TC-KH09-008,009 FIX: Kiểm tra số dư ví trước khi đặt
     var totalPrice = state.budget + FEE;
+    try {
+      var wallet = await apiFetch('/api/wallets/balance');
+      if (wallet && typeof wallet.balance === 'number' && wallet.balance < totalPrice) {
+        var insufficientMsg = 'Số dư ví không đủ (' + formatVND(wallet.balance) + '). Cần ' + formatVND(totalPrice) + ' để đặt dịch vụ.';
+        showToastMsg(insufficientMsg, 5000);
+        if (confirm(insufficientMsg + '\n\nBạn có muốn nạp tiền không?')) {
+          window.location.href = 'naptienqr.html';
+        }
+        isSubmitting = false; btn.disabled = false; btn.classList.remove('opacity-50'); updateSummary();
+        return;
+      }
+    } catch (walletErr) {
+      console.warn('[Ví] Không kiểm tra được số dư:', walletErr.message);
+    }
     var productList = state.products.map(function(p) { return p.name + ' x' + p.qty; }).join(', ');
     var note = 'Mua hộ tại ' + state.selectedStore + '. Sản phẩm: ' + productList + '. Ngân sách: ' + formatVND(state.budget);
 
@@ -418,7 +467,7 @@
           total_price: totalPrice,
           longitude: 106.6297,
           latitude: 10.8231,
-          note: note
+          notes: note
         }
       });
       hideLoading();

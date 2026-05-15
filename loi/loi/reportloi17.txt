@@ -1,0 +1,67 @@
+lỗi 1: TC-KH01-002	Đăng nhập sai mật khẩu	"1. Mở ứng dụng 
+2. Chọn tab “Cư dân” 
+3. Nhập số điện thoại hợp lệ 
+4. Nhập sai mật khẩu 
+5. Nhấn “Đăng nhập”"	Hiển thị thông báo “Sai mật khẩu” hoặc thông báo tương ứng, không cho đăng nhập	High	Hiển thị thông báo" phiên đăng nhập hết hạn"	FAIL	Low		
+TC-KH01-003	Đăng nhập với số điện thoại chưa đăng ký	"1. Mở ứng dụng 
+2. Chọn tab “Cư dân” 
+3. Nhập số điện thoại chưa tồn tại trong hệ thống 
+4. Nhập mật khẩu bất kỳ 
+5. Nhấn “Đăng nhập”"	Hiển thị thông báo tài khoản không tồn tại	High	Hiển thị thông báo" phiên đăng nhập hết hạn"	FAIL	Low		
+TC-KH01-007	Kiểm tra định dạng số điện thoại không hợp lệ	"1. Mở ứng dụng 
+2. Chọn tab “Cư dân” 
+3. Nhập số điện thoại chứa chữ cái/ký tự đặc biệt 
+4. Nhập mật khẩu bất kỳ 
+5. Nhấn “Đăng nhập”"	Hệ thống hiển thị lỗi định dạng số điện thoại không hợp lệ ngay khi nhập ký tự không hợp lệ 	High	Ngay khi nhập ký tự lạ không hiển thị thông báo. Khi click vào Đăng nhập hiển thị thông báo "phiên đăng nhập hết hạn"	FAIL	High	
+TC-KH01-008	Kiểm tra số điện thoại ít hơn quy định	"1. Nhập số điện thoại dưới số ký tự cho phép 
+2. Nhập mật khẩu 
+3. Nhấn “Đăng nhập”"	Hệ thống hiển thị lỗi độ dài số điện thoại không hợp lệ	Medium	Ngay khi nhập ít hơn không hiển thị thông báo. Khi click vào Đăng nhập hiển thị thông báo "phiên đăng nhập hết hạn"	FAIL	Medium	
+TC-KH01-009	Kiểm tra số điện thoại vượt quá độ dài quy định	"1. Nhập số điện thoại vượt số ký tự cho phép 
+2. Nhập mật khẩu 
+3. Nhấn “Đăng nhập”"	Hệ thống hiển thị lỗi độ dài số điện thoại không hợp lệ	Medium	Ngay khi nhập dài hơn không hiển thị thông báo. Khi click vào Đăng nhập hiển thị thông báo "phiên đăng nhập hết hạn"	FAIL	Medium	
+TC-KH01-010	Kiểm tra mật khẩu phân biệt chữ hoa chữ thường	"1. Nhập đúng số điện thoại 
+2. Nhập mật khẩu sai kiểu chữ hoa/thường 
+3. Nhấn “Đăng nhập”"	Đăng nhập thất bại và hiển thị thông báo sai mật khẩu	Medium	Hiển thị thông báo" phiên đăng nhập hết hạn"	FAIL	Medium	
+TC-KH01-011	Kiểm tra khoảng trắng đầu/cuối ở số điện thoại	"1. Nhập số điện thoại có khoảng trắng đầu/cuối 
+2. Nhập đúng mật khẩu 
+3. Nhấn “Đăng nhập”"	Chặn luôn khoảng trắng đầu/ cuối 	Medium	Vẫn nhập được bình thường	FAIL	Medium	
+TC-KH01-012	Kiểm tra khoảng trắng đầu/cuối ở mật khẩu	"1. Nhập số điện thoại hợp lệ 
+2. Nhập mật khẩu có khoảng trắng đầu/cuối 
+3. Nhấn “Đăng nhập”"	Chặn luôn khoảng trắng đầu/ cuối 	Medium	Vẫn hiển thị ký tự 	FAIL	Medium	
+TC-KH01-018	Kiểm tra UI màn hình đăng nhập	"1. Mở màn hình đăng nhập 
+2. Quan sát giao diện, font chữ, vị trí button, input"	Giao diện hiển thị đúng thiết kế, không vỡ layout	Low	Logo kết nối đăng nhập Facebook, google hiển thị lỗi	FAIL	Low
+TC-KH01-019	Kiểm tra đăng nhập khi mất kết nối mạng	"1. Tắt mạng internet 
+2. Nhập tài khoản hợp lệ 
+3. Nhấn “Đăng nhập”"	Hiển thị thông báo lỗi kết nối mạng	High	Hiển thị lỗi thông báo" Fail to fetch"	FAIL	Low
+TC-KH07-001	Đặt dịch vụ dọn nhà cơ bản thành công khi thanh toán bằng ví  có dư số tiền 	"1. Đăng nhập hệ thống 
+2. Từ Trang chủ nhấn “Dọn nhà” 
+3. Chọn loại “dọn tiêu chuẩn” 
+4. Chọn ngày và giờ hợp lệ 
+5. Chọn số giờ 2h 
+6. Nhập ghi chú 
+7. Nhập địa chỉ 
+8. Nhấn “Đặt & thanh toán”"	Đơn dọn nhà được tạo thành công và Hiển thị trạng thái Đang tìm tasker ở màn Hoạt động 	High	Đang thiếu trường Địa chỉ và đang hiển thị trạng thái đang xử lý 	FAIL	Low	Em Toàn đang muốn thêm trường nhập Địa chỉ 
+TC-KH07-002	Đặt dịch vụ dọn nhà cao cấp thành công khi thanh toán bằng ví có dư số tiền 	"1. Mở màn hình đặt dịch vụ dọn nhà 
+2. Chọn loại “Cao cấp” 
+3. Nhập đầy đủ thông tin hợp lệ 
+4. Nhấn “Đặt & thanh toán”"	Đơn dọn nhà được tạo thành công và Hiển thị trạng thái Đang tìm tasker ở màn Hoạt động 	High	Đang thiếu trường Địa chỉ và đang hiển thị trạng thái đang xử lý 	FAIL	Low	
+TC-KH07-005	Kiểm tra không cho chọn ngày quá khứ	1. Chọn ngày nhỏ hơn ngày hiện tại	Hệ thống không cho phép chọn ngày quá khứ	High	Vẫn nhận ngày quá khử và đặt thành công	FAIL	High
+TC-KH07-008	Kiểm tra nhập ghi chú cho Tasker	"1. Nhập nội dung ghi chú yêu cầu dọn nhà 2. Đặt dịch vụ
+3. Kiểm tra hiển thị ghi chú ở màn chi tiết đơn hàng "	Ghi chú được lưu cùng đơn hàng	Medium	Không hiển thị ghi chú 	FAIL	High
+TC-KH07-012	Kiểm tra khấu trừ ví sau khi đặt đơn	"1. Ghi nhận số dư ví trước khi đặt 
+2. Đặt dịch vụ thành công"	"Số dư ví thay đổi theo trạng thái như sau: 
+- Trạng thái đang tìm tasker: Không trừ 
+- Trạng thái tasker đang đến: Không trừ 
+- Trạng thái tasker đang hoạt động: Không trừ 
+- trạng thái tasker Đã hoạt động: CÓ trừ đúng số tiền. Kiểm tra lại số tiền hiển thị 
+"	High		Not run	
+TC-KH07-013	Kiểm tra đặt đơn khi ví không đủ số dư và chọn thanh toán bằng ví 	"1. Sử dụng tài khoản có số dư không đủ 
+2. Chọn phương thức thanh toán bằng ví
+3. Thực hiện đặt đơn"	Thông báo không đủ số dư trong ví và button chuyển sang màn nạp tiền 	High	Đặt dịch vụ thành công và khi hoàn thành đơn trừ số tiền hiển thị âm 	FAIL	High
+TC-KH07-014	Kiểm tra đặt đơn khi ví không đủ số dư và chọn thanh toán tiền mặt 	"1. Sử dụng tài khoản có số dư không đủ 
+2. Chọn phương thức thanh toán tiền mặt 
+3. Thực hiện đặt đơn"	Hệ thống vẫn đặt đơn bình thường 	High		Not run	
+TC-KH07-015	Kiểm tra hiển thị thông tin ngày giờ 	"1. Tại màn hình Dọn dẹp nhà 
+2. Kiểm tra hiển thị Ngày giờ "	Hệ thống hiển thị mặc định ngày giờ hiện tại 	Medium	Hệ thống đang hiển thị giờ cố định 	FAIL	Medium
+TC-KH07-016	Kiểm tra đặt đơn khi mất kết nối mạng	"1. Tắt internet 
+2. Thực hiện đặt dịch vụ"	Hệ thống hiển thị lỗi kết nối mạng	Medium		Not run	

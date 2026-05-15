@@ -86,6 +86,13 @@ export class OrdersController {
     return { message: 'Review submitted successfully', review };
   }
 
+  @Get('my')
+  @Roles('CUSTOMER')
+  @ApiOperation({ summary: 'Lấy danh sách đơn hàng của khách hàng hiện tại (Cần Token Customer)' })
+  async getMyOrders(@Request() req) {
+    return this.ordersService.getCustomerHistory(req.user.userId);
+  }
+
   @Get('customer/history')
   @Roles('CUSTOMER')
   @ApiOperation({ summary: 'Xem lịch sử đơn hàng của Khách hàng (Cần Token Customer)' })

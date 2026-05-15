@@ -7,6 +7,11 @@ CHIOI*.xlsx
 CHIOI*.xls
 admingit/
 
+# Bug tracker / QA artifacts (đừng commit zip lớn)
+bugtracker.zip
+bugtracker/
+*.zip
+
 # Build output
 backend/dist/
 

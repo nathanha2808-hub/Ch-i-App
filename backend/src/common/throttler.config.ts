@@ -1,24 +1,28 @@
 import { ThrottlerModuleOptions } from '@nestjs/throttler';
 
+// Lỗi DB kết nối FIX: Throttler quá nghiêm → chặn user bình thường
+// Global guard chỉ áp 'short' (300 req/phút/IP) — đủ cho app thực tế
+// Auth/register/otp áp thêm throttler riêng qua @Throttle() decorator
 export const throttlerConfig: ThrottlerModuleOptions = [
   {
     name: 'short',
     ttl: 60_000,
-    limit: 200, // 200 req/phút/IP cho general API (đủ cho 1 user heavy use)
+    limit: 300, // Tăng lên 300 req/phút/IP cho user bình thường
   },
   {
     name: 'auth',
     ttl: 60_000,
-    limit: 30, // 30 lần/phút/IP login (đủ cho user gõ sai pass + test; chống brute force ở nginx layer)
+    limit: 20, // 20 lần login/phút — chỉ dùng khi apply @Throttle('auth')
   },
   {
     name: 'register',
     ttl: 60_000,
-    limit: 5, // 5 lần/phút (chống spam đăng ký từ bot)
+    limit: 10, // Tăng từ 3 → 10 (3 quá thấp, block user thật)
   },
   {
     name: 'otp',
     ttl: 30 * 60_000,
-    limit: 5, // 5 lần/30 phút (chống spam SMS phí $)
+    limit: 5, // Tăng từ 3 → 5 OTP/30 phút
   },
 ];
+
