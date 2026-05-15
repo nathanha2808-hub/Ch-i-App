@@ -68,6 +68,23 @@
     .btn-loading .btn-text { display: none; }
     .btn-loading .btn-spinner { display: inline-block; }
     .btn-spinner { display: none; }
+    /* SMS Notification */
+    .sms-notification {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(-100%);
+      z-index: 10001; width: 92%; max-width: 420px;
+      background: #fff; border-radius: 0 0 16px 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 16px 18px; transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+      border-bottom: 3px solid #ff7e36;
+    }
+    .sms-notification.show { transform: translateX(-50%) translateY(0); }
+    .sms-notification .sms-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .sms-notification .sms-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#ff7e36,#a04100); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+    .sms-notification .sms-sender { font-weight: 700; color: #241914; font-size: 14px; }
+    .sms-notification .sms-time { font-size: 11px; color: #8b7266; margin-left: auto; }
+    .sms-notification .sms-body { font-size: 15px; color: #1b1c1c; line-height: 1.5; }
+    .sms-notification .sms-otp-code { font-size: 28px; font-weight: 800; color: #a04100; letter-spacing: 6px; text-align: center; margin: 8px 0 4px; }
+    .sms-notification .sms-note { font-size: 11px; color: #8b7266; text-align: center; }
     .progress-dot { width: 10px; height: 10px; border-radius: 50%; background: #dfc0b3; transition: all 0.3s; }
     .progress-dot.active { background: #ff7e36; transform: scale(1.2); }
     .progress-dot.done { background: #a04100; }
@@ -259,8 +276,9 @@
     try {
       var result = await apiFetch('/api/auth/forgot-password', { method: 'POST', body: { phone: phone } });
       setLoading(btnSendOtp, false);
-      showToastMsg('✅ ' + result.message);
       if (result.masked_phone) maskedPhoneEl.textContent = result.masked_phone;
+      if (result.dev_otp) showSmsNotification(result.dev_otp, result.masked_phone);
+      else showToastMsg('✅ ' + result.message);
       startOtpCountdown();
       startResendCountdown();
       goToStep(2);
@@ -303,7 +321,8 @@
     try {
       var result = await apiFetch('/api/auth/resend-otp', { method: 'POST', body: { phone: storedPhone } });
       setLoading(btnResend, false);
-      showToastMsg('✅ ' + result.message);
+      if (result.dev_otp) showSmsNotification(result.dev_otp, result.masked_phone);
+      else showToastMsg('✅ ' + result.message);
       otpInputs.forEach(function(input) { input.value = ''; });
       otpInputs[0].focus();
       storedOtp = '';
@@ -387,6 +406,32 @@
   }
 
   phoneInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') btnSendOtp.click(); });
+
+  // ===== Thông báo giả lập SMS (Phase Test) =====
+  function showSmsNotification(otpCode, maskedPhone) {
+    var old = document.getElementById('sms-noti');
+    if (old) old.remove();
+    var now = new Date();
+    var timeStr = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+    var noti = document.createElement('div');
+    noti.id = 'sms-noti';
+    noti.className = 'sms-notification';
+    noti.innerHTML = '<div class="sms-header">'
+      + '<div class="sms-icon"><span class="material-symbols-outlined" style="font-size:18px">sms</span></div>'
+      + '<span class="sms-sender">Chị Ơi! SMS</span>'
+      + '<span class="sms-time">' + timeStr + '</span>'
+      + '<button onclick="this.closest(\'.sms-notification\').classList.remove(\'show\');setTimeout(function(){document.getElementById(\'sms-noti\')?.remove()},400)" style="margin-left:8px;color:#8b7266;font-size:18px;cursor:pointer">✕</button>'
+      + '</div>'
+      + '<div class="sms-body">Mã xác nhận của bạn là:</div>'
+      + '<div class="sms-otp-code">' + otpCode + '</div>'
+      + '<div class="sms-note">⏱ Hiệu lực 5 phút · Gửi đến ' + (maskedPhone || '') + '</div>';
+    document.body.appendChild(noti);
+    setTimeout(function() { noti.classList.add('show'); }, 50);
+    setTimeout(function() {
+      noti.classList.remove('show');
+      setTimeout(function() { noti.remove(); }, 400);
+    }, 15000);
+  }
 })();
 </script>
 </body></html>

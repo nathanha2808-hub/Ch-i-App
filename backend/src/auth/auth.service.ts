@@ -132,6 +132,8 @@ export class AuthService {
     return {
       message: `Mã OTP đã gửi đến số ${maskedPhone}`,
       masked_phone: maskedPhone,
+      // ⚠️ CHỈ DÙNG CHO PHASE TEST — XÓA KHI GO-LIVE
+      dev_otp: otpCode,
     };
   }
 
