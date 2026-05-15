@@ -78,25 +78,47 @@
     body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #fff8f6; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     .orange-gradient { background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); }
-    .card-shadow { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); }
-    .soft-shadow { box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08); }
+    /* Premium card shadow — layered for depth */
+    .card-premium {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 12px 32px rgba(255,126,54,0.10);
+    }
+    /* Page entrance animation */
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes logoReveal {
+        from { opacity: 0; transform: scale(0.8) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .anim-logo { animation: logoReveal 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+    .anim-form { animation: fadeSlideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.15s both; }
+    
+    .header-gradient {
+        background: linear-gradient(180deg, #c2410c 0%, #ff7e36 65%, #fcf9f8 100%);
+    }
+
     a, button { transition: all 0.2s ease; }
     .cccd-preview { max-height: 180px; object-fit: contain; border-radius: 12px; }
     @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(255,126,54,0.4); } 100% { box-shadow: 0 0 0 12px rgba(255,126,54,0); } }
     .ocr-loading { animation: pulse-ring 1.2s infinite; }
+    
+    /* Input focus glow */
+    input:focus {
+        box-shadow: 0 0 0 3px rgba(255,126,54,0.12);
+    }
 </style>
 </head>
 <body class="bg-surface-dim text-on-surface min-h-screen flex flex-col items-center">
-    <div class="w-full max-w-[430px] min-h-screen bg-background relative shadow-2xl overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-[280px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+    <div class="w-full max-w-[430px] min-h-screen bg-background relative shadow-2xl overflow-y-auto no-scrollbar">
 
 <!-- Header Section -->
-<header class="orange-gradient w-full h-[200px] flex flex-col items-center justify-center relative overflow-hidden">
+<header class="header-gradient w-full h-[220px] flex flex-col items-center justify-center relative overflow-hidden">
     <div class="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
     <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-black/5 rounded-full blur-2xl"></div>
-    <div class="z-10 text-center px-[20px] flex flex-col items-center">
-        <img src="../assets/images/logo.jpg" alt="Chị Ơi! Logo" class="w-16 h-16 rounded-full border-3 border-white/30 shadow-lg mb-2 object-cover"/>
-        <h1 class="text-white text-[22px] font-extrabold tracking-tight">Đăng ký Tasker</h1>
+    <div class="z-10 text-center px-[20px] flex flex-col items-center anim-logo">
+        <img src="../assets/images/logo.jpg" alt="Chị Ơi! Logo" class="w-[72px] h-[72px] rounded-full border-[3px] border-white/30 shadow-xl mb-2 object-cover"/>
+        <h1 class="text-white text-[26px] font-extrabold tracking-tight leading-tight">Đăng ký Tasker</h1>
         <div class="inline-flex items-center gap-1 mt-1.5 px-3 py-1 bg-white/20 rounded-full">
             <span class="material-symbols-outlined text-white text-[12px]" style="font-variation-settings: 'FILL' 1, 'wght' 600;">verified</span>
             <span class="text-white text-[11px] font-bold tracking-wide uppercase">Đối tác Chị Ơi!</span>
@@ -105,38 +127,44 @@
 </header>
 
 <!-- Main Content: Register Card -->
-<main class="w-full px-[20px] -mt-10 z-20 pb-8 relative">
-    <div class="bg-white rounded-[24px] card-shadow border border-surface-container/50 p-6 flex flex-col gap-5">
+<main class="w-full max-w-md px-container-padding -mt-8 z-20 pb-xl">
+    <div class="bg-white rounded-[24px] card-premium border border-surface-container/40 px-6 py-5 flex flex-col gap-4 anim-form">
 
         <!-- Welcome text -->
         <div class="text-center">
-            <p class="text-on-surface-variant text-body-sm">Chỉ cần SĐT, mật khẩu và ảnh CCCD để đăng ký</p>
+            <p class="text-on-surface-variant text-[13px]">Chỉ cần SĐT, mật khẩu và ảnh CCCD để đăng ký</p>
         </div>
 
         <!-- Form fields -->
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-3">
             <!-- SĐT -->
-            <div class="relative flex items-center">
-                <span class="material-symbols-outlined absolute left-4 text-outline">phone</span>
-                <input id="phoneInput" class="w-full pl-12 pr-4 py-4 bg-surface-container-low border-none rounded-[16px] text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary-container transition-all text-body-lg" placeholder="Số điện thoại (*)" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="11"/>
+            <div class="flex flex-col gap-1">
+                <div class="relative flex items-center">
+                    <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px]">phone</span>
+                    <input id="phoneInput" class="w-full pl-11 pr-4 py-3 bg-surface-container-low border-none rounded-2xl text-on-surface placeholder:text-outline/60 focus:ring-2 focus:ring-primary-container transition-all text-[15px]" placeholder="Số điện thoại (*)" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="11"/>
+                </div>
             </div>
 
             <!-- Mật khẩu -->
-            <div class="relative flex items-center">
-                <span class="material-symbols-outlined absolute left-4 text-outline">lock</span>
-                <input id="passwordInput" class="w-full pl-12 pr-12 py-4 bg-surface-container-low border-none rounded-[16px] text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary-container transition-all text-body-lg" placeholder="Mật khẩu (8-20 ký tự) (*)" type="password" minlength="8" maxlength="20"/>
-                <button type="button" class="absolute right-4 text-outline hover:text-on-surface-variant" onclick="togglePass('passwordInput', this)">
-                    <span class="material-symbols-outlined">visibility</span>
-                </button>
+            <div class="flex flex-col gap-1">
+                <div class="relative flex items-center">
+                    <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px]">lock</span>
+                    <input id="passwordInput" class="w-full pl-11 pr-12 py-3 bg-surface-container-low border-none rounded-2xl text-on-surface placeholder:text-outline/60 focus:ring-2 focus:ring-primary-container transition-all text-[15px]" placeholder="Mật khẩu (8-20 ký tự) (*)" type="password" minlength="8" maxlength="20"/>
+                    <button type="button" class="absolute right-3.5 text-outline hover:text-on-surface-variant transition-colors" onclick="togglePass('passwordInput', this)">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Xác nhận mật khẩu -->
-            <div class="relative flex items-center">
-                <span class="material-symbols-outlined absolute left-4 text-outline">lock_reset</span>
-                <input id="confirmPasswordInput" class="w-full pl-12 pr-12 py-4 bg-surface-container-low border-none rounded-[16px] text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary-container transition-all text-body-lg" placeholder="Xác nhận mật khẩu (*)" type="password" minlength="8" maxlength="20"/>
-                <button type="button" class="absolute right-4 text-outline hover:text-on-surface-variant" onclick="togglePass('confirmPasswordInput', this)">
-                    <span class="material-symbols-outlined">visibility</span>
-                </button>
+            <div class="flex flex-col gap-1">
+                <div class="relative flex items-center">
+                    <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px]">lock_reset</span>
+                    <input id="confirmPasswordInput" class="w-full pl-11 pr-12 py-3 bg-surface-container-low border-none rounded-2xl text-on-surface placeholder:text-outline/60 focus:ring-2 focus:ring-primary-container transition-all text-[15px]" placeholder="Xác nhận mật khẩu (*)" type="password" minlength="8" maxlength="20"/>
+                    <button type="button" class="absolute right-3.5 text-outline hover:text-on-surface-variant transition-colors" onclick="togglePass('confirmPasswordInput', this)">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -208,8 +236,8 @@
 
         <!-- CTA -->
         <div class="flex flex-col gap-3 items-center">
-            <button id="registerBtn" onclick="handleTaskerRegister()" class="orange-gradient w-full py-4 rounded-[16px] shadow-lg shadow-primary-container/30 active:scale-[0.98] transition-all">
-                <span class="text-white text-[15px] font-bold">GỬI HỒ SƠ ĐĂNG KÝ</span>
+            <button id="registerBtn" onclick="handleTaskerRegister()" class="orange-gradient w-full py-3.5 rounded-2xl shadow-lg shadow-primary-container/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                <span class="text-white text-[15px] font-bold tracking-wide">GỬI HỒ SƠ ĐĂNG KÝ</span>
             </button>
             <p class="text-body-sm text-on-surface-variant">
                 Đã có tài khoản? <a class="text-primary font-bold" href="dangnhaptasker.html">Đăng nhập →</a>
@@ -444,7 +472,13 @@
 
             // Disable button + loading
             registerBtn.disabled = true;
-            registerBtn.innerHTML = '<span class="text-white text-[15px] font-bold">Đang xử lý...</span>';
+            registerBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-white text-[15px] font-bold tracking-wide">ĐANG XỬ LÝ...</span>
+            `;
             showError('');
 
             try {
@@ -470,7 +504,7 @@
             } catch (err) {
                 showError(err.message || 'Đăng ký thất bại. Vui lòng thử lại.');
                 registerBtn.disabled = false;
-                registerBtn.innerHTML = '<span class="text-white text-[15px] font-bold">GỬI HỒ SƠ ĐĂNG KÝ</span>';
+                registerBtn.innerHTML = '<span class="text-white text-[15px] font-bold tracking-wide">GỬI HỒ SƠ ĐĂNG KÝ</span>';
             }
         }
 

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
+<link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "primary": "#a04100",
+                    "primary-container": "#ff7e36",
+                    "surface-dim": "#dcd9d9",
+                    "surface-container-low": "#f6f3f2",
+                    "surface-container": "#f0eded",
+                    "on-surface": "#1b1c1c",
+                    "on-surface-variant": "#584238",
+                    "outline": "#8b7266",
+                    "outline-variant": "#dfc0b3",
+                    "error": "#ba1a1a",
+                    "background": "#fcf9f8"
+                },
+                "fontFamily": {
+                    "body-sm": ["Be Vietnam Pro"],
+                    "body-md": ["Be Vietnam Pro"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "title-sm": ["Be Vietnam Pro"]
+                }
+            }
+        }
+    }
+</script>
+<style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; }
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .orange-gradient {
+        background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);
+    }
+    /* Premium card shadow — layered for depth */
+    .card-premium {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 12px 32px rgba(255,126,54,0.10);
+    }
+    /* Page entrance animation */
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes logoReveal {
+        from { opacity: 0; transform: scale(0.8) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .anim-logo { animation: logoReveal 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+    .anim-form { animation: fadeSlideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.15s both; }
+
+    /* Input focus glow */
+    input:focus {
+        box-shadow: 0 0 0 3px rgba(255,126,54,0.12);
+    }
+    /* Login button hover glow */
+    #loginBtn {
+        transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    #loginBtn:hover:not(:disabled) {
+        box-shadow: 0 6px 24px rgba(255,126,54,0.35);
+        transform: translateY(-1px);
+    }
+    #loginBtn:active:not(:disabled) {
+        transform: scale(0.98) translateY(0);
+    }
+    #loginBtn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .header-gradient {
+        background: linear-gradient(180deg, #1b1c1c 0%, #303030 65%, #fcf9f8 100%);
+    }
+</style>
+</head>
+<body class="bg-surface-dim text-on-surface h-[100dvh] overflow-hidden flex flex-col items-center">
+    <div class="w-full max-w-[430px] h-[100dvh] bg-background relative shadow-2xl overflow-hidden flex flex-col">
+
+<!-- Header Section — COMPACT -->
+<header class="header-gradient w-full flex-shrink-0 flex flex-col items-center justify-center relative overflow-hidden" style="height: clamp(160px, 30vh, 240px);">
+    <div class="absolute -top-16 -right-16 w-56 h-56 bg-white/5 rounded-full blur-3xl animate-pulse" style="animation-duration:4s;"></div>
+    <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-black/20 rounded-full blur-2xl"></div>
+
+    <div class="z-10 text-center px-5 flex flex-col items-center anim-logo">
+        <img src="../assets/images/logo.jpg" alt="Chị Ơi! Logo" class="w-[72px] h-[72px] rounded-full border-[3px] border-white/20 shadow-xl mb-2 object-cover"/>
+        <h1 class="text-white text-[26px] font-extrabold tracking-tight leading-tight">Chị Ơi!</h1>
+        <p class="text-white/70 text-[13px] mt-0.5">Dịch vụ tiện ích tại gia</p>
+        
+        <!-- Badge Admin -->
+        <div class="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-white/10 rounded-full border border-white/20">
+            <span class="material-symbols-outlined text-white text-[14px]" style="font-variation-settings: 'FILL' 1, 'wght' 600;">admin_panel_settings</span>
+            <span class="text-white text-[11px] font-bold tracking-wide uppercase">Cổng Quản Trị</span>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="flex-1 flex flex-col w-full max-w-md mx-auto px-5 -mt-8 z-20 relative">
+
+    <!-- Login Card -->
+    <div class="bg-white rounded-[24px] card-premium border border-surface-container/40 px-6 py-6 flex flex-col gap-4 anim-form">
+        <!-- Login Form -->
+        <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-1">
+                <div class="relative flex items-center">
+                    <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px]">phone</span>
+                    <input id="phoneInput" class="w-full pl-11 pr-4 py-3 bg-surface-container-low border-none rounded-2xl text-on-surface placeholder:text-outline/60 focus:ring-2 focus:ring-primary-container transition-all text-[15px]" placeholder="Số điện thoại Admin" type="tel" maxlength="10" inputmode="numeric" autocomplete="tel"/>
+                </div>
+                <p id="phoneError" class="text-error text-[12px] px-1 leading-tight" style="display:none;"></p>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <div class="relative flex items-center">
+                    <span class="material-symbols-outlined absolute left-3.5 text-outline text-[20px]">lock</span>
+                    <input id="passwordInput" class="w-full pl-11 pr-12 py-3 bg-surface-container-low border-none rounded-2xl text-on-surface placeholder:text-outline/60 focus:ring-2 focus:ring-primary-container transition-all text-[15px]" placeholder="Mật khẩu" type="password" autocomplete="current-password"/>
+                    <button type="button" class="absolute right-3.5 text-outline hover:text-on-surface-variant transition-colors" onclick="var i=document.getElementById('passwordInput');var b=this.querySelector('span');if(i.type==='password'){i.type='text';b.textContent='visibility_off';}else{i.type='password';b.textContent='visibility';}">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </button>
+                </div>
+                <p id="errorMsg" class="text-error text-[12px] px-1 leading-tight" style="display:none;"></p>
+            </div>
+        </div>
+
+        <!-- Login Button -->
+        <button id="loginBtn" onclick="handleAdminLogin()" class="orange-gradient w-full py-3.5 rounded-2xl shadow-lg shadow-primary-container/25 flex items-center justify-center gap-2 mt-2">
+            <span class="text-white text-[15px] font-bold tracking-wide">ĐĂNG NHẬP ADMIN</span>
+        </button>
+    </div>
+
+    <!-- Footer Spacer -->
+    <div class="flex-1"></div>
+    <footer class="pb-4 pt-2 w-full text-center">
+        <p class="text-outline/40 text-[10px]">© 2024 Chị Ơi! Home Services</p>
+    </footer>
+</main>
+</div>
+
+<script src="../shared/api.js?v=20260514"></script>
+<script>
+document.getElementById('phoneInput').addEventListener('input', function() {
+    var cleaned = this.value.replace(/[^\d]/g, '');
+    if (cleaned.length > 10) cleaned = cleaned.substring(0, 10);
+    if (cleaned !== this.value) this.value = cleaned;
+    document.getElementById('phoneError').style.display = 'none';
+});
+
+document.getElementById('passwordInput').addEventListener('input', function() {
+    if (this.value !== this.value.trim()) {
+        this.value = this.value.trim();
+    }
+});
+
+function validatePhone(phone) {
+    if (!phone) return 'Vui lòng nhập số điện thoại.';
+    if (/[^\d]/.test(phone)) return 'Số điện thoại chỉ được chứa chữ số.';
+    if (phone.length < 10) return 'Số điện thoại phải có 10 chữ số.';
+    if (!/^0\d{9}$/.test(phone)) return 'Số điện thoại phải bắt đầu bằng số 0.';
+    return null;
+}
+
+async function handleAdminLogin() {
+    var phone = document.getElementById('phoneInput').value.trim();
+    var pass = document.getElementById('passwordInput').value.trim();
+    var errorEl = document.getElementById('errorMsg');
+    var phoneErr = document.getElementById('phoneError');
+    var loginBtn = document.getElementById('loginBtn');
+
+    errorEl.style.display = 'none';
+    phoneErr.style.display = 'none';
+
+    var phoneValidErr = validatePhone(phone);
+    if (phoneValidErr) {
+        phoneErr.textContent = phoneValidErr;
+        phoneErr.style.display = 'block';
+        return;
+    }
+
+    if (!pass) {
+        errorEl.textContent = 'Vui lòng nhập mật khẩu.';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="animate-spin w-5 h-5 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg><span class="text-white text-[15px] font-bold">Đang đăng nhập...</span></span>';
+
+    try {
+        var data = await apiFetch('/api/auth/login', {
+            method: 'POST',
+            body: { phone: phone, password: pass }
+        });
+
+        ChiOiAuth.saveLogin(data);
+        var user = ChiOiAuth.getUser();
+        
+        if (user && user.role === 'ADMIN') {
+            window.location.href = 'bangdieukhien.html';
+        } else {
+            ChiOiAuth.logout();
+            errorEl.textContent = 'Tài khoản không có quyền quản trị.';
+            errorEl.style.display = 'block';
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = '<span class="text-white text-[15px] font-bold tracking-wide">ĐĂNG NHẬP ADMIN</span>';
+            return;
+        }
+    } catch (err) {
+        var msg = err.message || '';
+        if (msg.includes('hết hạn') || msg.toLowerCase().includes('unauthorized') || msg.toLowerCase().includes('invalid')) {
+            msg = 'Sai số điện thoại hoặc mật khẩu.';
+        } else if (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network')) {
+            msg = 'Không có kết nối mạng. Vui lòng kiểm tra Internet.';
+        } else if (!msg) {
+            msg = 'Sai số điện thoại hoặc mật khẩu.';
+        }
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<span class="text-white text-[15px] font-bold tracking-wide">ĐĂNG NHẬP ADMIN</span>';
+    }
+}
+
+document.getElementById('passwordInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleAdminLogin();
+});
+document.getElementById('phoneInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('passwordInput').focus();
+});
+</script>
+</body></html>

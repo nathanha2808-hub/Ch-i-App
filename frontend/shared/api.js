@@ -55,11 +55,29 @@ const ChiOiAuth = {
     return !!this.getToken();
   },
 
-  /** Bắt buộc đăng nhập — nếu chưa có token thì redirect */
+  /** Bắt buộc đăng nhập — nếu chưa có token thì redirect, đồng thời kiểm tra phân quyền (luồng nào vào luồng nấy) */
   requireAuth(loginPageUrl) {
     if (!this.isLoggedIn()) {
       window.location.href = loginPageUrl || 'dangnhap.html';
       return false;
+    }
+    
+    // Tự động kiểm tra luồng (Customer, Tasker, Admin)
+    const user = this.getUser();
+    if (user && user.role) {
+      const path = window.location.pathname.toLowerCase();
+      if (path.includes('/khachhang/') && user.role !== 'CUSTOMER') {
+        this.logout(loginPageUrl || '/khachhang/dangnhap.html');
+        return false;
+      }
+      if (path.includes('/giupviec/') && user.role !== 'TASKER') {
+        this.logout(loginPageUrl || '/giupviec/dangnhaptasker.html');
+        return false;
+      }
+      if (path.includes('/admin/') && user.role !== 'ADMIN') {
+        this.logout(loginPageUrl || '/admin/dangnhapadmin.html');
+        return false;
+      }
     }
     return true;
   }
