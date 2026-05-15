@@ -329,7 +329,7 @@ workflows:
         auth: integration
         submit_to_testflight: true
         beta_groups:
-          - "Internal Testers"          # ⚠️ Tạo group này trong App Store Connect → TestFlight → Internal Testing
+          - "Test Phòng Nam"            # Khớp đúng group trong App Store Connect → TestFlight → Internal Testing
         submit_to_app_store: false      # Manual review submission
 
       email:
