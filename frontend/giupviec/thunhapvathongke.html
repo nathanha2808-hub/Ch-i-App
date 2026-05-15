@@ -213,6 +213,73 @@ tailwind.config = {
 </div><!-- /main-content -->
 </main>
 
+<!-- UC_13: Withdraw Modal -->
+<div id="withdraw-modal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="withdraw-overlay"></div>
+  <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto animate-slide-up">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="font-title-sm text-title-sm text-on-surface">Yêu cầu rút tiền</h2>
+      <button id="withdraw-close" class="p-1 rounded-full hover:bg-surface-container-high">
+        <span class="material-symbols-outlined text-on-surface-variant">close</span>
+      </button>
+    </div>
+    <p id="withdraw-balance-info" class="text-body-sm text-on-surface-variant mb-4">Số dư khả dụng: 0 đ</p>
+
+    <!-- TC-T13-008,009: Chọn ngân hàng -->
+    <label class="text-label-caps text-label-caps text-on-surface-variant uppercase block mb-1">Ngân hàng *</label>
+    <select id="wd-bank" class="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl text-body-lg mb-3 focus:ring-2 focus:ring-primary/20 focus:border-primary">
+      <option value="">-- Chọn ngân hàng --</option>
+      <option value="Vietcombank">Vietcombank (VCB)</option>
+      <option value="Techcombank">Techcombank (TCB)</option>
+      <option value="BIDV">BIDV</option>
+      <option value="VietinBank">VietinBank</option>
+      <option value="MB Bank">MB Bank</option>
+      <option value="ACB">ACB</option>
+      <option value="Sacombank">Sacombank</option>
+      <option value="VPBank">VPBank</option>
+      <option value="TPBank">TPBank</option>
+      <option value="Agribank">Agribank</option>
+      <option value="SHB">SHB</option>
+      <option value="HDBank">HDBank</option>
+      <option value="OCB">OCB</option>
+      <option value="MSB">MSB</option>
+      <option value="Momo">Ví MoMo</option>
+    </select>
+
+    <!-- Số tài khoản -->
+    <label class="text-label-caps text-label-caps text-on-surface-variant uppercase block mb-1">Số tài khoản *</label>
+    <input id="wd-account" type="text" inputmode="numeric" maxlength="30" placeholder="Nhập số tài khoản ngân hàng" class="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl text-body-lg mb-3 focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+
+    <!-- Tên chủ tài khoản -->
+    <label class="text-label-caps text-label-caps text-on-surface-variant uppercase block mb-1">Chủ tài khoản *</label>
+    <input id="wd-holder" type="text" maxlength="100" placeholder="VD: NGUYEN VAN A" class="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl text-body-lg mb-3 focus:ring-2 focus:ring-primary/20 focus:border-primary uppercase" />
+
+    <!-- TC-T13-025: Số tiền (chỉ cho nhập số) -->
+    <label class="text-label-caps text-label-caps text-on-surface-variant uppercase block mb-1">Số tiền rút *</label>
+    <input id="wd-amount" type="text" inputmode="numeric" maxlength="15" placeholder="Tối thiểu 100.000 đ" class="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl text-body-lg mb-1 focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+    <p id="wd-amount-hint" class="text-[11px] text-on-surface-variant mb-4">* T+1 · Min 100k · Khấu trừ TNCN 10% nếu &gt;2tr</p>
+
+    <!-- Validation message -->
+    <p id="wd-error" class="text-body-sm text-error mb-3 hidden"></p>
+
+    <!-- TC-T13-011,012: Submit button with anti-spam -->
+    <button id="wd-submit" class="w-full py-3.5 bg-gradient-to-r from-primary to-primary-container text-white font-title-sm rounded-full shadow-lg active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+      XÁC NHẬN RÚT TIỀN
+    </button>
+
+    <!-- TC-T13-018: Pending requests -->
+    <div id="wd-pending-section" class="mt-4 hidden">
+      <h3 class="text-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Yêu cầu đang chờ xử lý</h3>
+      <div id="wd-pending-list"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .animate-slide-up { animation: slideUp 0.3s ease-out; }
+</style>
+
 <!-- BottomNavBar -->
 <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
   <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-transform" href="trangchutasker.html">
@@ -432,21 +499,111 @@ tailwind.config = {
     });
   }
 
-  // === TC-T12-024,025: Withdraw ===
-  document.getElementById('btn-withdraw').addEventListener('click', async function() {
+  // === UC_13: Withdraw Modal Logic ===
+  var wdModal = document.getElementById('withdraw-modal');
+  var wdBank = document.getElementById('wd-bank');
+  var wdAccount = document.getElementById('wd-account');
+  var wdHolder = document.getElementById('wd-holder');
+  var wdAmount = document.getElementById('wd-amount');
+  var wdError = document.getElementById('wd-error');
+  var wdSubmit = document.getElementById('wd-submit');
+  var isSubmitting = false;
+
+  // TC-T13-025: Chỉ cho nhập số vào field số tiền
+  wdAmount.addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+
+  // Mở modal
+  document.getElementById('btn-withdraw').addEventListener('click', function() {
     if (walletBalance <= 0) { showToastMsg('Số dư không đủ để rút tiền'); return; }
-    var amount = prompt('Nhập số tiền muốn rút (tối thiểu 100.000 đ):');
-    if (!amount) return;
-    var amountNum = parseInt(amount.replace(/\D/g, ''));
-    if (isNaN(amountNum) || amountNum < 100000) { showToastMsg('Số tiền tối thiểu 100.000 đ'); return; }
-    if (amountNum > walletBalance) { showToastMsg('Số dư không đủ. Hiện có: ' + fmtVND(walletBalance)); return; }
+    document.getElementById('withdraw-balance-info').textContent = 'Số dư khả dụng: ' + fmtVND(walletBalance);
+    wdError.classList.add('hidden');
+    wdModal.classList.remove('hidden');
+    loadPendingWithdrawals();
+  });
+
+  // Đóng modal
+  document.getElementById('withdraw-close').addEventListener('click', function() { wdModal.classList.add('hidden'); });
+  document.getElementById('withdraw-overlay').addEventListener('click', function() { wdModal.classList.add('hidden'); });
+
+  // TC-T13-018: Load pending withdrawals
+  async function loadPendingWithdrawals() {
+    try {
+      var txns = await apiFetch('/api/wallets/transactions');
+      var pending = txns.filter(function(t) { return t.type === 'WITHDRAW' && t.status === 'PENDING'; });
+      var section = document.getElementById('wd-pending-section');
+      var list = document.getElementById('wd-pending-list');
+      if (pending.length > 0) {
+        section.classList.remove('hidden');
+        list.innerHTML = '';
+        pending.forEach(function(t) {
+          var div = document.createElement('div');
+          div.className = 'flex justify-between items-center p-3 bg-surface-container-low rounded-lg mb-2';
+          div.innerHTML = '<div><p class="text-body-sm text-on-surface">' + (t.description || 'Rút tiền') + '</p><p class="text-[11px] text-on-surface-variant">' + fmtDate(t.created_at) + '</p></div>' +
+            '<span class="text-[12px] font-medium text-orange-500 bg-orange-50 px-2 py-1 rounded-full">Chờ duyệt</span>';
+          list.appendChild(div);
+        });
+      } else {
+        section.classList.add('hidden');
+      }
+    } catch(e) { /* ignore */ }
+  }
+
+  // TC-T13-001 ~ 025: Submit withdraw
+  wdSubmit.addEventListener('click', async function() {
+    // TC-T13-011,012: Chống spam/double click
+    if (isSubmitting) return;
+    wdError.classList.add('hidden');
+
+    var bank = wdBank.value;
+    var account = wdAccount.value.trim();
+    var holder = wdHolder.value.trim();
+    var amountStr = wdAmount.value.trim();
+
+    // TC-T13-010: Validate ngân hàng
+    if (!bank) { wdError.textContent = 'Vui lòng chọn ngân hàng'; wdError.classList.remove('hidden'); return; }
+    // Validate STK
+    if (!account || account.length < 5) { wdError.textContent = 'Vui lòng nhập số tài khoản hợp lệ (ít nhất 5 ký tự)'; wdError.classList.remove('hidden'); return; }
+    // Validate tên chủ TK
+    if (!holder || holder.length < 2) { wdError.textContent = 'Vui lòng nhập tên chủ tài khoản'; wdError.classList.remove('hidden'); return; }
+    // TC-T13-007: Validate trống
+    if (!amountStr) { wdError.textContent = 'Vui lòng nhập số tiền muốn rút'; wdError.classList.remove('hidden'); return; }
+
+    var amountNum = parseInt(amountStr);
+    // TC-T13-005,006: Validate 0 hoặc âm
+    if (isNaN(amountNum) || amountNum <= 0) { wdError.textContent = 'Số tiền phải lớn hơn 0'; wdError.classList.remove('hidden'); return; }
+    // TC-T13-001: Min 100k
+    if (amountNum < 100000) { wdError.textContent = 'Số tiền tối thiểu 100.000 đ'; wdError.classList.remove('hidden'); return; }
+    // TC-T13-004: Validate > balance
+    if (amountNum > walletBalance) { wdError.textContent = 'Số dư không đủ. Hiện có: ' + fmtVND(walletBalance); wdError.classList.remove('hidden'); return; }
+
+    // TC-T13-021: Loading + anti-spam
+    isSubmitting = true;
+    wdSubmit.disabled = true;
+    wdSubmit.textContent = 'ĐANG XỬ LÝ...';
 
     try {
-      await apiFetch('/api/wallets/withdraw', { method: 'POST', body: { amount: amountNum } });
-      showToastMsg('✅ Yêu cầu rút ' + fmtVND(amountNum) + ' đã được gửi!');
+      // TC-T13-016: API call
+      await apiFetch('/api/wallets/withdraw', {
+        method: 'POST',
+        body: { amount: amountNum, bank_name: bank, account_number: account, account_holder: holder }
+      });
+      // TC-T13-002: Thông báo thành công
+      wdModal.classList.add('hidden');
+      showToastMsg('✅ Yêu cầu rút ' + fmtVND(amountNum) + ' đã được gửi! Admin sẽ xử lý trong 24h.');
+      // Reset form
+      wdBank.value = ''; wdAccount.value = ''; wdHolder.value = ''; wdAmount.value = '';
+      // TC-T13-016: Refresh data
       setTimeout(function() { loadStats(currentPeriod); }, 1500);
     } catch (e) {
-      showToastMsg('❌ ' + e.message);
+      // TC-T13-013,014: Error handling
+      wdError.textContent = e.message || 'Có lỗi xảy ra, vui lòng thử lại';
+      wdError.classList.remove('hidden');
+    } finally {
+      isSubmitting = false;
+      wdSubmit.disabled = false;
+      wdSubmit.textContent = 'XÁC NHẬN RÚT TIỀN';
     }
   });
 

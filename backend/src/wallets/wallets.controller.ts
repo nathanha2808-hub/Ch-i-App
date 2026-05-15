@@ -32,9 +32,9 @@ export class WalletsController {
   }
 
   @Post('withdraw')
-  @ApiOperation({ summary: 'Yêu cầu rút tiền từ ví' })
+  @ApiOperation({ summary: 'Yêu cầu rút tiền từ ví (UC_13)' })
   @ApiBody({ type: WithdrawDto })
   async withdraw(@Request() req, @Body() body: WithdrawDto) {
-    return this.walletsService.withdraw(req.user.userId, body.amount);
+    return this.walletsService.withdraw(req.user.userId, body.amount, body.bank_name, body.account_number, body.account_holder);
   }
 }
