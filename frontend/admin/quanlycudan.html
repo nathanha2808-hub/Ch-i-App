@@ -307,7 +307,7 @@ Thêm cư dân mới
       </div>
       <div>
         <label class="block text-body-sm text-on-surface-variant mb-1">Mật khẩu <span class="text-error">*</span></label>
-        <input id="add-password" type="password" placeholder="Tối thiểu 6 ký tự"
+        <input id="add-password" type="password" placeholder="Tối thiểu 8 ký tự, gồm hoa, thường, số, đặc biệt"
           class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2 text-body-sm focus:ring-primary focus:border-primary outline-none" required/>
       </div>
       <div>
@@ -658,8 +658,12 @@ Thêm cư dân mới
         if (addError) { addError.textContent = 'Vui lòng điền đầy đủ các trường bắt buộc.'; addError.classList.remove('hidden'); }
         return;
       }
-      if (password.length < 6) {
-        if (addError) { addError.textContent = 'Mật khẩu phải có ít nhất 6 ký tự.'; addError.classList.remove('hidden'); }
+      if (password.length < 8 || password.length > 20) {
+        if (addError) { addError.textContent = 'Mật khẩu phải từ 8 đến 20 ký tự.'; addError.classList.remove('hidden'); }
+        return;
+      }
+      if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[\W_]/.test(password)) {
+        if (addError) { addError.textContent = 'Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.'; addError.classList.remove('hidden'); }
         return;
       }
 

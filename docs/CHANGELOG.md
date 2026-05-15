@@ -4,6 +4,62 @@
 
 ---
 
+## [1.3.1] — 2026-05-15
+
+### 🔒 Tiêu chuẩn hóa chính sách bảo mật mật khẩu
+
+#### Changed
+- **Backend:** Cập nhật DTOs (`register.dto.ts`, `change-password.dto.ts`, `reset-password.dto.ts`) yêu cầu mật khẩu tối thiểu 8 ký tự, bao gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.
+- **Frontend:** Đồng bộ xác thực Regex mật khẩu trên toàn bộ các form đăng ký, đặt lại mật khẩu và đổi mật khẩu cho cả Khách hàng, Tasker và Admin (`dangky.html`, `dangkytasker.html`, `quenmatkhau.html`, `taikhoan.html`, `quanlycudan.html`).
+- **UI:** Cập nhật đồng bộ các thông báo lỗi và placeholder input để phản ánh chính xác yêu cầu bảo mật mới.
+
+---
+
+## [1.4.0] — 2026-05-15
+
+### 📊 UC_12 — Thu nhập & Thống kê Tasker
+
+#### Added
+- **Backend:** Endpoint `GET /api/taskers/stats?period=today|week|month` — trả về tổng thu nhập, phí 15%, đánh giá TB, tỷ lệ nhận đơn, % so sánh kỳ trước, biểu đồ theo ngày.
+- **Frontend:** Rewrite toàn bộ `thunhapvathongke.html` — 25 test cases UC_12.
+
+#### Fixed (25 Test Cases)
+- **TC-T12-001:** Mở màn hình Thu nhập thành công
+- **TC-T12-002:** Tổng thu nhập tính đúng từ `tasker_earnings`
+- **TC-T12-003:** % so sánh kỳ trước (▲/▼)
+- **TC-T12-004/005:** Biểu đồ thu nhập theo ngày (T2–CN) từ API
+- **TC-T12-006:** Số đơn hoàn thành chính xác
+- **TC-T12-007:** Đánh giá TB từ `reviews` table
+- **TC-T12-008:** Tỷ lệ nhận đơn = COMPLETED/(COMPLETED+CANCELLED)
+- **TC-T12-009:** Phí nền tảng 15% hiển thị riêng
+- **TC-T12-010/011/012/013:** Filter chips Hôm nay/Tuần này/Tháng + chuyển đổi liên tục
+- **TC-T12-014/015:** Empty state + hiển thị 0 khi chưa có dữ liệu
+- **TC-T12-016:** Nút Refresh làm mới dữ liệu
+- **TC-T12-017/018:** Loading skeleton + Error state khi mất mạng/timeout
+- **TC-T12-019:** Auth guard redirect login
+- **TC-T12-021:** Format tiền tệ VND
+- **TC-T12-022:** Loading skeleton animation
+- **TC-T12-024/025:** Nút rút tiền + disable khi số dư = 0
+
+### 💰 UC_13 — Yêu cầu rút tiền Tasker (25 TCs)
+
+#### Added
+- **Backend:** Cập nhật `WithdrawDto` thêm `bank_name`, `account_number`, `account_holder` + min 100k.
+- **Frontend:** Withdraw Modal đầy đủ form (chọn ngân hàng, STK, tên chủ TK, số tiền).
+
+#### Fixed
+- **TC-T13-001~003:** Submit rút tiền thành công + thông báo + disable khi balance=0
+- **TC-T13-004~007:** Validation: số tiền > balance, =0, âm, trống
+- **TC-T13-008~010:** Dropdown 15 ngân hàng + validate chưa chọn
+- **TC-T13-011/012:** Chống spam/double click bằng `isSubmitting` flag
+- **TC-T13-013/014:** Error handling khi mất mạng/timeout
+- **TC-T13-016:** Đồng bộ số dư sau khi tạo request (auto reload)
+- **TC-T13-018:** Hiển thị danh sách yêu cầu "Chờ duyệt"
+- **TC-T13-021:** Loading state khi gửi request
+- **TC-T13-024/025:** Format tiền VND + chỉ cho nhập số
+
+---
+
 ## [1.3.0] — 2026-05-13
 
 ### 🚨 Phase 5 — Recovery + bug fixes mới

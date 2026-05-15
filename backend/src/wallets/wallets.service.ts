@@ -111,17 +111,24 @@ export class WalletsService {
     return result;
   }
 
-  async withdraw(userId: number, amount: number) {
+  async withdraw(userId: number, amount: number, bankName?: string, accountNumber?: string, accountHolder?: string) {
     if (amount <= 0) {
       throw new BadRequestException('Amount must be positive');
+    }
+
+    if (amount < 100000) {
+      throw new BadRequestException('Số tiền tối thiểu 100.000đ');
     }
 
     const wallet = await this.getWallet(userId);
 
     // TypeScript compilation fix: Ensure balance is treated as a number
     if (Number(wallet.balance) < amount) {
-      throw new BadRequestException('Insufficient balance');
+      throw new BadRequestException('Số dư không đủ. Hiện có: ' + Number(wallet.balance).toLocaleString('vi-VN') + 'đ');
     }
+
+    const bankInfo = bankName ? `${bankName} - ${accountNumber} - ${accountHolder}` : '';
+    const description = bankInfo ? `Yêu cầu rút tiền → ${bankInfo}` : 'Yêu cầu rút tiền';
 
     const result = await this.prisma.$transaction(async (prisma) => {
       const updatedWallet = await prisma.wallets.update({
@@ -136,7 +143,7 @@ export class WalletsService {
           amount: amount, // amount to withdraw
           type: 'WITHDRAW',
           status: 'PENDING',
-          description: 'Yêu cầu rút tiền',
+          description: description,
         },
       });
 

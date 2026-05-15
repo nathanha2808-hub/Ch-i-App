@@ -9,6 +9,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/responsive.css"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -134,7 +135,7 @@
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-lg min-h-screen pb-32">
-<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<div class="absolute top-0 left-0 w-full h-[300px] -z-10 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
 <!-- Lỗi 5 FIX: Header có background khi scroll, chữ luôn rõ ràng -->
 <header id="topHeader" class="sticky top-0 z-50 flex justify-between items-center w-full px-container-padding h-16 transition-all duration-300" style="background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%);">
 <div class="flex items-center gap-4">

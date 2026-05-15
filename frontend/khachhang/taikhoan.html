@@ -9,6 +9,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/responsive.css"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -119,7 +120,7 @@
     </style>
 </head>
 <body class="text-on-surface">
-<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<div class="absolute top-0 left-0 w-full h-[300px] -z-10 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
 <!-- Header Section -->
 <header class="fixed top-0 left-0 right-0 z-40 bg-transparent pt-12 px-container-padding">
 <div class="flex justify-between items-center">
@@ -412,7 +413,11 @@
                 var np = document.getElementById('pw-new').value;
                 var cf = document.getElementById('pw-confirm').value;
                 if (!cur || !np) { showToastMsg('Vui lòng nhập đầy đủ'); return; }
-                if (np.length < 6) { showToastMsg('Mật khẩu mới ít nhất 6 ký tự'); return; }
+                if (np.length < 8 || np.length > 20) { showToastMsg('Mật khẩu mới phải từ 8-20 ký tự'); return; }
+                if (!/[A-Z]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa'); return; }
+                if (!/[a-z]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết thường'); return; }
+                if (!/[0-9]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ số'); return; }
+                if (!/[\W_]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt'); return; }
                 if (np !== cf) { showToastMsg('Mật khẩu xác nhận không khớp'); return; }
                 try { await apiFetch('/api/auth/change-password', { method: 'POST', body: { current_password: cur, new_password: np } }); closeModal(); showToastMsg('✅ Đổi mật khẩu thành công'); }
                 catch (e) { showToastMsg('❌ ' + e.message); }

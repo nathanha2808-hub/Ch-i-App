@@ -86,6 +86,24 @@ model notifications {
   users           users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
 }
 
+model otp_codes {
+  id            Int       @id @default(autoincrement())
+  user_id       Int
+  phone         String    @db.VarChar(20)
+  otp_code      String    @db.VarChar(8)
+  purpose       String    @default("RESET_PASSWORD") @db.VarChar(30)
+  attempts      Int       @default(0)
+  max_attempts  Int       @default(5)
+  expires_at    DateTime  @db.Timestamp(6)
+  used_at       DateTime? @db.Timestamp(6)
+  created_at    DateTime  @default(now()) @db.Timestamp(6)
+
+  user          users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([phone])
+  @@index([expires_at])
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model order_interventions {
   intervention_id Int       @id @default(autoincrement())
@@ -258,6 +276,7 @@ model users {
   support_tickets                      support_tickets[]
   taskers                              taskers?
   wallets                              wallets?
+  otp_codes                            otp_codes[]
 }
 
 model vouchers {
