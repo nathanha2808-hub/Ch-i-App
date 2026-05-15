@@ -7,6 +7,43 @@
  */
 
 // ==============================================================
+// 0. AUTO-INJECT RESPONSIVE CSS + VIEWPORT META FIX
+// ==============================================================
+// Đảm bảo UI/UX hoạt động trên tất cả mobile screens (320px → tablet 1024px)
+// + iPhone notch + Android display cutout + landscape orientation
+(function autoInjectResponsive() {
+  // Fix viewport meta tag (add viewport-fit=cover for iPhone notch)
+  var meta = document.querySelector('meta[name="viewport"]');
+  if (meta && !/viewport-fit\s*=\s*cover/i.test(meta.content || '')) {
+    meta.content = (meta.content || 'width=device-width, initial-scale=1') + ', viewport-fit=cover';
+  } else if (!meta) {
+    meta = document.createElement('meta');
+    meta.name = 'viewport';
+    meta.content = 'width=device-width, initial-scale=1, viewport-fit=cover';
+    document.head.appendChild(meta);
+  }
+
+  // Inject responsive.css (chỉ 1 lần per page)
+  if (!document.getElementById('chioi-responsive-css')) {
+    var link = document.createElement('link');
+    link.id = 'chioi-responsive-css';
+    link.rel = 'stylesheet';
+    // Tính relative path dựa vào current document URL
+    // shared/api.js đang trong /shared/ → responsive.css cùng folder
+    var apiScript = document.querySelector('script[src*="shared/api.js"]');
+    if (apiScript) {
+      // VD: ../shared/api.js?v=... → ../shared/responsive.css
+      var apiSrc = apiScript.getAttribute('src') || '';
+      link.href = apiSrc.replace(/api\.js(\?.*)?$/, 'responsive.css?v=20260517');
+    } else {
+      link.href = '/shared/responsive.css?v=20260517';
+    }
+    // Insert vào <head> NGAY trước </head> để override tailwind nếu cần
+    document.head.appendChild(link);
+  }
+})();
+
+// ==============================================================
 // 1. CẤU HÌNH - TỰ ĐỘNG DETECT MÔI TRƯỜNG
 // ==============================================================
 // Production (Nginx port 80/443): API proxy cùng origin → không cần port

@@ -5,7 +5,7 @@
 //   - Static khác (CSS/JS/fonts/icons): cache-first, refresh background
 //   - API calls: network-only (real-time data, không cache)
 
-const VERSION = 'chioi-v1.0.5'; // Fix login redirect bug: absolute paths cho window.location.href
+const VERSION = 'chioi-v1.0.6'; // Responsive UI/UX cho mobile cross-device (safe-area, dvh, clamp, landscape)
 const CACHE_STATIC = `${VERSION}-static`;
 const CACHE_PAGES  = `${VERSION}-pages`;
 

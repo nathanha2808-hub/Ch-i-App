@@ -1,0 +1,187 @@
+/* ============================================================================
+ * Chị Ơi! — Responsive UI/UX Cross-device
+ * ============================================================================
+ * Inject vào tất cả pages qua shared/api.js
+ * Mục tiêu: render đẹp trên iPhone SE 320 → iPhone Pro Max 430 → iPad 1024
+ *           landscape + portrait, iOS notch + Android display cutout
+ * ============================================================================
+ */
+
+/* ---------- Safe area CSS variables (iPhone notch + home indicator) ------- */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* ---------- Reset for mobile webview ---------- */
+html, body {
+  /* Prevent iOS Safari rubber-band scroll bouncing on body */
+  overscroll-behavior-y: none;
+  /* Prevent text size auto-adjust khi xoay landscape iOS */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- Fix viewport height bug iOS (URL bar hide/show) ----------------
+ * Replace any `h-screen` or `min-h-screen` với dvh để KHÔNG bị URL bar che
+ * (dvh = dynamic viewport height, native iOS Safari 15.4+ và Chrome 108+)
+ */
+.h-screen,
+.min-h-screen {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+}
+
+/* Fallback browsers cũ KHÔNG support dvh */
+@supports not (height: 100dvh) {
+  .h-screen { height: 100vh !important; }
+  .min-h-screen { min-height: 100vh !important; }
+}
+
+/* ---------- Container width: max-w-[430px] but responsive on tablets ---- */
+.max-w-\[430px\] {
+  max-width: min(430px, 100vw) !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* On tablets (>= 768px) và landscape: keep mobile-style narrow container
+ * but center và thêm subtle shadow để tạo cảm giác "phone in tablet" */
+@media (min-width: 768px) {
+  .max-w-\[430px\] {
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+/* ---------- Safe area padding ---------- */
+/* Bottom navs (fixed/sticky) — đẩy lên trên home indicator iPhone */
+nav.fixed.bottom-0,
+nav[class*="bottom-0"][class*="fixed"],
+footer.fixed.bottom-0,
+[data-safe-bottom],
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px) !important;
+}
+
+/* Headers fixed top — tránh notch */
+header.fixed.top-0,
+header[class*="top-0"][class*="fixed"],
+[data-safe-top],
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 12px) !important;
+}
+
+/* Content area nếu có fixed header — thêm margin-top safe-area */
+main.with-safe-top {
+  margin-top: env(safe-area-inset-top, 0px) !important;
+}
+
+/* ---------- Touch targets: minimum 44×44pt (Apple HIG) ---------- */
+button, a[role="button"], input[type="button"], input[type="submit"] {
+  min-height: 44px;
+  touch-action: manipulation; /* loại bỏ 300ms tap delay iOS */
+}
+
+/* Exception: small icon buttons trong nav/header được giữ size hiện tại */
+nav button, header button, .icon-btn {
+  min-height: revert;
+}
+
+/* ---------- Inputs: prevent iOS zoom khi focus ---------- */
+input, select, textarea {
+  font-size: max(16px, 1em) !important; /* < 16px iOS auto-zoom in */
+}
+
+/* Exception cho compact UI (date input, time input nhỏ) */
+input[data-compact],
+.compact-input input {
+  font-size: 14px !important;
+}
+
+/* ---------- Form auto-fill background bug iOS Safari ----------------------
+ * iOS Safari highlight autofilled input với màu vàng khó đọc → giữ design color
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: #1b1c1c !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* ---------- Responsive typography (clamp) ---------- */
+/* Apply chỉ khi class "responsive-text" hoặc tự động cho h1/h2 */
+.text-responsive-lg { font-size: clamp(20px, 5vw, 28px) !important; }
+.text-responsive-md { font-size: clamp(16px, 4vw, 20px) !important; }
+.text-responsive-sm { font-size: clamp(13px, 3vw, 15px) !important; }
+
+/* ---------- Landscape mode adjustments ----------------------------------
+ * Smartphone landscape: viewport thường < 500px height → bottom nav che content
+ */
+@media (max-height: 500px) and (orientation: landscape) {
+  /* Compact bottom nav */
+  nav[class*="bottom-0"][class*="fixed"] {
+    height: 48px !important;
+  }
+  /* Reduce header padding */
+  header[class*="top-0"][class*="fixed"] {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  /* Main content thêm bottom padding để không bị nav che */
+  main {
+    padding-bottom: 56px !important;
+  }
+}
+
+/* ---------- Small phones (iPhone SE 320px width) ---------- */
+@media (max-width: 360px) {
+  /* Reduce padding để không tràn */
+  .px-6, [class*="px-container-padding"] { padding-left: 12px !important; padding-right: 12px !important; }
+  .px-5 { padding-left: 10px !important; padding-right: 10px !important; }
+  /* Smaller font cho text quá dài */
+  .text-\[15px\] { font-size: 14px !important; }
+  .text-\[13px\] { font-size: 12px !important; }
+}
+
+/* ---------- Tablets / Foldables (>= 600px width) ----------
+ * Phone-style narrow column centered, không full-width
+ */
+@media (min-width: 600px) {
+  body {
+    background: linear-gradient(135deg, #fcf9f8 0%, #fae4da 100%) !important;
+  }
+}
+
+/* ---------- Prevent horizontal scroll trên mọi viewport ---------- */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+}
+
+/* ---------- Accessibility: focus-visible cho keyboard navigation ------- */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #ff7e36;
+  outline-offset: 2px;
+}
+
+/* ---------- iOS bounce scroll cho modals ---------- */
+.modal-overlay, [class*="modal-overlay"] {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- Print styles (rare nhưng có thể) ---------- */
+@media print {
+  nav, header, footer, .no-print { display: none !important; }
+}
