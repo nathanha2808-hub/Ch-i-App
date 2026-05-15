@@ -8,6 +8,7 @@ import { RegisterDto } from './dto/register.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResendOtpDto } from './dto/resend-otp.dto';
 
 @ApiTags('Authentication')
 @Controller('api/auth')
@@ -48,6 +49,14 @@ export class AuthController {
   @ApiBody({ type: ResetPasswordDto })
   async resetPassword(@Body() body: ResetPasswordDto) {
     return this.authService.resetPassword(body);
+  }
+
+  @Post('resend-otp')
+  @Throttle({ otp: { limit: 3, ttl: 30 * 60_000 } })
+  @ApiOperation({ summary: 'Gửi lại mã OTP — rate limit 3 lần/30 phút/IP, chờ 30s giữa mỗi lần' })
+  @ApiBody({ type: ResendOtpDto })
+  async resendOtp(@Body() body: ResendOtpDto) {
+    return this.authService.resendOtp(body.phone);
   }
 
   @Post('change-password')
