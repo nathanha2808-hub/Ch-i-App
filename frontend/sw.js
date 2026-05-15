@@ -5,7 +5,7 @@
 //   - Static khác (CSS/JS/fonts/icons): cache-first, refresh background
 //   - API calls: network-only (real-time data, không cache)
 
-const VERSION = 'chioi-v1.0.3'; // BUMP để force update khi đổi api.js / strategy / icons
+const VERSION = 'chioi-v1.0.4'; // Role-based isolation trong requireAuth() + admin login page riêng
 const CACHE_STATIC = `${VERSION}-static`;
 const CACHE_PAGES  = `${VERSION}-pages`;
 
