@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -61,6 +61,13 @@
 <span data-filter="trong_tre" class="chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all">Trông trẻ</span>
 <span data-filter="mua_ho" class="chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all">Mua hộ</span>
 </div>
+<!-- TC-KH10-006 FIX: Filter theo trạng thái -->
+<div id="status-chips" class="flex overflow-x-auto gap-2 no-scrollbar pb-2">
+<span data-status="all" class="chip-active px-4 py-2 rounded-full text-body-sm font-semibold shrink-0 cursor-pointer shadow-sm transition-all">Tất cả TT</span>
+<span data-status="active" class="chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all">Đang xử lý</span>
+<span data-status="COMPLETED" class="chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all">Hoàn thành</span>
+<span data-status="CANCELLED" class="chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all">Đã hủy</span>
+</div>
 <!-- Lỗi 7 FIX: Date range picker hoạt động -->
 <div id="date-range-btn" class="flex items-center justify-between bg-white border border-outline-variant rounded-xl px-4 py-3 shadow-sm active:bg-surface-container-low transition-colors cursor-pointer">
 <div class="flex items-center gap-3">
@@ -121,6 +128,7 @@
 
   var allOrders = [];
   var activeFilter = 'all';
+  var activeStatusFilter = 'all';
   var dateFrom = null, dateTo = null;
 
   // Service name → type mapping for filter
@@ -171,6 +179,15 @@
           if (d >= toEnd) return false;
         }
       }
+      // TC-KH10-006: Filter by status
+      if (activeStatusFilter !== 'all') {
+        if (activeStatusFilter === 'active') {
+          // Đang xử lý = PENDING, ACCEPTED, TASKER_ARRIVED, IN_PROGRESS
+          if (['COMPLETED', 'CANCELLED'].indexOf(o.status) >= 0) return false;
+        } else {
+          if (o.status !== activeStatusFilter) return false;
+        }
+      }
       return true;
     });
 
@@ -214,7 +231,7 @@
     var status = statusMap[order.status] || { label: order.status, bg: 'bg-gray-100', text: 'text-gray-700' };
     // Bug 4 FIX (report13): Hiển thị đúng địa chỉ từ DB
     var address = order.address || 'Chưa cập nhật';
-    var note = order.note || 'Không có ghi chú';
+    var note = order.notes || order.note || 'Không có ghi chú';
     var scheduledTime = order.scheduled_time ? formatDateTime(order.scheduled_time) : 'Chưa xác định';
 
     // Bug 3 FIX (report13): Cho phép hủy đơn khi status = PENDING hoặc ACCEPTED
@@ -287,6 +304,19 @@
       activeFilter = this.getAttribute('data-filter');
       document.querySelectorAll('#filter-chips span').forEach(function(c) {
         c.className = c.getAttribute('data-filter') === activeFilter
+          ? 'chip-active px-4 py-2 rounded-full text-body-sm font-semibold shrink-0 cursor-pointer shadow-sm transition-all'
+          : 'chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all';
+      });
+      renderOrders();
+    });
+  });
+
+  // TC-KH10-006 FIX: Status filter chips
+  document.querySelectorAll('#status-chips span').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      activeStatusFilter = this.getAttribute('data-status');
+      document.querySelectorAll('#status-chips span').forEach(function(c) {
+        c.className = c.getAttribute('data-status') === activeStatusFilter
           ? 'chip-active px-4 py-2 rounded-full text-body-sm font-semibold shrink-0 cursor-pointer shadow-sm transition-all'
           : 'chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all';
       });

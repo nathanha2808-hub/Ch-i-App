@@ -107,10 +107,18 @@ export class ApiController {
 
   @Post('taskers/register-service')
   @Roles('TASKER')
-  @ApiOperation({ summary: 'Tasker đăng ký thêm dịch vụ mới' })
+  @ApiOperation({ summary: 'Tasker đăng ký thêm dịch vụ mới (auto-approve nếu đã VERIFIED KYC)' })
   @ApiBody({ schema: { example: { service_id: 1 } } })
   async registerService(@Request() req, @Body('service_id', ParseIntPipe) serviceId: number) {
     return this.apiService.registerTaskerService(req.user.userId, serviceId);
+  }
+
+  @Patch('taskers/toggle-service')
+  @Roles('TASKER')
+  @ApiOperation({ summary: 'Bật/Tắt dịch vụ (Tasker đã duyệt KYC → auto-approve, không cần admin duyệt lại)' })
+  @ApiBody({ schema: { example: { service_id: 1 } } })
+  async toggleService(@Request() req, @Body('service_id', ParseIntPipe) serviceId: number) {
+    return this.apiService.toggleTaskerService(req.user.userId, serviceId);
   }
 
   // --- Support APIs ---

@@ -142,7 +142,7 @@
 </div>
 </div>
 <div class="flex gap-sm">
-<button class="bg-surface-container-high p-3 rounded-full text-primary hover:bg-primary-container/20 transition-colors">
+<button id="btn-call-tasker" class="bg-surface-container-high p-3 rounded-full text-primary hover:bg-primary/10 active:scale-95 transition-colors">
 <span class="material-symbols-outlined" data-icon="call">call</span>
 </button>
 </div>
@@ -236,6 +236,11 @@
 <span class="text-body-sm text-on-surface-variant">Ghi chú</span>
 <span id="order-note" class="text-body-sm font-semibold text-on-background text-right max-w-[60%]"></span>
 </div>
+<!-- TC-KH10-001: Hiển thị địa chỉ -->
+<div id="address-row" class="flex justify-between items-start" style="display:none;">
+<span class="text-body-sm text-on-surface-variant">Địa chỉ</span>
+<span id="order-address" class="text-body-sm font-semibold text-on-background text-right max-w-[60%]"></span>
+</div>
 <div class="pt-sm mt-sm border-t border-outline-variant flex justify-between items-center">
 <span class="text-body-lg font-bold text-on-background">Tổng tiền</span>
 <span class="text-headline-md font-bold text-primary">450.000 đ</span>
@@ -292,11 +297,11 @@
   var orderId = params.get('orderId');
   if (!orderId) return;
 
-  // Bug 2 FIX: Stepper steps mapping
+  // TC-KH10-003 FIX: Stepper steps mapping - đúng text theo spec
   var STEPS = [
     { key: 'PENDING', label: 'Đã đặt đơn', desc: 'Đơn hàng của bạn đã được tiếp nhận' },
     { key: 'ACCEPTED', label: 'Đã tìm Tasker', desc: 'Tasker đã nhận việc' },
-    { key: 'TASKER_ARRIVED', label: 'Tasker đang đến', desc: 'Đang di chuyển tới địa chỉ của bạn' },
+    { key: 'TASKER_ARRIVED', label: 'Tasker đã đến', desc: 'Tasker đã đến địa chỉ của bạn' },
     { key: 'IN_PROGRESS', label: 'Đang thực hiện', desc: 'Tasker đang tiến hành dịch vụ' },
     { key: 'COMPLETED', label: 'Hoàn thành', desc: 'Dịch vụ kết thúc' }
   ];
@@ -308,11 +313,23 @@
     return 0;
   }
 
-  function renderStepper(status) {
+  // TC-KH10-004 FIX: Store timestamps for each step
+  var stepTimestamps = {};
+
+  function renderStepper(status, order) {
     var currentIdx = getStepIndex(status);
     var container = document.querySelector('.space-y-0.relative');
     if (!container) return;
     container.innerHTML = '';
+
+    // TC-KH10-004: Extract step timestamps from order if available
+    if (order) {
+      if (order.created_at) stepTimestamps['PENDING'] = order.created_at;
+      if (order.accepted_at) stepTimestamps['ACCEPTED'] = order.accepted_at;
+      if (order.arrived_at) stepTimestamps['TASKER_ARRIVED'] = order.arrived_at;
+      if (order.started_at) stepTimestamps['IN_PROGRESS'] = order.started_at;
+      if (order.completed_at) stepTimestamps['COMPLETED'] = order.completed_at;
+    }
 
     STEPS.forEach(function(step, idx) {
       var isCompleted = idx < currentIdx;
@@ -332,11 +349,19 @@
       }
 
       var textClass = isActive ? 'text-body-lg font-bold text-primary' : (isCompleted ? 'text-body-lg font-semibold text-on-background' : 'text-body-lg font-semibold text-outline');
-      var timeText = isActive ? 'Hiện tại' : '';
+      
+      // TC-KH10-004: Display timestamp for each step
+      var timeText = '';
+      if (isActive) {
+        timeText = 'Hiện tại';
+      } else if (isCompleted && stepTimestamps[step.key]) {
+        var ts = new Date(stepTimestamps[step.key]);
+        timeText = ('0' + ts.getHours()).slice(-2) + ':' + ('0' + ts.getMinutes()).slice(-2);
+      }
 
       var contentHTML = '<div class="' + (isLast ? 'flex-1' : 'pb-lg flex-1') + '">' +
         '<div class="flex justify-between items-start"><span class="' + textClass + '">' + step.label + '</span>' +
-        (timeText ? '<span class="text-body-sm font-bold text-primary">' + timeText + '</span>' : '') +
+        (timeText ? '<span class="text-body-sm ' + (isActive ? 'font-bold text-primary' : 'text-on-surface-variant') + '">' + timeText + '</span>' : '') +
         '</div><p class="text-body-sm font-body-sm text-on-surface-variant">' + step.desc + '</p></div>';
 
       div.innerHTML = iconHTML + contentHTML;
@@ -349,10 +374,23 @@
     var order = await apiFetch('/api/orders/' + orderId);
 
     var taskerName = (order.taskers && order.taskers.users && order.taskers.users.full_name) ? order.taskers.users.full_name : 'Chưa có Tasker';
+    var taskerPhone = (order.taskers && order.taskers.users && order.taskers.users.phone) ? order.taskers.users.phone : '';
     var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ';
 
     var h3 = document.querySelector('section:first-of-type h3');
     if (h3) h3.textContent = taskerName;
+
+    // TC-KH10-007 FIX: Make call button functional
+    var callBtn = document.getElementById('btn-call-tasker');
+    if (callBtn && taskerPhone) {
+      callBtn.addEventListener('click', function() {
+        window.location.href = 'tel:' + taskerPhone;
+      });
+    } else if (callBtn) {
+      callBtn.addEventListener('click', function() {
+        showToastMsg('Không có số điện thoại Tasker');
+      });
+    }
 
     var detailSpans = document.querySelectorAll('.space-y-sm .flex.justify-between span:last-child');
     if (detailSpans.length >= 4) {
@@ -362,16 +400,27 @@
       detailSpans[3].textContent = formatVND(order.total_price);
     }
 
-    // Bug 2 FIX: Render stepper based on actual status
-    renderStepper(order.status || 'PENDING');
+    // TC-KH10-003 FIX: Render stepper with timestamps
+    renderStepper(order.status || 'PENDING', order);
 
-    // TC-KH07-008: Hiển thị ghi chú nếu có
-    if (order.note) {
+    // TC-KH10-001 FIX: Hiển thị ghi chú nếu có (check cả notes và note)
+    var orderNote = order.notes || order.note || '';
+    if (orderNote) {
       var noteRow = document.getElementById('note-row');
       var noteSpan = document.getElementById('order-note');
       if (noteRow && noteSpan) {
-        noteSpan.textContent = order.note;
+        noteSpan.textContent = orderNote;
         noteRow.style.display = 'flex';
+      }
+    }
+
+    // TC-KH10-001 FIX: Hiển thị địa chỉ
+    if (order.address) {
+      var addressRow = document.getElementById('address-row');
+      var addressSpan = document.getElementById('order-address');
+      if (addressRow && addressSpan) {
+        addressSpan.textContent = order.address;
+        addressRow.style.display = 'flex';
       }
     }
 
@@ -381,6 +430,14 @@
       var tid = order.tasker_id || 0;
       btn.setAttribute('onclick', "window.location.href='chatvoitasker.html?orderId=" + order.order_id + "&receiverId=" + tid + "'");
     });
+
+    // Make action bar call button also work
+    var actionCallBtns = document.querySelectorAll('section.grid button');
+    if (actionCallBtns.length >= 2 && taskerPhone) {
+      actionCallBtns[1].addEventListener('click', function() {
+        window.location.href = 'tel:' + taskerPhone;
+      });
+    }
   } catch (e) {
     console.warn('[TheoDoi] Lỗi load đơn hàng:', e.message);
   }
@@ -391,7 +448,7 @@
     socket.on('order_status_updated', function(data) {
       if (String(data.order.order_id) === String(orderId)) {
         showToastMsg('🔔 Trạng thái đơn: ' + data.order.status);
-        renderStepper(data.order.status);
+        renderStepper(data.order.status, data.order);
       }
     });
 

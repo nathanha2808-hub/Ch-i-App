@@ -1,0 +1,29 @@
+lỗi 1: UC-REG-15	Họ tên chỉ chứa số	Nhập "123456"	Chặn luôn định dạng số ở trường Họ tên 	Medium	Vẫn hiển thị số ở trường Họ tên 	FAIL	High	
+lỗi 2:UC-REG-16	Họ tên chứa ký tự đặc biệt	Nhập "@@@###"	Chặn luôn định dạng đặc biệt ở trường Họ tên 	Medium	Vẫn hiển thị số ở trường Họ tên 	FAIL	High	
+lỗi 3:UC-REG-19	SĐT ít hơn quy định	Nhập "12345"	Hiển thị lỗi sai định dạng 	High	Vẫn đăng ký thành công 	FAIL	High	
+lỗi 4: UC-REG-15	Họ tên chỉ chứa số	Nhập "123456"	Chặn luôn định dạng số ở trường Họ tên 	Medium	Vẫn hiển thị số ở trường Họ tên 	FAIL	High		
+UC-REG-16	Họ tên chứa ký tự đặc biệt	Nhập "@@@###"	Chặn luôn định dạng đặc biệt ở trường Họ tên 	Medium	Vẫn hiển thị số ở trường Họ tên 	FAIL	High		
+UC-REG-17	Họ tên quá ngắn	Nhập "A"	Báo lỗi độ dài	Medium					
+UC-REG-18	Họ tên vượt ký tự tối đa	Nhập >255 ký tự	Hiển thị lỗi	Medium					
+UC-REG-19	SĐT ít hơn quy định	Nhập "12345"	Hiển thị lỗi sai định dạng 	High	Vẫn đăng ký thành công 	FAIL	High		
+UC-REG-20	SĐT dài hơn quy định	Nhập "12345678912345"	Hiển thị lỗi sai định dạng 	High	Vẫn đăng ký thành công 	FAIL	High		
+UC-REG-21	SĐT chứa chữ	Nhập "098abc123"	Chặn luôn ký tự chữ 	High	Vẫn nhập chữ được bình thường 	FAIL	High		
+UC-REG-22	SĐT chứa ký tự đặc biệt	Nhập "098@#123"	Chặn luôn ký tự đặc biệt 	High	Vẫn nhập được bình thường và đăng nhập thành công 	FAIL	High		
+UC-REG-23	SĐT có khoảng trắng đầu/cuối	Nhập " 0987654321 "	Chặn luôn khoảng trắng đầu cuối 	Medium	Vẫn nhập được bình thường và đăng nhập thành công 	FAIL	High		
+UC-REG-24	Đăng ký bằng SĐT đã tồn tại	Dùng số đã đăng ký	Hiển thị "SĐT đã tồn tại"	High	"Hiển thị thông báo Phone number already exists
+
+"	FAIL	Low		
+UC-REG-25	Mật khẩu<8 ký tự 	Nhập mật khẩu 6 ký tự 	Hiển thị lỗi	High	Vẫn nhập được mật khẩu 	FAIL	Medium	Mật khẩu từ 8-20	
+UC-REG-26	Mật khẩu không đúng format	Chỉ nhập chữ thường	Báo lỗi 	High	Vẫn nhập được binh thường và đăng ký thành công 	FAIL	High		
+UC-REG-27	Mật khẩu không có ký tự đặc biệt	Nhập Abc12345	Nhập thành công 	Medium		PASS			
+UC-REG-28	Mật khẩu vượt giới hạn 20 ký tự	Nhập 21 ký tự 	Hiển thị lỗi
+UC-REG-35	Nhập emoji vào họ tên	Nhập 😀 Nguyễn Văn A	Chỉ được nhập ký tự chữ 	Medium		Not run	
+UC-REG-38	Paste chuỗi cực dài	Dán >1000 ký tự	Không crash	Medium		PASS	
+UC-REG-39	Điều hướng bằng Tab	Dùng phím Tab	Focus đúng thứ tự	Medium		PASS	
+UC-REG-40	Kiểm tra màn hình nhỏ	Test trên mobile nhỏ	Không vỡ UI	Medium		Not run	
+UC-REG-41	Test đa trình duyệt	Chrome, Edge, Firefox	Hiển thị đúng	Medium		Not run	
+UC-REG-43	Kiểm tra footer	Quan sát cuối trang	Hiển thị đúng nội dung	Low		PASS	
+UC-REG-44	Submit khi dữ liệu chưa hợp lệ	Điền thiếu dữ liệu	Hiển thị thông báo lỗi 	Medium		PASS	
+UC-REG-45	Server phản hồi chậm	Giả lập mạng yếu	Không treo ứng dụng	Medium		Not run	
+UC-REG-46	Kiểm tra bố cục layout 	"1. Tại màn hình Đăng ký 
+2. Kiểm tra toàn bộ bố cục "	Màn hình hiển thị bố cục rõ ràng, không xô lệch 	Medium	Bố cục màn hình bị xô lệch 	FAIL	Low	Medium	Vẫn nhập được mật khẩu 	FAIL	Medium		

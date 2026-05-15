@@ -1,0 +1,2 @@
+TC_T06_02: Hiển thị thống báo khi nhận đơn
+Hệ thống không hiển thị thông báo khi nhận đơn thành công
