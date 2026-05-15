@@ -254,12 +254,15 @@ TC-KH07-001,Đặt dịch vụ dọn nhà cơ bản thành công khi thanh toán
 5. Chọn số giờ 2h 
 6. Nhập ghi chú 
 7. Nhập địa chỉ 
-8. Nhấn “Đặt & thanh toán”",Đơn dọn nhà được tạo thành công và Hiển thị trạng thái Đang tìm tasker ở màn Hoạt động ,High,khi click vào icon Bản đồ -> Không chọn được địa chỉ trên bản đồ ,FAIL,Low,Em Toàn đang muốn thêm trường nhập Địa chỉ ,Fixed
+8. Nhấn “Đặt & thanh toán”",Đơn dọn nhà được tạo thành công và Hiển thị trạng thái Đang tìm tasker ở màn Hoạt động ,High,,PASS,Low,Em Toàn đang muốn thêm trường nhập Địa chỉ ,Fixed
 TC-KH07-002,Đặt dịch vụ dọn nhà cao cấp thành công khi thanh toán bằng ví có dư số tiền ,"1. Mở màn hình đặt dịch vụ dọn nhà 
 2. Chọn loại “Cao cấp” 
 3. Nhập đầy đủ thông tin hợp lệ 
-4. Nhấn “Đặt & thanh toán”",Đơn dọn nhà được tạo thành công và Hiển thị trạng thái Đang tìm tasker ở màn Hoạt động ,High,khi click vào icon Bản đồ -> Không chọn được địa chỉ trên bản đồ ,FAIL,Low,,Dev-Completed
-,Kiểm tra khi không nhập thông tin địa chỉ nhà ,"1. Đăng nhập hệ thống 
+4. Nhấn “Đặt & thanh toán”",Đơn dọn nhà được tạo thành công và Hiển thị trạng thái Đang tìm tasker ở màn Hoạt động ,High,,PASS,Low,,Dev-Completed
+TC-KH07-003,Kiểm tra khi chọn địa chỉ nhà trên map ,"1. Mở màn hình Đặt dịch vụ dọn nhà 
+2. Chọn loại dịch vụ 
+3. Nhấp icon Map để chọn địa chỉ nhà ",Hiển thị bản đồ và người dùng click thành công để chọn địa chỉ ,High,click vào icon Map không hiển thị gì ,FAIL,High,,
+TC-KH07-004,Kiểm tra khi không nhập thông tin địa chỉ nhà ,"1. Đăng nhập hệ thống 
 2. Từ Trang chủ nhấn “Dọn nhà” 
 3. Chọn loại
 4. Chọn ngày và giờ hợp lệ 
@@ -267,45 +270,45 @@ TC-KH07-002,Đặt dịch vụ dọn nhà cao cấp thành công khi thanh toán
 6. Nhập ghi chú 
 7. Không nhập địa chỉ 
 8. Nhấn “Đặt & thanh toán”",Hiển thị thông báo nhập địa chỉ ,High,,PASS,,,
-TC-KH07-003,Kiểm tra hiển thị loại dịch vụ,"1. Mở màn hình M05 
+TC-KH07-005,Kiểm tra hiển thị loại dịch vụ,"1. Mở màn hình M05 
 2. Quan sát danh sách loại dịch vụ",Hiển thị đầy đủ lựa chọn “Dọn tiêu chuẩn ” và “Dọn tổng vệ sinh”,Medium,,PASS,,,
-TC-KH07-004,Kiểm tra chọn ngày thực hiện hợp lệ,"1. Chọn ngày hiện tại hoặc ngày tương lai 
+TC-KH07-006,Kiểm tra chọn ngày thực hiện hợp lệ,"1. Chọn ngày hiện tại hoặc ngày tương lai 
 2. Tiếp tục đặt đơn",Hệ thống cho phép chọn ngày hợp lệ,High,,PASS,,,
-TC-KH07-005,Kiểm tra không cho chọn ngày quá khứ,1. Chọn ngày nhỏ hơn ngày hiện tại,Hệ thống không cho phép chọn ngày quá khứ,High,Vẫn nhận ngày quá khử và đặt thành công,PASS,High,,Dev-Completed
-,Kiểm tra không cho chọn giờ quá khứ,1. Chọn giờ trước giờ hiện tại ,Hệ thống hiển thị lỗi ,High,Vẫn đặt thành công đơn hàng ,FAIL,High,,
-TC-KH07-006,Kiểm tra chọn giờ thực hiện hợp lệ,1. Chọn giờ nằm trong khung thời gian hỗ trợ,Hệ thống lưu đúng giờ thực hiện,High,,PASS,,,
-TC-KH07-007,Kiểm tra hiển thị các mốc số giờ,1. Mở dropdown/chọn số giờ,"Hiển thị đủ các lựa chọn 2h, 3h, 4h, 5h",Medium,,PASS,,,
-TC-KH07-008,Kiểm tra nhập ghi chú cho Tasker,"1. Nhập nội dung ghi chú yêu cầu dọn nhà 2. Đặt dịch vụ
+TC-KH07-007,Kiểm tra không cho chọn ngày quá khứ,1. Chọn ngày nhỏ hơn ngày hiện tại,Hệ thống không cho phép chọn ngày quá khứ,High,Vẫn nhận ngày quá khử và đặt thành công,PASS,High,,Dev-Completed
+TC-KH07-008,Kiểm tra không cho chọn giờ quá khứ,1. Chọn giờ trước giờ hiện tại ,Hệ thống hiển thị lỗi ,High,Vẫn đặt thành công đơn hàng ,FAIL,Medium,,
+TC-KH07-009,Kiểm tra chọn giờ thực hiện hợp lệ,1. Chọn giờ nằm trong khung thời gian hỗ trợ,Hệ thống lưu đúng giờ thực hiện,High,,PASS,,,
+TC-KH07-010,Kiểm tra hiển thị các mốc số giờ,1. Mở dropdown/chọn số giờ,"Hiển thị đủ các lựa chọn 2h, 3h, 4h, 5h",Medium,,PASS,,,
+TC-KH07-011,Kiểm tra nhập ghi chú cho Tasker,"1. Nhập nội dung ghi chú yêu cầu dọn nhà 2. Đặt dịch vụ
 3. Kiểm tra hiển thị ghi chú ở màn chi tiết đơn hàng ",Ghi chú được lưu cùng đơn hàng,Medium,Không hiển thị ghi chú ,FAIL,High,,Fixed
-TC-KH07-009,Kiểm tra để trống ghi chú,"1. Không nhập ghi chú 
+TC-KH07-012,Kiểm tra để trống ghi chú,"1. Không nhập ghi chú 
 2. Thực hiện đặt đơn",Hệ thống vẫn cho phép đặt đơn thành công,Medium,,PASS,,,
-TC-KH07-010,Kiểm tra tính tổng tiền tự động,"1. Chọn loại dịch vụ và số giờ khác nhau 
+TC-KH07-013,Kiểm tra tính tổng tiền tự động,"1. Chọn loại dịch vụ và số giờ khác nhau 
 2. Quan sát tổng tiền",Tổng tiền được cập nhật đúng theo lựa chọn,High,,PASS,,,
-TC-KH07-011,Kiểm tra lại tổng tiền tự động khi admin thay đổi công thức tính tiền  trên hệ thống ,"0. Admin đã thay đổi công thức tính tiền 
+TC-KH07-014,Kiểm tra lại tổng tiền tự động khi admin thay đổi công thức tính tiền  trên hệ thống ,"0. Admin đã thay đổi công thức tính tiền 
 1. Chọn loại dịch vụ và số giờ khác nhau 
 2. Quan sát tổng tiền ",Tổng tiền được cập nhật đúng theo lựa chọn,High,,Not run,,,
-TC-KH07-012,Kiểm tra khấu trừ ví sau khi đặt đơn,"1. Ghi nhận số dư ví trước khi đặt 
+TC-KH07-015,Kiểm tra khấu trừ ví sau khi đặt đơn,"1. Ghi nhận số dư ví trước khi đặt 
 2. Đặt dịch vụ thành công","Số dư ví thay đổi theo trạng thái như sau: 
 - Trạng thái đang tìm tasker: Không trừ 
 - Trạng thái tasker đang đến: Không trừ 
 - Trạng thái tasker đang hoạt động: Không trừ 
 - trạng thái tasker Đã hoàn thành: CÓ trừ đúng số tiền. Kiểm tra lại số tiền hiển thị 
 ",High,,PASS,,,
-TC-KH07-013,Kiểm tra đặt đơn khi ví không đủ số dư và chọn thanh toán bằng ví ,"1. Sử dụng tài khoản có số dư không đủ 
+TC-KH07-016,Kiểm tra đặt đơn khi ví không đủ số dư và chọn thanh toán bằng ví ,"1. Sử dụng tài khoản có số dư không đủ 
 2. Chọn phương thức thanh toán bằng ví
 3. Thực hiện đặt đơn",Thông báo không đủ số dư trong ví và button chuyển sang màn nạp tiền ,High,Đặt dịch vụ thành công và khi hoàn thành đơn trừ số tiền hiển thị âm ,FAIL,High,,
-TC-KH07-014,Kiểm tra đặt đơn khi ví không đủ số dư và chọn thanh toán tiền mặt ,"1. Sử dụng tài khoản có số dư không đủ 
+TC-KH07-017,Kiểm tra đặt đơn khi ví không đủ số dư và chọn thanh toán tiền mặt ,"1. Sử dụng tài khoản có số dư không đủ 
 2. Chọn phương thức thanh toán tiền mặt 
 3. Thực hiện đặt đơn",Hệ thống vẫn đặt đơn bình thường ,High,,Not run,,,
-TC-KH07-015,Kiểm tra hiển thị thông tin ngày giờ ,"1. Tại màn hình Dọn dẹp nhà 
+TC-KH07-018,Kiểm tra hiển thị thông tin ngày giờ ,"1. Tại màn hình Dọn dẹp nhà 
 2. Kiểm tra hiển thị Ngày giờ ",Hệ thống hiển thị mặc định ngày giờ hiện tại ,Medium,Hệ thống đang hiển thị giờ cố định ,FAIL,Medium,,
-TC-KH07-016,Kiểm tra đặt đơn khi mất kết nối mạng,"1. Tắt internet 
+TC-KH07-019,Kiểm tra đặt đơn khi mất kết nối mạng,"1. Tắt internet 
 2. Thực hiện đặt dịch vụ",Hệ thống hiển thị lỗi kết nối mạng,Medium,,Not run,,,
-TC-KH07-017,Kiểm tra nhấn nhiều lần nút đặt đơn,"1. Nhập đầy đủ thông tin 
+TC-KH07-020,Kiểm tra nhấn nhiều lần nút đặt đơn,"1. Nhập đầy đủ thông tin 
 2. Nhấn liên tục “Đặt & thanh toán”",Hệ thống chỉ tạo một đơn duy nhất,Medium,,PASS,,,
-TC-KH07-018,Kiểm tra giao diện màn hình đặt dịch vụ,"1. Mở màn hình M05 
+TC-KH07-021,Kiểm tra giao diện màn hình đặt dịch vụ,"1. Mở màn hình M05 
 2. Quan sát layout, button, textbox",Giao diện hiển thị đúng thiết kế UI/UX,Low,,PASS,,,
-TC-KH07-019,Kiểm tra thông tin hiển thị dịch vụ trong Màn Hoạt động ,"1. Tại màn hình trang chủ 
+TC-KH07-022,Kiểm tra thông tin hiển thị dịch vụ trong Màn Hoạt động ,"1. Tại màn hình trang chủ 
 2. Click vào button ""Hoạt động""
 3. Kiểm tra danh sách hoạt động theo lọc tất cả và dọn nhà ","Hiển thị chi tiết dịch vụ dọn nhà  bao gồm trạng thái, thời gian, tasker tên",High,,PASS,,,
 UC-KH-08 — Đặt dịch vụ trông trẻ,,,,,,,,,
@@ -334,9 +337,16 @@ TC-KH08-002,Đặt dịch vụ trông trẻ khi thanh toán bằng ví khi khôn
 9. Kiểm tra tổng tiền hiển thị
 10. Nhấn “Đặt dịch vụ”",- hệ thống hiển thị thông báo lỗi không đủ số sư và button chuyển sang màn nạp tiền ,High,"Đang thiếu trường nhập Địa chỉ  
 Khi hoàn thành đơn hàng, Số dư trừ đi còn âm tiền ",FAIL,High,,
-,Kiểm tra khi không nhập thông tin địa chỉ nhà ,,,,,,,,
-,Kiểm tra khi chọn địa chỉ nhà trên map ,,,,,,,,
-TC-KH08-003,Kiểm tra đặt đơn khi lựa chọn thanh toán bằng tiền mặt ,"1. Vào Trang chủ M04
+TC-KH08-003,Kiểm tra khi không nhập thông tin địa chỉ nhà ,"1. Đăng nhập hệ thống 
+2. Từ Trang chủ nhấn “trông trẻ ” 
+3. Chọn ngày và giờ hợp lệ 
+4. Chọn số giờ 2h 
+5. Nhập ghi chú 
+6. Không nhập địa chỉ 
+7. Nhấn “Đặt & thanh toán”",Hiển thị thông báo nhập địa chỉ ,High,,PASS,,,
+TC-KH08-004,Kiểm tra khi chọn địa chỉ nhà trên map ,"1. Mở màn hình Đặt dịch vụ trông trẻ
+2. Nhấp icon Map để chọn địa chỉ nhà ",Hiển thị bản đồ và người dùng click thành công để chọn địa chỉ ,High,click vào icon Map không hiển thị gì ,FAIL,High,,
+TC-KH08-005,Kiểm tra đặt đơn khi lựa chọn thanh toán bằng tiền mặt ,"1. Vào Trang chủ M04
 2. Nhấn dịch vụ “Trông trẻ”
 3. Chọn số trẻ là “2”
 4. Nhập độ tuổi trẻ
@@ -346,26 +356,26 @@ TC-KH08-003,Kiểm tra đặt đơn khi lựa chọn thanh toán bằng tiền m
 8. Kiểm tra tổng tiền hiển thị
 9, Chọn hình thức thanh toán tiền mặt 
 10. click ""Đặt đơn""",- Hệ thống đặt thành công và không bị trừ tiền ở ví ,High,,Not run,,,
-TC-KH08-004,Kiểm tra hiển thị lựa chọn số trẻ,"1. Mở màn hình Đặt dịch vụ trông trẻ 
+TC-KH08-006,Kiểm tra hiển thị lựa chọn số trẻ,"1. Mở màn hình Đặt dịch vụ trông trẻ 
 2. Click vào button + /-
 3. Hiển thị Số lượng trẻ đúng khi thêm hoặc bớt ",Hệ thống hiện thị đúng số lượng trẻ ,Medium,,PASS,,,
-TC-KH08-005,Kiểm tra nhập độ tuổi trẻ hợp lệ,"1. Nhập độ tuổi hợp lệ của trẻ 
+TC-KH08-007,Kiểm tra nhập độ tuổi trẻ hợp lệ,"1. Nhập độ tuổi hợp lệ của trẻ 
 2. Kiểm tra thông tin trẻ ở hóa đơn ",Hệ thống lưu đúng độ tuổi trẻ tại màn Trông trẻ ,High,,PASS,,,
-TC-KH08-006,Kiểm tra chọn khoảng giờ hợp lệ,1. Chọn giờ bắt đầu  hợp lệ,Hệ thống lưu đúng khoảng thời gian tại màn Trông trẻ  ,High,,PASS,,,
-TC-KH08-007,Kiểm tra chọn ngày và giờ trước thời gian hiện tại ,"1. Nhập ngày/ giờ bắt đầu trước thời gian hiện tại 
+TC-KH08-008,Kiểm tra chọn khoảng giờ hợp lệ,1. Chọn giờ bắt đầu  hợp lệ,Hệ thống lưu đúng khoảng thời gian tại màn Trông trẻ  ,High,,PASS,,,
+TC-KH08-009,Kiểm tra chọn ngày và giờ trước thời gian hiện tại ,"1. Nhập ngày/ giờ bắt đầu trước thời gian hiện tại 
 2. Nhấn “Tìm Tasker”",Hệ thống hiển thị lỗi thời gian không hợp lệ,High,,FAIL,Medium,,
-TC-KH08-008,Kiểm tra nhập yêu cầu đặc biệt,"1. Nhập lịch ăn/ngủ hoặc yêu cầu riêng 
+TC-KH08-010,Kiểm tra nhập yêu cầu đặc biệt,"1. Nhập lịch ăn/ngủ hoặc yêu cầu riêng 
 2. Đặt đơn
 3. Kiểm tra hiển thị ghi chú ở CHi tiết đơn hàng ",Yêu cầu đặc biệt được lưu trong đơn,Medium,Không hiển thị ghi chú ,FAIL,High,,
-TC-KH08-009,Kiểm tra tính tổng tiền theo số giờ,"1. Chọn khoảng thời gian khác nhau 
+TC-KH08-011,Kiểm tra tính tổng tiền theo số giờ,"1. Chọn khoảng thời gian khác nhau 
 2. Quan sát tổng tiền",Tổng tiền được tính đúng theo công thức số giờ × 100k,High,,Not run,,,
-TC-KH08-010,Kiểm tra tính tổng tiền theo số giờ khi admin set lại công thức tính tiền ,"1. Admin thay đổi công thức tính tiền 
+TC-KH08-012,Kiểm tra tính tổng tiền theo số giờ khi admin set lại công thức tính tiền ,"1. Admin thay đổi công thức tính tiền 
 2. Quan sát tổng tiền ",Số tiền thay đổi theo công thức mới ,High,,Not run,,,
-TC-KH08-011,Kiểm tra khấu trừ ví sau khi đặt đơn,"1. Đặt đơn thành công 
+TC-KH08-013,Kiểm tra khấu trừ ví sau khi đặt đơn,"1. Đặt đơn thành công 
 2. Kiểm tra số dư ví",Số dư ví giảm đúng số tiền thanh toán,High,,PASS,,,
-TC-KH08-012,Kiểm tra đặt đơn khi mất mạng,"1. Tắt internet 
+TC-KH08-014,Kiểm tra đặt đơn khi mất mạng,"1. Tắt internet 
 2. Đặt dịch vụ",Hệ thống hiển thị lỗi kết nối mạng,Medium,,Not run,,,
-TC-KH08-013,Kiểm tra giao diện màn hình trông trẻ,"1. Mở màn hình M06 
+TC-KH08-015,Kiểm tra giao diện màn hình trông trẻ,"1. Mở màn hình M06 
 2. Quan sát layout giao diện",Giao diện hiển thị đúng thiết kế,Low,"Bố cục icon không đúng vị trí sau: 
 - ở độ tuổi trẻ 
 - ở Ngày và giờ bắt đầu ",FAIL,Low,,
@@ -392,7 +402,7 @@ TC-KH09-009,Kiểm tra khấu trừ ví sau khi đặt đơn,"1. Đặt đơn th
 TC-KH09-010,Kiểm tra đặt mua hộ khi mất mạng,"1. Tắt internet 
 2. Thực hiện đặt mua hộ",Hệ thống hiển thị lỗi kết nối mạng,Medium,,Not run,,,
 UC-KH-10 — Theo dõi tiến trình đơn,,,,,,,,,
-,Kiểm tra tổng quan trang Hoạt động ,"1. Vào tab Hoạt động 
+TC-KH10-000,Kiểm tra tổng quan trang Hoạt động ,"1. Vào tab Hoạt động 
 ",Màn hình hiển thị như thiết kế,High,,PASS,,,
 TC-KH10-001,Kiểm tra tổng quan trang Chi tiết đơn hàng ,"1. Vào tab Hoạt động 
 2. Nhấn vào đơn hàng ","Hệ thống mở màn hình chi tiết đơn hàng và hiển thị các thông tin: 
@@ -404,117 +414,102 @@ TC-KH10-001,Kiểm tra tổng quan trang Chi tiết đơn hàng ,"1. Vào tab Ho
 - Ngày tạo 
 - Địa chỉ 
 - Ghi chú 
-- Các button Theo dõi đơn, chat tasker, hủy đơn, đóng",High,"- Hiển thị sai trường Thời gian lên lịch
+- Các button Theo dõi đơn, chat tasker, hủy đơn, đóng",High,"- Hiển thị sai trường Thời gian lên lịch(Sai giờ)
 - Không hiển thị địa chỉ  
 - Không hiển thị ghi chú khi đã nhập khi tạo đơn ",FAIL,High,,
 TC-KH10-002,Hiển thị trạng thái hiện tại của đơn,1. Mở màn hình theo dõi đơn,Hiển thị đúng trạng thái hiện tại của đơn hàng,High,,PASS,,,
 TC-KH10-003,Hiển thị đủ 5 bước tiến trình đơn ở trang theo dõi đơn hàng  ,"1. Mở màn hình theo dõi đơn hàng 
 2. Quan sát tiến trình","Hiển thị đủ 5 bước theo đúng flow hệ thống:  Đã đặt đơn, Đã tìm tasker, tasker đã đến, Đang thực hiện, Hoàn thành ",High,"Hiển thị đủ 5 bước:  Đã đặt đơn, Đã tìm tasker, tasker đang đến, Đang thực hiện, Hoàn thành ",FAIL,Low,,
-TC-KH10-004,Hiển thị thời gian tại từng bước,1. Quan sát timeline tiến trình đơn,Mỗi bước hiển thị đúng timestamp,Medium,Không hiển thị thời gian từng bước ,FAIL,Medium,,
-TC-KH10-005,Hiển thị thông tin Tasker,1. Mở màn hình tracking,"Hiển thị tên, sao đánh giá và số việc của Tasker",High,,PASS,,,
-TC-KH10-006,Kiểm tra nút Chat với Tasker,1. Nhấn nút Chat trên tracking,Hệ thống chuyển sang màn hình chat M10,High,,PASS,,,
-TC-KH10-007,Kiểm tra nút Gọi Tasker,1. Nhấn icon gọi điện trên tracking,Hệ thống thực hiện gọi điện cho Tasker,High,,FAIL,,,
-TC-KH10-008,Kiểm tra hiển thị nút Hủy đơn trước khi Tasker bắt đầu,1. Mở đơn ở trạng thái chưa bắt đầu,Nút “Hủy đơn” vẫn hiển thị,Medium,,PASS,,,
-TC-KH10-009,Kiểm tra ẩn nút Hủy khi đơn đang thực hiện,1. Mở đơn ở trạng thái “Đang thực hiện”,Nút “Hủy đơn” bị ẩn hoặc disable,Medium,,,,,
-TC-KH10-010,Kiểm tra cập nhật trạng thái theo thời gian thực,1. Theo dõi đơn trong quá trình xử lý,Trạng thái đơn tự động cập nhật realtime,High,,,,,
-TC-KH10-011,Kiểm tra khi thực hiện Hủy đơn hàng ,,,,,,,,
+TC-KH10-004,Hiển thị thời gian tại từng bước,"1. Mở màn hình theo dõi đơn hàng 
+
+2. Quan sát timeline tiến trình đơn",Mỗi bước hiển thị đúng timestamp,Medium,Không hiển thị thời gian từng bước ,FAIL,Medium,,
+TC-KH10-005,Hiển thị thông tin Tasker,1. Mở màn hình theo dõi đơn hàng ,"Hiển thị tên, sao đánh giá và số việc của Tasker",High,,PASS,,,
+TC-KH10-006,Kiểm tra nút Chat với Tasker,1. Nhấn nút Chat trên tracking,Hệ thống chuyển sang màn hình chat,High,,PASS,,,
+TC-KH10-007,Kiểm tra nút Gọi Tasker,"1. Mở màn theo dõi đơn hàng 
+2. Nhấn icon gọi điện ",Hệ thống thực hiện gọi điện cho Tasker,High,không gọi được ,FAIL,,,
+TC-KH10-008,Kiểm tra Hủy đơn trước khi Tasker bắt đầu,"1. Mở màn theo dõi đơn hàng 
+2. Click Hủy đơn ",Nút “Hủy đơn” vẫn hiển thị và Hủy thành công ,Medium,Không hủy được ,FAIL,,,
+TC-KH10-009,Kiểm tra ẩn nút Hủy khi đơn đang thực hiện,1. Mở đơn ở trạng thái “Đang thực hiện”,Nút “Hủy đơn” bị ẩn hoặc disable,Medium,Nút hủy đơn vẫn hiển thị không bị disable,FAIL,,,
 UC-KH-11+12  CHAT VÀ GỌI TASKER,,,,,,,,,
-TC-KH11-001,Mở màn hình chat thành công từ tracking,"1. Vào màn hình theo dõi đơn M08 
-2. Nhấn nút “Chat”",Hệ thống mở màn hình chat M10 thành công,High,,,,,
+TC-KH11-001,Mở màn hình chat thành công từ tracking,1. Vào màn hình theo dõi đơn ,Hệ thống mở màn hình chat,High,,PASS,,,
 TC-KH11-002,Mở màn hình chat từ danh sách hoạt động,"1. Vào màn hình Hoạt động M09 
-2. Chọn đơn đang thực hiện 3. Nhấn “Chat”",Hệ thống mở đúng cửa sổ chat với Tasker,High,,,,,
+2. Chọn đơn đang thực hiện 
+3. Nhấn “Chat”",Hệ thống mở đúng cửa sổ chat với Tasker,High,,PASS,,,
 TC-KH11-003,Hiển thị lịch sử tin nhắn,"1. Mở màn hình chat 
-2. Quan sát khu vực hội thoại",Hiển thị đầy đủ lịch sử tin nhắn trước đó,High,,,,,
+2. Quan sát khu vực hội thoại",Hiển thị đầy đủ lịch sử tin nhắn trước đó,High,,PASS,,,
 TC-KH11-004,Gửi tin nhắn văn bản thành công,"1. Nhập nội dung tin nhắn 
-2. Nhấn icon gửi",Tin nhắn được gửi thành công và hiển thị trên màn hình chat,High,,,,,
+2. Nhấn icon gửi",Tin nhắn được gửi thành công và hiển thị trên màn hình chat,High,,PASS,,,
 TC-KH11-005,Nhận phản hồi từ Tasker,"1. Gửi tin nhắn đến Tasker 
-2. Chờ phản hồi",Tin nhắn phản hồi từ Tasker hiển thị realtime,High,,,,,
-TC-KH11-006,Kiểm tra gửi nhiều tin nhắn liên tiếp,1. Nhập và gửi nhiều tin nhắn liên tục,Tất cả tin nhắn được gửi đúng thứ tự,Medium,,,,,
+2. Chờ phản hồi",Tin nhắn phản hồi từ Tasker hiển thị realtime,High,,PASS,,,
+TC-KH11-006,Kiểm tra gửi nhiều tin nhắn liên tiếp,1. Nhập và gửi nhiều tin nhắn liên tục,Tất cả tin nhắn được gửi đúng thứ tự,Medium,,PASS,,,
 TC-KH11-007,Kiểm tra gửi tin nhắn rỗng,"1. Không nhập nội dung 
-2. Nhấn nút gửi",Hệ thống không cho gửi tin nhắn rỗng,High,,,,,
-TC-KH11-008,Kiểm tra giới hạn ký tự tin nhắn,"1. Nhập nội dung vượt giới hạn ký tự 
-2. Nhấn gửi",Hệ thống hiển thị validate hoặc giới hạn số ký tự,Medium,,,,,
+2. Nhấn nút gửi",Hệ thống không cho gửi tin nhắn rỗng,High,,PASS,,,
+TC-KH11-008,Kiểm tra hiển thị textbox khi nhập tin nhắn dài ,"1. Nhập nội dung dài, nhiều 
+2.Kiểm tra textbox Nhập tin nhắn ","Tin nhắn hiển thị đúng, đầy đủ và xuống dòng ",Medium,,FAIL,,,
 TC-KH11-009,Gửi ảnh đính kèm thành công,"1. Nhấn icon đính kèm 
 2. Chọn ảnh từ thiết bị 
-3. Gửi ảnh",Ảnh được gửi thành công trong cuộc trò chuyện,High,,,,,
-TC-KH11-010,Gửi file đính kèm thành công,"1. Nhấn icon đính kèm 
-2. Chọn file hợp lệ 
-3. Gửi file",File được gửi thành công,Medium,,,,,
-TC-KH11-011,Kiểm tra upload file không hợp lệ,"1. Chọn file không đúng định dạng hỗ trợ 
-2. Gửi file",Hệ thống hiển thị lỗi file không hợp lệ,Medium,,,,,
-TC-KH11-012,Kiểm tra trạng thái online của Tasker,1. Mở màn hình chat khi Tasker online,Hiển thị trạng thái online của Tasker,Medium,,,,,
-TC-KH11-013,Kiểm tra trạng thái offline của Tasker,1. Mở màn hình chat khi Tasker offline,Hiển thị trạng thái offline hoặc last seen,Medium,,,,,
-TC-KH11-014,Kiểm tra tự động scroll xuống tin nhắn mới,1. Nhận tin nhắn mới từ Tasker,Màn hình chat tự động scroll xuống cuối,Low,,,,,
-TC-KH11-015,Kiểm tra gọi điện từ màn hình chat,1. Nhấn icon điện thoại trong chat,Hệ thống chuyển sang chức năng gọi điện UC-KH-12,High,,,,,
+3. Gửi ảnh",Ảnh được gửi thành công trong cuộc trò chuyện,High,,PASS,,,
+TC-KH11-012,Kiểm tra trạng thái online của Tasker,1. Mở màn hình chat khi Tasker online,Hiển thị trạng thái online của Tasker,Medium,,PASS,,,
+TC-KH11-013,Kiểm tra tự động scroll xuống tin nhắn khi mới vào màn hình chat,"1. Mở màn hình chat khi Tasker online
+2. Kiểm tra hiển thị tin nhắn ",Hiển thị tin nhắn gần nhất trước ,High,Hiển thị từ đầu. Khách muốn xem phải kéo xuống ,FAIL,,,
+TC-KH11-014,Kiểm tra hiển thị icon kéo xuống dưới khi có tin nhắn mới,"1. Tại màn hình chat 
+2. kiểm tra hiển thị icon kéo xuống ",Hiển thị icon kéo xuống và khi click vào tự động kéo xuống tin nhắn mới ,Low,Chưa có ,FAIL,,,
+TC-KH11-015,Kiểm tra gọi điện từ màn hình chat,1. Nhấn icon điện thoại trong chat,Hệ thống chuyển sang chức năng gọi điện ,High,,PASS,,,
 TC-KH11-016,Kiểm tra gửi tin nhắn khi mất mạng,"1. Tắt internet 
-2. Gửi tin nhắn",Hệ thống hiển thị lỗi gửi tin nhắn thất bại,High,,,,,
+2. Gửi tin nhắn",Hệ thống hiển thị lỗi gửi tin nhắn thất bại,High,,Not run,,,
 TC-KH11-017,Kiểm tra hiển thị thời gian gửi tin nhắn,"1. Gửi và nhận tin nhắn 
-2. Quan sát timestamp",Mỗi tin nhắn hiển thị đúng thời gian gửi,Low,,,,,
-TC-KH12-018,Kiểm tra giao diện màn hình chat,"1. Mở màn hình M10 
-2. Quan sát UI chat",Giao diện hiển thị đúng thiết kế UI/UX,Low,,,,,
+2. Quan sát timestamp",Mỗi tin nhắn hiển thị đúng thời gian gửi,Low,,PASS,,,
+TC-KH12-018,Kiểm tra giao diện màn hình chat,"1. Mở màn hình
+2. Quan sát UI chat",Giao diện hiển thị đúng thiết kế UI/UX,Low,,FAIL,,,
 TC-KH12-019,Gọi điện từ màn hình tracking thành công,"1. Mở màn hình tracking M08 
-2. Nhấn icon điện thoại",Hệ thống kết nối cuộc gọi đến Tasker,High,,,,,
-TC-KH12-020,Gọi điện từ màn hình chat thành công,"1. Mở màn hình chat M10 
-2. Nhấn icon điện thoại",Cuộc gọi được thực hiện thành công,High,,,,,
-TC-KH12-021,Kiểm tra hiển thị popup quyền gọi điện,1. Nhấn gọi điện lần đầu tiên,Hệ thống yêu cầu cấp quyền gọi điện,Medium,,,,,
-TC-KH12-022,Kiểm tra từ chối quyền gọi điện,1. Từ chối quyền gọi điện khi hệ thống yêu cầu,Hệ thống hiển thị thông báo không thể thực hiện cuộc gọi,Medium,,,,,
-TC-KH12-023,Kiểm tra Tasker không nghe máy,1. Thực hiện gọi điện khi Tasker không bắt máy,Hệ thống hiển thị thông báo không liên lạc được,Medium,,,,,
-TC-KH12-024,Kiểm tra số điện thoại Tasker không hợp lệ,1. Thực hiện gọi đến số không hợp lệ,Hệ thống hiển thị lỗi cuộc gọi thất bại,Medium,,,,,
+2. Nhấn icon điện thoại",Hệ thống kết nối cuộc gọi đến Tasker,High,,FAIL,,,
+TC-KH12-021,Kiểm tra hiển thị popup quyền gọi điện,1. Nhấn gọi điện lần đầu tiên,Hệ thống yêu cầu cấp quyền gọi điện,Medium,,Not run,,,
+TC-KH12-022,Kiểm tra từ chối quyền gọi điện,1. Từ chối quyền gọi điện khi hệ thống yêu cầu,Hệ thống hiển thị thông báo không thể thực hiện cuộc gọi,Medium,,Not run,,,
+TC-KH12-023,Kiểm tra hiển thị thông báo Tasker không nghe máy,1. Thực hiện gọi điện khi Tasker không bắt máy,Hệ thống hiển thị thông báo không liên lạc được,Medium,,PASS,,,
+,Kiểm tra hiển thị thông báo trong tin nhắn sau khi tasker từ chối nghe máy ,"1. Mở màn hình chat 
+2. Kiểm tra hiển thị thông báo trong tin nhắn khi tasker không nghe máy ",Hệ thống hiển thị thông báo Cuộc gọi từ chối  ,Low,Không có ,FAIL,,,
 TC-KH12-025,Kiểm tra gọi điện khi mất sóng/mất mạng,"1. Tắt sóng điện thoại hoặc internet 
-2. Thực hiện gọi",Hệ thống hiển thị lỗi kết nối cuộc gọi,Medium,,,,,
+2. Thực hiện gọi",Hệ thống hiển thị lỗi kết nối cuộc gọi,Medium,,Not run,,,
 TC-KH12-026,Kiểm tra quay lại app sau khi kết thúc cuộc gọi,"1. Gọi điện cho Tasker 
-2. Kết thúc cuộc gọi",Ứng dụng quay lại đúng màn hình trước đó,Low,,,,,
+2. Kết thúc cuộc gọi",Ứng dụng quay lại đúng màn hình trước đó,Low,,Not run,,,
 UC-KH-13  Hủy đơn,,,,,,,,,
 TC-KH13-001,Hủy đơn thành công từ màn hình tracking,"1. Mở tracking của đơn chưa bắt đầu 
 2. Nhấn “Hủy đơn” 
-3. Xác nhận hủy",Đơn chuyển sang trạng thái “Đã hủy”,High,,,,,
-TC-KH13-002,Hủy đơn thành công từ màn hình hoạt động,"1. Vào M09 
+3. Xác nhận hủy",Đơn chuyển sang trạng thái “Đã hủy”,High,Click hủy đơn không hoạt động ,FAIL,,,
+TC-KH13-002,Hủy đơn thành công từ màn hình hoạt động,"1. Vào Màn hoạt động 
 2. Chọn đơn sắp tới 
 3. Nhấn “Hủy” 
-4. Xác nhận",Đơn được hủy thành công,High,,,,,
-TC-KH13-003,Kiểm tra popup xác nhận hủy đơn,1. Nhấn “Hủy đơn”,Hệ thống hiển thị popup xác nhận hủy,High,,,,,
+4. Xác nhận",Đơn được hủy thành công,High,,PASS,,,
+TC-KH13-003,Kiểm tra popup xác nhận hủy đơn,1. Nhấn “Hủy đơn”,Hệ thống hiển thị popup xác nhận hủy,High,- Mới thành công khi click Hủy ở màn Hoạt động ,Not run,,,
 TC-KH13-004,Kiểm tra từ chối xác nhận hủy đơn,"1. Nhấn “Hủy đơn” 
-2. Chọn “Không” hoặc “Đóng”",Đơn vẫn giữ nguyên trạng thái ban đầu,Medium,,,,,
-TC-KH13-005,Kiểm tra hoàn tiền vào ví sau khi hủy,"1. Hủy đơn thành công 
-2. Kiểm tra số dư ví",Tiền được hoàn về ví theo chính sách,High,,,,,
+2. Chọn “Không” hoặc “Đóng”",Đơn vẫn giữ nguyên trạng thái ban đầu,Medium,- Mới thành công khi click Hủy ở màn Hoạt động ,Not run,,,
 TC-KH13-006,Kiểm tra trạng thái đơn sau khi hủy,"1. Hủy đơn thành công 
-2. Mở lại chi tiết đơn",Đơn hiển thị trạng thái “Đã hủy”,High,,,,,
+2. Mở lại chi tiết đơn",Đơn hiển thị trạng thái “Đã hủy”,High,,PASS,,,
 TC-KH13-007,Kiểm tra không cho hủy khi đơn đang thực hiện,"1. Mở đơn ở trạng thái “Đang thực hiện” 
-2. Nhấn “Hủy đơn”",Hệ thống không cho phép hủy hoặc hiển thị chính sách phí hủy,High,,,,,
-TC-KH13-008,Kiểm tra áp dụng phí hủy đơn,"1. Hủy đơn trong thời gian áp dụng phí 
-2. Kiểm tra ví",Hệ thống trừ phí hủy đúng theo chính sách,Medium,,,,,
-TC-KH13-009,Kiểm tra hủy đơn khi mất mạng,1. Tắt internet 2. Thực hiện hủy đơn,Hệ thống hiển thị lỗi kết nối mạng,Medium,,,,,
-TC-KH13-010,Kiểm tra nhấn nhiều lần nút hủy,1. Nhấn liên tục nút “Xác nhận hủy”,Hệ thống chỉ xử lý một lần hủy đơn,Medium,,,,,
+2. Kiểm tra hiển thị button Hủy đơn ",Hệ thống mất nút Hủy đơn ,High,- Mới thành công ở màn Hoạt động ,Not run,,,
+TC-KH13-009,Kiểm tra hủy đơn khi mất mạng,1. Tắt internet 2. Thực hiện hủy đơn,Hệ thống hiển thị lỗi kết nối mạng,Medium,,PASS,,,
+TC-KH13-010,Kiểm tra nhấn nhiều lần nút hủy,1. Nhấn liên tục nút “Xác nhận hủy”,Hệ thống chỉ xử lý một lần hủy đơn,Medium,,PASS,,,
 UC-KH-14 — Xem lịch sử hoạt động,,,,,,,,,
-TC-KH14-001,Mở màn hình hoạt động thành công,1. Nhấn tab “Hoạt động” trên thanh điều hướng,Hệ thống mở màn hình activity.php,High,,,,,
-TC-KH14-002,Hiển thị tab “Đang & sắp tới” mặc định,1. Mở màn hình hoạt động,Tab “Đang & sắp tới” được chọn mặc định,High,,,,,
-TC-KH14-003,Chuyển sang tab “Đã hoàn tất”,1. Nhấn tab “Đã hoàn tất”,Hệ thống hiển thị danh sách đơn đã hoàn tất,High,,,,,
-TC-KH14-004,Chuyển sang tab “Đã hủy”,1. Nhấn tab “Đã hủy”,Hệ thống hiển thị danh sách đơn đã hủy,High,,,,,
-TC-KH14-005,Hiển thị thông tin đơn hàng đầy đủ,1. Quan sát danh sách đơn,"Hiển thị loại dịch vụ, mã đơn, Tasker, đúng thời gian và trạng thái cập nhật theo real time ",High,,,,,
-TC-KH14-006,Xem chi tiết đơn từ lịch sử hoạt động,1. Nhấn vào một đơn bất kỳ,Hệ thống mở màn hình chi tiết đơn,High,,,,,
-TC-KH14-007,Theo dõi đơn từ tab đang thực hiện,1. Chọn đơn đang thực hiện 2. Nhấn “Theo dõi”,Hệ thống chuyển sang màn hình tracking,High,,,,,
-TC-KH14-008,Chat với Tasker từ lịch sử hoạt động,1. Chọn đơn đang thực hiện 2. Nhấn “Chat”,Hệ thống mở màn hình chat với Tasker,High,,,,,
-TC-KH14-009,Kiểm tra trạng thái rỗng khi chưa có đơn,"1. Đăng nhập bằng tài khoản chưa từng đặt đơn 
-2. Vào Hoạt động",Hệ thống hiển thị trạng thái rỗng phù hợp,Medium,,,,,
-TC-KH14-010,Kiểm tra scroll danh sách hoạt động,"1. Có nhiều đơn hàng trong hệ thống 
-2. Cuộn danh sách",Danh sách scroll mượt và không lỗi UI,Low,,,,,
-TC-KH14-011,Kiểm tra load dữ liệu khi mất mạng,"1. Tắt internet 
-2. Mở màn hình hoạt động",Hệ thống hiển thị lỗi tải dữ liệu,Medium,,,,,
-TC-KH14-012,Kiểm tra hiển thị chi tiết đơn hàng ,"1. Tài màn hình Hoạt động 
-2. click vào một đơn hàng
-","Hiển thị thông tin chi tiết đơn hàng: 
-Mã đơn
-Dịch vụ
-Dọn nhà
-Trạng thái
-Tasker
-Thời gian lên lịch
-Ngày tạo
-Địa chỉ
-Chưa cập nhật địa chỉ
-Ghi chú",High,,,,,
+TC-KH14-001,Mở màn hình hoạt động thành công,1. Nhấn tab “Hoạt động” trên thanh điều hướng,Hệ thống mở màn hình Hoạt động ,High,,PASS,,,
+TC-KH14-002,Hiển thị tab “Tất cả trạng thái” mặc định,1. Mở màn hình hoạt động,Tab “Tất cả trạng thái” được chọn mặc định,High,,PASS,,,
+TC-KH14-003,Hiển thị tab “Đang xử lý” ,1. Nhấn tab “Đang xử lý ”,Hệ thống hiển thị danh sách đơn đang xử lý,High,,PASS,,,
+TC-KH14-004,Chuyển sang tab “Đã hoàn tất”,1. Nhấn tab “Đã hoàn tất”,Hệ thống hiển thị danh sách đơn đã hoàn tất,High,,PASS,,,
+TC-KH14-005,Chuyển sang tab “Đã hủy”,1. Nhấn tab “Đã hủy”,Hệ thống hiển thị danh sách đơn đã hủy,High,,PASS,,,
+TC-KH14-006,Hiển thị thông tin đơn hàng đầy đủ,"1. Mở màn hình hoạt động 
+2. Click vào đơn hàng ","Hiển thị loại dịch vụ, mã đơn, Tasker, đúng thời gian lên lịch, thời gian tạo, ghi chú, địa chỉ, tổng tiền. 
+Các button: Theo dõi đơn, Hủy đơn(có hoặc không), Đóng, Chat(có hoặc không)",High,"- Hiển thị sai thời gian lên lịch 
+- Chưa phân loại dịch vụ dọn nhà ",FAIL,,,
+TC-KH14-007,Xem chi tiết đơn từ lịch sử hoạt động,1. Nhấn vào một đơn bất kỳ,Hệ thống mở màn hình chi tiết đơn,High,,PASS,,,
+TC-KH14-008,Theo dõi đơn từ tab đang thực hiện,1. Chọn đơn đang thực hiện 2. Nhấn “Theo dõi”,Hệ thống chuyển sang màn hình tracking,High,,PASS,,,
+TC-KH14-009,Chat với Tasker từ lịch sử hoạt động,1. Chọn đơn đang thực hiện 2. Nhấn “Chat”,Hệ thống mở màn hình chat với Tasker,High,,PASS,,,
+TC-KH14-010,Kiểm tra trạng thái rỗng khi chưa có đơn,"1. Đăng nhập bằng tài khoản chưa từng đặt đơn 
+2. Vào Hoạt động",Hệ thống hiển thị trạng thái rỗng phù hợp,Medium,,PASS,,,
+TC-KH14-011,Kiểm tra scroll danh sách hoạt động,"1. Có nhiều đơn hàng trong hệ thống 
+2. Cuộn danh sách",Danh sách scroll mượt và không lỗi UI,Low,,PASS,,,
+TC-KH14-012,Kiểm tra load dữ liệu khi mất mạng,"1. Tắt internet 
+2. Mở màn hình hoạt động",Hệ thống hiển thị lỗi tải dữ liệu,Medium,,Not run,,,
 UC-KH-15 — Xem thông báo,,,,,,,,,
-TC-KH15-001,Mở màn hình thông báo thành công,1. Nhấn tab “Thông báo”,Hệ thống mở màn hình notifications.php,High,,,,,
+TC-KH15-001,Mở màn hình thông báo thành công,1. Nhấn tab “Thông báo”,Hệ thống mở màn hình notifications.php,High,,PASS,,,
 TC-KH15-002,Hiển thị danh sách thông báo,1. Mở màn hình thông báo,Hiển thị đầy đủ danh sách thông báo,High,,,,,
 TC-KH15-003,Hiển thị dấu chấm đỏ với thông báo chưa đọc,"1. Có thông báo chưa đọc 
 2. Mở danh sách thông báo",Thông báo chưa đọc hiển thị dấu chấm đỏ,High,,,,,
