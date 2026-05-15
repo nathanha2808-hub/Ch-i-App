@@ -253,7 +253,7 @@
 
     </div>
 
-    <script src="../shared/api.js?v=20260515"></script>
+    <script src="../shared/api.js?v=20260516"></script>
     <script>
         function togglePass(inputId, btn) {
             var input = document.getElementById(inputId);
@@ -498,7 +498,7 @@
                 ChiOiAuth.saveLogin(data);
                 showToastMsg('✅ Đăng ký thành công! Tài khoản đang chờ Admin phê duyệt.');
                 setTimeout(function() {
-                    window.location.href = 'trangchutasker.html';
+                    window.location.href = '/giupviec/trangchutasker.html';
                 }, 1500);
 
             } catch (err) {

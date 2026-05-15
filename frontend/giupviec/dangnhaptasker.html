@@ -234,7 +234,7 @@
     <!-- Footer Spacer -->
     <div class="flex-1"></div>
 </main>
-<script src="../shared/api.js?v=20260515"></script>
+<script src="../shared/api.js?v=20260516"></script>
 <script>
 // Toggle password visibility
 var toggleBtn = document.getElementById('togglePassword');
@@ -328,7 +328,7 @@ async function handleTaskerLogin() {
         loginBtn.innerHTML = '<span class="text-white text-[15px] font-bold tracking-wide">ĐĂNG NHẬP</span>';
         return;
       }
-      window.location.href = 'trangchutasker.html';
+      window.location.href = '/giupviec/trangchutasker.html';
     } else {
       ChiOiAuth.logout();
       errorEl.textContent = 'Tài khoản không tồn tại trong hệ thống Tasker.';

@@ -257,7 +257,7 @@
 
     </div>
 
-<script src="../shared/api.js?v=20260515"></script>
+<script src="../shared/api.js?v=20260516"></script>
 <script>
 // ============================================================
 // TC-KH01-007,011: Real-time phone input — chỉ cho nhập số, không khoảng trắng
@@ -338,7 +338,7 @@ async function handleLogin() {
         // Bug 1 FIX (report14): Phân quyền đăng nhập
         var user = ChiOiAuth.getUser();
         if (user && user.role === 'CUSTOMER') {
-            window.location.href = 'trangchu.html';
+            window.location.href = '/khachhang/trangchu.html';
         } else {
             ChiOiAuth.logout();
             errorEl.textContent = 'Tài khoản không tồn tại trong hệ thống khách hàng.';
