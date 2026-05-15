@@ -327,11 +327,12 @@
 
         function validatePassword(pass) {
             if (!pass) return 'Vui lòng nhập mật khẩu.';
-            if (pass.length < 8) return 'Mật khẩu phải có ít nhất 8 ký tự.'; // UC-REG-25
-            if (pass.length > 20) return 'Mật khẩu không được vượt quá 20 ký tự.'; // UC-REG-28
-            if (!/[A-Z]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa.'; // UC-REG-26
-            if (!/[a-z]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ cái viết thường.'; // UC-REG-26
-            if (!/[0-9]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ số.'; // UC-REG-26
+            if (pass.length < 8) return 'Mật khẩu phải có ít nhất 8 ký tự.'; 
+            if (pass.length > 20) return 'Mật khẩu không được vượt quá 20 ký tự.'; 
+            if (!/[A-Z]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa.'; 
+            if (!/[a-z]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ cái viết thường.'; 
+            if (!/[0-9]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ số.'; 
+            if (!/[\W_]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt.';
             return null;
         }
 

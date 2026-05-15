@@ -181,7 +181,7 @@
 </div>
 <div class="relative">
     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
-    <input id="newPassword" class="w-full h-14 pl-12 pr-12 bg-surface-container-lowest border border-outline-variant rounded-2xl text-body-lg focus:ring-2 focus:ring-primary/20 focus:border-primary-container transition-all" placeholder="Mật khẩu mới (tối thiểu 6 ký tự)" type="password"/>
+    <input id="newPassword" class="w-full h-14 pl-12 pr-12 bg-surface-container-lowest border border-outline-variant rounded-2xl text-body-lg focus:ring-2 focus:ring-primary/20 focus:border-primary-container transition-all" placeholder="Mật khẩu mới (8-20 ký tự)" type="password"/>
     <button class="toggle-pw absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors">
         <span class="material-symbols-outlined">visibility_off</span>
     </button>
@@ -346,7 +346,11 @@
   btnResetPassword.addEventListener('click', async function() {
     var newPass = newPasswordInput.value;
     var confirmPass = confirmPasswordInput.value;
-    if (newPass.length < 6) { showToastMsg('Mật khẩu mới phải từ 6 ký tự trở lên'); return; }
+    if (newPass.length < 8 || newPass.length > 20) { showToastMsg('Mật khẩu phải từ 8 đến 20 ký tự'); return; }
+    if (!/[A-Z]/.test(newPass)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa'); return; }
+    if (!/[a-z]/.test(newPass)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết thường'); return; }
+    if (!/[0-9]/.test(newPass)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ số'); return; }
+    if (!/[\W_]/.test(newPass)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt'); return; }
     if (newPass !== confirmPass) { showToastMsg('Mật khẩu xác nhận không khớp'); return; }
     if (!storedPhone || !storedOtp) { showToastMsg('Vui lòng thực hiện lại từ đầu'); goToStep(1); return; }
     setLoading(btnResetPassword, true);
