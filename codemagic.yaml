@@ -302,10 +302,24 @@ workflows:
           cd mobile-ios/ios/App
           pod install --repo-update
 
-      - name: Bump build number (auto from Codemagic)
+      - name: Bump build number
         script: |
+          set -e
           cd mobile-ios/ios/App
-          agvtool new-version -all $(($(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID") + 1))
+          # Dùng BUILD_NUMBER nội bộ của Codemagic (auto-increment mỗi build)
+          # + offset 100 để safely vượt qua mọi version Apple đã có
+          # (build #18 + #19 đã upload version 1 → reject duplicate).
+          # Build #20 sẽ là version 120, #21 là 121... không bao giờ trùng.
+          #
+          # Cách cũ dùng `app-store-connect get-latest-app-store-build-number`
+          # KHÔNG hoạt động — query về empty hoặc output thừa whitespace làm
+          # $(()) math fail, agvtool giữ nguyên version=1 → upload reject.
+          NEW_VERSION=$(($BUILD_NUMBER + 100))
+          echo "===== Bump CFBundleVersion to $NEW_VERSION ====="
+          echo "Codemagic BUILD_NUMBER: $BUILD_NUMBER"
+          agvtool new-version -all "$NEW_VERSION"
+          echo "Verify after bump:"
+          agvtool what-version
 
       - name: Build Release IPA + dSYM
         script: |
