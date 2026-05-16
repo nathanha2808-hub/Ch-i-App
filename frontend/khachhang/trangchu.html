@@ -132,6 +132,21 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    /* UC-KH-04: Search */
+    #search-container { position: relative; }
+    #search-input { transition: box-shadow 0.2s, border-color 0.2s; }
+    #search-input:focus { box-shadow: 0 0 0 3px rgba(255,126,54,0.15); border-color: #ff7e36; }
+    #search-results { max-height: 320px; overflow-y: auto; }
+    #search-results::-webkit-scrollbar { width: 4px; }
+    #search-results::-webkit-scrollbar-thumb { background: rgba(160,65,0,0.15); border-radius: 10px; }
+    .search-result-item { transition: background 0.15s; }
+    .search-result-item:hover, .search-result-item:focus { background: #FFF1EB; }
+    .search-result-item:active { transform: scale(0.98); }
+    .search-highlight { color: #a04100; font-weight: 700; background: rgba(255,126,54,0.1); border-radius: 2px; padding: 0 1px; }
+    @keyframes searchSlideIn { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+    .search-slide-in { animation: searchSlideIn 0.2s ease-out; }
+    #search-clear { transition: opacity 0.15s, transform 0.15s; }
   </style>
 </head>
 
@@ -155,6 +170,23 @@
 
     </header>
     <main class="px-container-padding relative z-10 mt-2 stitch-anim-fade-in">
+      <!-- UC-KH-04: Thanh tìm kiếm dịch vụ -->
+      <section id="search-container" class="mb-md">
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px] pointer-events-none" id="search-icon">search</span>
+          <input id="search-input" type="text" inputmode="search" autocomplete="off"
+            class="w-full h-12 pl-11 pr-10 rounded-2xl border border-outline-variant bg-surface-container-lowest text-body-lg placeholder:text-on-surface-variant/50 focus:outline-none"
+            placeholder="Tìm dịch vụ... VD: Dọn nhà, Trông trẻ" />
+          <button id="search-clear" type="button"
+            class="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center opacity-0 pointer-events-none"
+            title="Xóa tìm kiếm">
+            <span class="material-symbols-outlined text-on-surface-variant text-[18px]">close</span>
+          </button>
+        </div>
+        <!-- Dropdown kết quả tìm kiếm -->
+        <div id="search-results" class="absolute left-container-padding right-container-padding mt-1 bg-white rounded-2xl shadow-xl border border-outline-variant/30 z-[60] hidden search-slide-in"></div>
+      </section>
+
       <!-- Balance Card -->
       <div class="bg-surface-container-lowest rounded-xl p-md flex divide-x divide-outline-variant soft-shadow mb-xl">
         <a href="vivalichsu.html" class="flex-1 flex items-center justify-between pr-md">
@@ -338,15 +370,39 @@
           }
 
           // ===== 4. Load Danh sách dịch vụ nổi bật (Featured Services) =====
+          // UC-KH-04: Dữ liệu dịch vụ dùng chung cho cả featured grid và search
+          var allServices = [
+            { name: 'Dọn nhà', icon: '../assets/images/donnha.png', link: 'datdichvudonnha.html', rank: 3, keywords: 'dọn dẹp nhà cửa vệ sinh tổng vệ sinh lau chùi quét dọn' },
+            { name: 'Trông trẻ', icon: '../assets/images/trongtre.png', link: 'datdichvutrongtre.html', rank: 1, keywords: 'trông trẻ em bé giữ trẻ chăm sóc trẻ babysitter' },
+            { name: 'Mua hộ', icon: '../assets/images/muaho.png', link: 'datdichvumuaho.html', rank: 2, keywords: 'mua hộ đi chợ winmart siêu thị giao hàng ship đồ' }
+          ];
+
+          // Load thêm dịch vụ từ API (nếu admin đã thêm dịch vụ mới)
+          try {
+            var apiServices = await apiFetch('/api/services');
+            if (apiServices && apiServices.length > 0) {
+              apiServices.forEach(function(s) {
+                var exists = allServices.find(function(x) { return x.name === s.name; });
+                if (!exists && s.is_active) {
+                  allServices.push({
+                    name: s.name,
+                    icon: s.icon_url || '../assets/images/logo.jpg',
+                    link: 'datdichvudonnha.html?service_id=' + s.service_id,
+                    rank: 99,
+                    keywords: (s.description || '').toLowerCase()
+                  });
+                }
+              });
+            }
+          } catch (e) {
+            console.warn('[ChiOi] Không thể load dịch vụ từ API:', e.message);
+          }
+
           try {
             const featuredList = document.getElementById('featured-services');
             if (featuredList) {
-              // Dữ liệu dịch vụ với ranking phổ biến
-              const featuredData = [
-                { name: 'Dọn nhà', icon: '../assets/images/donnha.png', link: 'datdichvudonnha.html', rank: 3 },
-                { name: 'Trông trẻ', icon: '../assets/images/trongtre.png', link: 'datdichvutrongtre.html', rank: 1 },
-                { name: 'Mua hộ', icon: '../assets/images/muaho.png', link: 'datdichvumuaho.html', rank: 2 }
-              ];
+              // Chỉ hiển thị 3 dịch vụ top trên grid
+              var featuredData = allServices.filter(function(s) { return s.rank <= 3; }).sort(function(a,b) { return a.rank - b.rank; });
 
               featuredList.innerHTML = featuredData.map(svc => {
                 let customScale = 'scale-[1.15]';
@@ -398,6 +454,140 @@
           } catch (e) {
             console.warn('[ChiOi] Không thể load dịch vụ:', e.message);
           }
+
+          // ===== UC-KH-04: Search Engine Logic =====
+          (function initSearch() {
+            var searchInput = document.getElementById('search-input');
+            var searchResults = document.getElementById('search-results');
+            var searchClear = document.getElementById('search-clear');
+            var searchIcon = document.getElementById('search-icon');
+            var debounceTimer = null;
+
+            if (!searchInput || !searchResults || !searchClear) return;
+
+            // TC-KH04-007: Normalize text for Vietnamese search
+            function normalize(str) {
+              return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+            }
+
+            // TC-KH04-004: Escape regex special chars to prevent errors
+            function escapeRegex(str) {
+              return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            // Highlight matched text in result
+            function highlightMatch(text, query) {
+              if (!query) return text;
+              var safeQ = escapeRegex(query);
+              var regex = new RegExp('(' + safeQ + ')', 'gi');
+              return text.replace(regex, '<span class="search-highlight">$1</span>');
+            }
+
+            // TC-KH04-001/003/005/006/007: Core search function
+            function doSearch(query) {
+              var raw = query.trim();
+              
+              // TC-KH04-006: Empty → hide results
+              if (!raw) {
+                searchResults.classList.add('hidden');
+                return;
+              }
+
+              // TC-KH04-009: Check online status
+              if (!navigator.onLine) {
+                searchResults.classList.remove('hidden');
+                searchResults.innerHTML = '<div class="p-4 text-center">' +
+                  '<span class="material-symbols-outlined text-error text-[32px] mb-2">wifi_off</span>' +
+                  '<p class="text-body-sm text-error font-bold">Không có kết nối mạng</p>' +
+                  '<p class="text-caption text-on-surface-variant mt-1">Vui lòng kiểm tra kết nối internet</p>' +
+                  '</div>';
+                return;
+              }
+
+              // TC-KH04-003: Case-insensitive + normalize Vietnamese
+              var normalizedQuery = normalize(raw);
+
+              var results = allServices.filter(function(svc) {
+                var nameNorm = normalize(svc.name);
+                var kwNorm = normalize(svc.keywords || '');
+                return nameNorm.indexOf(normalizedQuery) > -1 || kwNorm.indexOf(normalizedQuery) > -1;
+              });
+
+              searchResults.classList.remove('hidden');
+
+              // TC-KH04-005: No results
+              if (results.length === 0) {
+                searchResults.innerHTML = '<div class="p-5 text-center">' +
+                  '<span class="material-symbols-outlined text-on-surface-variant/40 text-[40px]">search_off</span>' +
+                  '<p class="text-body-sm text-on-surface-variant font-bold mt-2">Không có kết quả</p>' +
+                  '<p class="text-caption text-on-surface-variant/60 mt-1">Thử tìm: "Dọn nhà", "Trông trẻ", "Mua hộ"</p>' +
+                  '</div>';
+                return;
+              }
+
+              // TC-KH04-001/007: Render results with highlight
+              var html = '';
+              results.forEach(function(svc, idx) {
+                html += '<a href="' + svc.link + '" class="search-result-item flex items-center gap-3 px-4 py-3 ' + (idx > 0 ? 'border-t border-outline-variant/10' : '') + ' cursor-pointer rounded-xl">' +
+                  '<div class="w-12 h-12 rounded-xl bg-primary-fixed/30 flex items-center justify-center flex-shrink-0 overflow-hidden">' +
+                  '<img src="' + svc.icon + '" alt="' + svc.name + '" class="w-10 h-10 object-contain" onerror="this.parentElement.innerHTML=\'<span class=\\\"material-symbols-outlined text-primary\\\">home_repair_service</span>\'"/>' +
+                  '</div>' +
+                  '<div class="flex-1 min-w-0">' +
+                  '<p class="text-body-lg font-bold text-on-surface truncate">' + highlightMatch(svc.name, raw) + '</p>' +
+                  '<p class="text-caption text-on-surface-variant truncate">Nhấn để đặt dịch vụ</p>' +
+                  '</div>' +
+                  '<span class="material-symbols-outlined text-primary-container text-[20px] flex-shrink-0">arrow_forward</span>' +
+                  '</a>';
+              });
+              searchResults.innerHTML = html;
+            }
+
+            // TC-KH04-008: Debounced input for fast response
+            searchInput.addEventListener('input', function() {
+              var val = this.value;
+              // Show/hide clear button
+              if (val.length > 0) {
+                searchClear.style.opacity = '1';
+                searchClear.style.pointerEvents = 'auto';
+                searchIcon.textContent = 'search';
+              } else {
+                searchClear.style.opacity = '0';
+                searchClear.style.pointerEvents = 'none';
+              }
+              // Debounce 150ms for smooth UX
+              clearTimeout(debounceTimer);
+              debounceTimer = setTimeout(function() { doSearch(val); }, 150);
+            });
+
+            // TC-KH04-002: Focus → show keyboard (native), show suggestions if has value
+            searchInput.addEventListener('focus', function() {
+              if (this.value.trim()) doSearch(this.value);
+            });
+
+            // TC-KH04-010: Clear button → reset to initial state
+            searchClear.addEventListener('click', function() {
+              searchInput.value = '';
+              searchResults.classList.add('hidden');
+              searchClear.style.opacity = '0';
+              searchClear.style.pointerEvents = 'none';
+              searchInput.focus();
+            });
+
+            // Close results when clicking outside
+            document.addEventListener('click', function(e) {
+              if (!searchInput.contains(e.target) && !searchResults.contains(e.target) && !searchClear.contains(e.target)) {
+                searchResults.classList.add('hidden');
+              }
+            });
+
+            // TC-KH04-009: Listen for online/offline events
+            window.addEventListener('offline', function() {
+              if (searchInput.value.trim()) doSearch(searchInput.value);
+            });
+            window.addEventListener('online', function() {
+              if (searchInput.value.trim()) doSearch(searchInput.value);
+            });
+          })();
 
           // ===== 4.1 Load Danh sách Tasker gần bạn =====
           var allTaskers = [];
