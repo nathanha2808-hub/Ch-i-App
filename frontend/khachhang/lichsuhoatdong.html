@@ -62,7 +62,7 @@
 <!-- Lỗi 7 FIX: Filters & Date Range - hoạt động đúng -->
 <div class="space-y-4">
 <div id="filter-chips" class="flex overflow-x-auto gap-2 no-scrollbar pb-2">
-<span data-filter="all" class="chip-active px-4 py-2 rounded-full text-body-sm font-semibold shrink-0 cursor-pointer shadow-sm transition-all">Tất cả</span>
+<span data-filter="all" class="chip-active px-4 py-2 rounded-full text-body-sm font-semibold shrink-0 cursor-pointer shadow-sm transition-all whitespace-nowrap">Tất cả</span>
 <span data-filter="don_nha" class="chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all">Dọn nhà</span>
 <span data-filter="trong_tre" class="chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all">Trông trẻ</span>
 <span data-filter="mua_ho" class="chip-inactive px-4 py-2 rounded-full text-body-sm shrink-0 cursor-pointer transition-all">Mua hộ</span>
@@ -239,7 +239,16 @@
     // Bug 4 FIX (report13): Hiển thị đúng địa chỉ từ DB
     var address = order.address || 'Chưa cập nhật';
     var note = order.notes || order.note || 'Không có ghi chú';
-    var scheduledTime = order.scheduled_time ? formatDateTime(order.scheduled_time) : 'Chưa xác định';
+    // TC-KH14-006 FIX: Hiển thị thời gian lên lịch với timezone VN chính xác
+    var scheduledTime = 'Chưa xác định';
+    if (order.scheduled_time) {
+      try {
+        var sd = new Date(order.scheduled_time);
+        scheduledTime = sd.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+      } catch(tz) {
+        scheduledTime = formatDateTime(order.scheduled_time);
+      }
+    }
 
     // Bug 3 FIX (report13): Cho phép hủy đơn khi status = PENDING hoặc ACCEPTED
     var canCancel = (order.status === 'PENDING' || order.status === 'ACCEPTED');

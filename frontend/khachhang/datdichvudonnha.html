@@ -602,7 +602,13 @@ Phương thức thanh toán
         setTimeout(function() { window.location.href = 'lichsuhoatdong.html'; }, 2000);
       } catch (e) {
         hideLoading();
-        showToastMsg('❌ ' + e.message);
+        // TC-KH07-016: Nếu lỗi liên quan số dư → hiển thị popup nạp tiền thay vì toast thô
+        var errMsg = (e.message || '').toLowerCase();
+        if (errMsg.includes('số dư') || errMsg.includes('insufficient') || errMsg.includes('balance') || errMsg.includes('không đủ')) {
+          showInsufficientPopup(walletBalanceAmount, totalPrice);
+        } else {
+          showToastMsg('❌ ' + e.message);
+        }
         // Mở khóa nút khi lỗi để user thử lại
         isSubmitting = false;
         submitBtn.disabled = false;

@@ -475,11 +475,25 @@
   });
 
   document.getElementById('btn-settings').addEventListener('click', function() {
+    // TC-KH24-005: Load saved settings
+    var pushNotif = localStorage.getItem('chioi_push_notif') !== 'false';
+    var smsNotif = localStorage.getItem('chioi_sms_notif') === 'true';
     showModal('Cài đặt',
       '<div class="space-y-4">' +
-      '<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl"><span class="text-body-lg">Thông báo đẩy</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:bg-primary-container after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label></div>' +
-      '<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl"><span class="text-body-lg">Thông báo SMS</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer"><div class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:bg-primary-container after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label></div>' +
-      '<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl"><span class="text-body-lg">Ngôn ngữ</span><span class="text-primary font-bold">Tiếng Việt</span></div></div>'
+      '<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl"><span class="text-body-lg">Thông báo đẩy</span><label class="relative inline-flex items-center cursor-pointer"><input id="toggle-push" type="checkbox"' + (pushNotif ? ' checked' : '') + ' class="sr-only peer"><div class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:bg-primary-container after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label></div>' +
+      '<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl"><span class="text-body-lg">Thông báo SMS</span><label class="relative inline-flex items-center cursor-pointer"><input id="toggle-sms" type="checkbox"' + (smsNotif ? ' checked' : '') + ' class="sr-only peer"><div class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:bg-primary-container after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label></div>' +
+      '<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl"><span class="text-body-lg">Ngôn ngữ</span><span class="text-primary font-bold">Tiếng Việt</span></div></div>',
+      function() {
+        // TC-KH24-005: Save settings when toggled
+        document.getElementById('toggle-push').addEventListener('change', function() {
+          localStorage.setItem('chioi_push_notif', this.checked);
+          showToastMsg(this.checked ? '🔔 Đã bật thông báo đẩy' : '🔕 Đã tắt thông báo đẩy');
+        });
+        document.getElementById('toggle-sms').addEventListener('change', function() {
+          localStorage.setItem('chioi_sms_notif', this.checked);
+          showToastMsg(this.checked ? '📨 Đã bật thông báo SMS' : '📩 Đã tắt thông báo SMS');
+        });
+      }
     );
   });
 
@@ -568,6 +582,14 @@
     document.body.appendChild(overlay);
     if (onRender) onRender();
   }
+
+  // TC-KH24-007: Offline detection
+  window.addEventListener('offline', function() {
+    showToastMsg('⚠️ Mất kết nối mạng. Vui lòng kiểm tra kết nối internet.');
+  });
+  window.addEventListener('online', function() {
+    showToastMsg('✅ Đã kết nối lại mạng.');
+  });
 })();
 
 function closeModal() {

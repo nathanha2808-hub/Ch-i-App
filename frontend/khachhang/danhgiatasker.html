@@ -203,7 +203,25 @@
   if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
 
   var params = new URLSearchParams(window.location.search);
-  var orderId = params.get('order_id');
+  var orderId = params.get('order_id') || params.get('orderId');
+
+  // TC-KH16-003: Load thông tin đơn hàng để hiển thị tên Tasker chính xác
+  if (orderId) {
+    try {
+      var order = await apiFetch('/api/orders/' + orderId);
+      var taskerName = (order.taskers && order.taskers.users && order.taskers.users.full_name) ? order.taskers.users.full_name : 'Tasker';
+      var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ';
+      var h2 = document.querySelector('section h2');
+      if (h2) h2.textContent = taskerName;
+      var pSvc = document.querySelector('section p.font-body-lg');
+      if (pSvc) pSvc.textContent = serviceName + ' · Đơn #' + orderId;
+      // Cập nhật avatar nếu có
+      if (order.taskers && order.taskers.users && order.taskers.users.avatar_url) {
+        var img = document.querySelector('section img');
+        if (img) img.src = order.taskers.users.avatar_url;
+      }
+    } catch(e) { console.warn('[Review] Không load được đơn:', e.message); }
+  }
 
   // ===== Star Rating Logic =====
   var rating = 0;
@@ -269,6 +287,8 @@
         comment = selectedTags.join(', ') + (comment ? '. ' + comment : '');
       }
 
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Đang gửi...';
       showLoading();
       try {
         await apiFetch('/api/orders/' + orderId + '/review', {
@@ -281,6 +301,8 @@
       } catch (e) {
         hideLoading();
         showToastMsg('❌ ' + e.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Gửi đánh giá';
       }
     });
   }

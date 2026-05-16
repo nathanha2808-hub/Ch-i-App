@@ -231,7 +231,11 @@
     var filtered = allTransactions;
     if (filter && filter !== 'all') {
       filtered = allTransactions.filter(function(tx) {
-        return tx.tx_type === filter || tx.type === filter;
+        var txType = tx.tx_type || tx.type || '';
+        // TC_KH17-004 FIX: Filter DEPOSIT cũng match TOP_UP
+        if (filter === 'DEPOSIT') return txType === 'DEPOSIT' || txType === 'TOP_UP';
+        if (filter === 'WITHDRAW') return txType === 'WITHDRAW' || txType === 'WITHDRAWAL';
+        return txType === filter;
       });
     }
 
@@ -244,16 +248,17 @@
     filtered.forEach(function(tx) {
       var type = tx.tx_type || tx.type || '';
       var amount = tx.amount || 0;
-      var isIncome = type === 'DEPOSIT' || type === 'REFUND' || type === 'BONUS';
+      // TC_KH17-003 FIX: Nhận cả TOP_UP, DEPOSIT, WITHDRAW, WITHDRAWAL
+      var isIncome = type === 'DEPOSIT' || type === 'TOP_UP' || type === 'REFUND' || type === 'BONUS';
       var icon = 'receipt';
       var iconColor = 'text-primary';
       var iconBg = 'bg-primary-container/20';
       var label = type;
 
-      if (type === 'DEPOSIT') { icon = 'account_balance_wallet'; label = 'Nạp tiền'; iconColor = 'text-tertiary'; iconBg = 'bg-tertiary-container/20'; }
+      if (type === 'DEPOSIT' || type === 'TOP_UP') { icon = 'account_balance_wallet'; label = 'Nạp tiền'; iconColor = 'text-tertiary'; iconBg = 'bg-tertiary-container/20'; }
       else if (type === 'PAYMENT') { icon = 'shopping_cart'; label = 'Thanh toán dịch vụ'; }
       else if (type === 'REFUND') { icon = 'history'; label = 'Hoàn tiền'; iconColor = 'text-secondary'; iconBg = 'bg-secondary-container/20'; }
-      else if (type === 'WITHDRAWAL') { icon = 'download'; label = 'Rút tiền'; iconColor = 'text-error'; iconBg = 'bg-error-container/20'; }
+      else if (type === 'WITHDRAWAL' || type === 'WITHDRAW') { icon = 'download'; label = 'Rút tiền'; iconColor = 'text-error'; iconBg = 'bg-error-container/20'; }
       else if (type === 'BONUS') { icon = 'redeem'; label = 'Thưởng'; iconColor = 'text-primary'; }
 
       var dateStr = '';

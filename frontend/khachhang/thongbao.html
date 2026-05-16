@@ -67,9 +67,6 @@
 <div class="bg-white rounded-[32px] p-md shadow-sm border border-primary-fixed/30 min-h-[400px]">
 <div class="flex justify-between items-center mb-md">
 <span class="text-body-sm font-semibold text-on-surface-variant">Gần đây</span>
-<button class="text-on-surface-variant hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-[20px]">settings</span>
-</button>
 </div>
 <div id="notif-list" class="flex flex-col gap-2">
 <!-- Rendered by JS -->
@@ -126,7 +123,7 @@
           } else {
             body = 'Giao dịch ' + formatVND(tx.amount) + ' đã được xử lý.';
           }
-          notifs.push({ type: 'wallet', icon: icon, iconBg: 'bg-tertiary-container', iconText: 'text-on-tertiary', title: title, body: body, time: tx.created_at, unread: false, link: 'vivalichsu.html' });
+          notifs.push({ type: 'wallet', icon: icon, iconBg: 'bg-tertiary-container', iconText: 'text-on-tertiary', title: title, body: body, time: tx.created_at, unread: true, link: 'vivalichsu.html' });
         });
       }
     } catch (e) { console.warn('[Notif] Wallet:', e.message); }
@@ -201,7 +198,17 @@
         '<p class="text-body-sm text-on-surface-variant leading-tight">' + n.body + '</p>' +
         '<span class="text-xs text-outline font-medium mt-1">' + timeAgo(n.time) + '</span></div>';
       if (n.link) {
-        div.addEventListener('click', function() { window.location.href = n.link; });
+        div.addEventListener('click', function() {
+          // TC-KH15-003/005/006: Đánh dấu đã đọc khi click
+          n.unread = false;
+          renderNotifs();
+          window.location.href = n.link;
+        });
+      } else {
+        div.addEventListener('click', function() {
+          n.unread = false;
+          renderNotifs();
+        });
       }
       list.appendChild(div);
     });

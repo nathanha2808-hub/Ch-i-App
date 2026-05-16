@@ -50,6 +50,10 @@
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     .orange-gradient { background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); }
     .soft-shadow { box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08); }
+    /* TC-KH23-006: Fix text tràn */
+    #ticket-history p, #ticket-history h4 { word-break: break-word; overflow-wrap: break-word; }
+    /* TC-KH23-011: Smooth scrolling */
+    #ticket-history { scroll-behavior: smooth; }
 </style>
 </head>
 <body class="bg-surface-dim text-on-surface min-h-screen flex flex-col items-center">

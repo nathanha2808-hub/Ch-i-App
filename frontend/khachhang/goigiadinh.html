@@ -133,7 +133,7 @@
 <h1 class="text-[18px] font-extrabold text-white">Gói gia đình</h1>
 </div>
 </header>
-<main class="relative z-10 mt-4 px-container-padding space-y-lg max-w-md mx-auto">
+<main class="relative z-10 mt-4 px-container-padding space-y-lg max-w-md mx-auto pb-8">
 <!-- Hero Banner -->
 <section class="orange-gradient p-6 rounded-2xl text-white relative overflow-hidden">
 <div class="relative z-10">
@@ -350,7 +350,14 @@
           body: { package_id: selectedPkg.id }
         });
         hideLoading();
+        // TC-KH22-005: Cập nhật UI ngay sau khi đăng ký thành công
         showToastMsg('✅ Đăng ký gói thành công! Đã trừ ' + formatVND(selectedPkg.price) + ' từ ví.');
+        var regBtn = document.getElementById('register-btn');
+        if (regBtn) {
+          regBtn.disabled = true;
+          regBtn.className = 'bg-green-500 text-white font-bold py-3 px-8 rounded-full shadow-lg flex items-center gap-2';
+          regBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]" style="font-variation-settings:\'FILL\' 1;">check_circle</span> Đã đăng ký';
+        }
         setTimeout(function() { window.location.href = 'taikhoan.html'; }, 2500);
       } catch (e) {
         hideLoading();

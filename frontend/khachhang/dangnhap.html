@@ -265,9 +265,23 @@
 
     </div>
 
-<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/api.js?v=20260516"></script>
 <script src="../shared/prefetch.js" defer></script>
 <script>
+// TC-KH01-021: Auto redirect nếu đã đăng nhập
+(function() {
+    var token = localStorage.getItem('chioi_token');
+    var user = localStorage.getItem('chioi_user');
+    if (token && user) {
+        try {
+            var userData = JSON.parse(user);
+            if (userData && userData.role === 'CUSTOMER') {
+                window.location.replace('trangchu.html');
+                return;
+            }
+        } catch(e) {}
+    }
+})();
 // ============================================================
 // TC-KH01-007,011: Real-time phone input — chỉ cho nhập số, không khoảng trắng
 // ============================================================

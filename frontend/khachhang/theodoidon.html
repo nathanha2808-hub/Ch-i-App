@@ -261,7 +261,7 @@
 <span class="material-symbols-outlined" data-icon="call">call</span>
 <span class="text-label-caps font-label-caps">Gọi</span>
 </button>
-<button class="flex flex-col items-center justify-center gap-1 py-3 px-2 bg-red-50 rounded-[16px] text-error hover:bg-error/10 active:scale-95 transition-all">
+<button id="btn-cancel-order" class="flex flex-col items-center justify-center gap-1 py-3 px-2 bg-red-50 rounded-[16px] text-error hover:bg-error/10 active:scale-95 transition-all">
 <span class="material-symbols-outlined" data-icon="cancel">cancel</span>
 <span class="text-label-caps font-label-caps">Hủy đơn</span>
 </button>
@@ -401,7 +401,14 @@
     if (detailSpans.length >= 4) {
       detailSpans[0].textContent = '#DH' + order.order_id;
       detailSpans[1].textContent = serviceName;
-      detailSpans[2].textContent = formatDateTime(order.scheduled_time);
+      // TC-KH10-001 FIX: Hiển thị thời gian với timezone VN chính xác
+      var scheduledDate = new Date(order.scheduled_time);
+      var timeOptions = { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+      try {
+        detailSpans[2].textContent = scheduledDate.toLocaleString('vi-VN', timeOptions);
+      } catch(tz) {
+        detailSpans[2].textContent = formatDateTime(order.scheduled_time);
+      }
       detailSpans[3].textContent = formatVND(order.total_price);
     }
 
@@ -447,6 +454,69 @@
     console.warn('[TheoDoi] Lỗi load đơn hàng:', e.message);
   }
 
+  // ===== TC-KH10-008, TC-KH13-001/003/004/006: Nút hủy đơn =====
+  var cancelBtn = document.getElementById('btn-cancel-order');
+  var currentOrderStatus = '';
+
+  // TC-KH10-009: Ẩn nút hủy khi đang thực hiện hoặc hoàn thành
+  function updateCancelBtnVisibility(status) {
+    currentOrderStatus = status;
+    if (cancelBtn) {
+      if (status === 'IN_PROGRESS' || status === 'COMPLETED' || status === 'CANCELLED') {
+        cancelBtn.style.display = 'none';
+      } else {
+        cancelBtn.style.display = 'flex';
+      }
+    }
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function() {
+      if (!orderId) { showToastMsg('Không tìm thấy đơn hàng'); return; }
+      // TC-KH13-003: Hiển thị popup xác nhận trước khi hủy
+      var existing = document.getElementById('cancel-modal');
+      if (existing) existing.remove();
+      var overlay = document.createElement('div');
+      overlay.id = 'cancel-modal';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;';
+      overlay.innerHTML = '<div style="background:#fff;border-radius:24px;width:90%;max-width:380px;padding:24px;">' +
+        '<div style="text-align:center;margin-bottom:16px;"><span class="material-symbols-outlined" style="font-size:48px;color:#ba1a1a;">cancel</span></div>' +
+        '<h3 style="font-weight:700;text-align:center;margin-bottom:8px;font-size:16px;">Xác nhận hủy đơn?</h3>' +
+        '<p style="text-align:center;font-size:13px;color:#666;margin-bottom:16px;">Bạn có chắc muốn hủy đơn hàng này?<br>Thao tác không thể hoàn tác.</p>' +
+        '<div style="display:flex;gap:12px;">' +
+        '<button id="cancel-no" style="flex:1;padding:12px;border-radius:12px;border:2px solid #dfc0b3;font-weight:700;color:#584238;background:white;cursor:pointer;">Không</button>' +
+        '<button id="cancel-yes" style="flex:1;padding:12px;border-radius:12px;background:#ba1a1a;color:white;font-weight:700;border:none;cursor:pointer;">Hủy đơn</button>' +
+        '</div></div>';
+      overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+      document.body.appendChild(overlay);
+      document.getElementById('cancel-no').addEventListener('click', function() { overlay.remove(); });
+      document.getElementById('cancel-yes').addEventListener('click', async function() {
+        overlay.remove();
+        showLoading();
+        try {
+          await apiFetch('/api/orders/' + orderId + '/cancel', { method: 'POST' });
+          hideLoading();
+          showToastMsg('✅ Đã hủy đơn hàng thành công');
+          renderStepper('CANCELLED');
+          updateCancelBtnVisibility('CANCELLED');
+          setTimeout(function() { window.location.href = 'lichsuhoatdong.html'; }, 2000);
+        } catch (e) {
+          hideLoading();
+          // TC-KH13-004: Hiển thị lý do không hủy được
+          showToastMsg('❌ ' + (e.message || 'Không thể hủy đơn'));
+        }
+      });
+    });
+  }
+
+  // Cập nhật visibility dựa trên status đơn hiện tại
+  try {
+    var order2 = await apiFetch('/api/orders/' + orderId);
+    if (order2 && order2.status) {
+      updateCancelBtnVisibility(order2.status);
+    }
+  } catch(e) {}
+
   // ===== SOCKET.IO REAL-TIME UPDATES =====
   var socket = connectSocket();
   if (socket) {
@@ -454,6 +524,7 @@
       if (String(data.order.order_id) === String(orderId)) {
         showToastMsg('🔔 Trạng thái đơn: ' + data.order.status);
         renderStepper(data.order.status, data.order);
+        updateCancelBtnVisibility(data.order.status);
       }
     });
 
@@ -461,6 +532,7 @@
       if (String(data.order.order_id) === String(orderId)) {
         showToastMsg('🎉 Tasker đã nhận đơn!');
         renderStepper('ACCEPTED');
+        updateCancelBtnVisibility('ACCEPTED');
       }
     });
   }

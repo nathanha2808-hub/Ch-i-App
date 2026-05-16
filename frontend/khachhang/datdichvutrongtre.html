@@ -194,14 +194,14 @@
 <div class="flex flex-col gap-xs">
 <span class="text-label-caps text-outline">Ngày</span>
 <div class="flex items-center gap-2 p-sm bg-surface-bright rounded-lg border border-outline-variant/30">
-<span class="material-symbols-outlined text-primary-container text-[18px]">calendar_month</span>
+<span class="material-symbols-outlined text-primary-container text-[18px] flex-shrink-0">calendar_month</span>
 <input id="dateInput" type="date" class="border-none bg-transparent text-body-sm font-medium p-0 focus:ring-0 flex-1" />
 </div>
 </div>
 <div class="flex flex-col gap-xs">
 <span class="text-label-caps text-outline">Giờ bắt đầu</span>
 <div class="flex items-center gap-2 p-sm bg-surface-bright rounded-lg border border-outline-variant/30">
-<span class="material-symbols-outlined text-primary-container text-[18px]">schedule</span>
+<span class="material-symbols-outlined text-primary-container text-[18px] flex-shrink-0">schedule</span>
 <input id="timeInput" type="time" value="18:00" class="border-none bg-transparent text-body-sm font-medium p-0 focus:ring-0 flex-1" />
 </div>
 </div>
@@ -564,7 +564,13 @@ Phương thức thanh toán
       setTimeout(function() { window.location.href = 'lichsuhoatdong.html'; }, 2000);
     } catch (e) {
       hideLoading();
-      showToastMsg('❌ ' + e.message);
+      // TC-KH08-002: Nếu lỗi liên quan số dư → hiển thị popup nạp tiền thay vì toast thô
+      var errMsg = (e.message || '').toLowerCase();
+      if (errMsg.includes('số dư') || errMsg.includes('insufficient') || errMsg.includes('balance') || errMsg.includes('không đủ')) {
+        showInsufficientPopup(0, totalPrice);
+      } else {
+        showToastMsg('❌ ' + e.message);
+      }
       isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.classList.remove('opacity-50');
