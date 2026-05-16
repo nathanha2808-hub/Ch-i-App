@@ -280,7 +280,8 @@
         card.innerHTML =
           '<div class="flex justify-between items-start">' +
             '<div><h3 class="text-title-sm font-title-sm text-on-surface">' + serviceName + '</h3>' +
-            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px]">schedule</span>' + formatDateTime(order.scheduled_time) + '</p></div>' +
+            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px]">schedule</span>' + formatDateTime(order.scheduled_time) + (order.duration_hours ? ' (' + order.duration_hours + ' giá»)' : '') + '</p>' +
+            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5"><span class="material-symbols-outlined text-[14px]">location_on</span>' + (order.address || 'ChÆ°a cáº­p nháº­t') + '</p></div>' +
             '<span class="' + s.bg + ' ' + s.text + ' px-3 py-1 rounded-full text-label-caps font-bold">' + s.label + '</span></div>' +
           '<div class="flex items-center justify-between border-t border-dashed border-outline-variant pt-3">' +
             '<span class="text-headline-md font-headline-md text-primary">' + formatVND(order.total_price) + '</span>' +

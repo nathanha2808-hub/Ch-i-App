@@ -712,6 +712,15 @@ document.querySelectorAll('table tbody tr').forEach(function(row) {
         // Hiển thị phương thức thanh toán
         var odPayment = el('od-payment');
         if (odPayment) odPayment.textContent = order.payment_method === 'CASH' ? 'Tiền mặt' : 'Ví điện tử';
+        // Bug #44: áº¨n nÃºt can thiá»‡p náº¿u Ä‘Æ¡n Ä‘Ã£ hoÃ n thÃ nh/há»§y
+        var btnCanThiep = document.getElementById('btn-can-thiep');
+        if (btnCanThiep) {
+          if (order.status === 'COMPLETED' || order.status === 'CANCELLED') {
+            btnCanThiep.style.display = 'none';
+          } else {
+            btnCanThiep.style.display = '';
+          }
+        }
         if (panel) panel.classList.remove('hidden');
       });
 
