@@ -2,6 +2,7 @@
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -115,6 +116,7 @@
           },
         }
     </script>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 </head>
 <body class="bg-background text-on-surface">
 <!-- Sidebar Navigation -->
@@ -152,6 +154,10 @@
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
 <span class="material-symbols-outlined">account_balance_wallet</span>
 <span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydichvu.html">
+<span class="material-symbols-outlined">home_repair_service</span>
+<span class="font-label-md text-label-md">Dịch vụ &amp; Phí</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
 <span class="material-symbols-outlined">inbox</span>
@@ -737,6 +743,7 @@ document.querySelectorAll('button').forEach(function(btn) {
 </script><!-- END-CHIOI-JS-INJECT -->
 
 <script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('../khachhang/dangnhap.html')) return;
@@ -1003,6 +1010,13 @@ document.querySelectorAll('button').forEach(function(btn) {
     hideLoading();
 
     allTaskers = (users || []).filter(function(u) { return u.role === 'TASKER' && u.taskers; }).map(function(u) {
+      // Bug Report20: Lấy danh sách dịch vụ từ tasker_services thay vì field không tồn tại
+      var serviceNames = [];
+      if (u.taskers.tasker_services && u.taskers.tasker_services.length > 0) {
+        serviceNames = u.taskers.tasker_services
+          .filter(function(ts) { return ts.services && ts.services.name; })
+          .map(function(ts) { return ts.services.name; });
+      }
       return {
         user_id: u.user_id,
         tasker_id: u.taskers.tasker_id,
@@ -1010,20 +1024,100 @@ document.querySelectorAll('button').forEach(function(btn) {
         phone: u.phone,
         created_at: u.created_at,
         kyc_status: u.taskers.kyc_status || u.status,
-        service_type: u.taskers.service_type,
-        area: u.taskers.area,
-        order_count: u.taskers.order_count || 0,
+        service_type: serviceNames.length > 0 ? serviceNames.join(', ') : 'Chưa đăng ký',
+        area: u.taskers.address || 'Chưa cập nhật',
+        order_count: u.taskers.total_jobs || 0,
         avg_rating: u.taskers.average_rating
       };
     });
 
     var pendingTaskers = allTaskers.filter(function(t) { return t.kyc_status === 'PENDING' || t.kyc_status === 'PENDING_APPROVAL' || t.kyc_status === 'UNVERIFIED'; });
+    var activeTaskers = allTaskers.filter(function(t) { return t.kyc_status === 'APPROVED' || t.kyc_status === 'ACTIVE' || t.kyc_status === 'VERIFIED'; });
+    var lockedTaskers = allTaskers.filter(function(t) { return t.kyc_status === 'REJECTED' || t.kyc_status === 'SUSPENDED'; });
 
     // Update stats
     var statTotal = document.getElementById('stat-total');
     var statPending = document.getElementById('stat-pending');
     if (statTotal) statTotal.textContent = allTaskers.length;
     if (statPending) statPending.textContent = pendingTaskers.length;
+
+    // Bug Report20: Hiển thị số lượng trên mỗi tab
+    var tabAll = document.getElementById('tab-all');
+    var tabPending = document.getElementById('tab-pending');
+    var tabActive = document.getElementById('tab-active');
+    var tabLocked = document.getElementById('tab-locked');
+    if (tabAll) tabAll.textContent = 'Tất cả Tasker (' + allTaskers.length + ')';
+    if (tabActive) tabActive.textContent = 'Đang hoạt động (' + activeTaskers.length + ')';
+    if (tabLocked) tabLocked.textContent = 'Bị tạm khóa (' + lockedTaskers.length + ')';
+    // Tab pending giữ badge riêng
+    var badgePending = document.getElementById('badge-pending');
+    if (badgePending) badgePending.textContent = pendingTaskers.length;
+    if (badgePending && pendingTaskers.length > 0) badgePending.style.display = 'inline-block';
+    else if (badgePending) badgePending.style.display = 'none';
+
+    // Bug Report20: Populate dropdown dịch vụ từ dữ liệu thực
+    var svcFilter = document.getElementById('tasker-svc-filter');
+    if (svcFilter) {
+      var uniqueServices = {};
+      allTaskers.forEach(function(t) {
+        if (t.service_type && t.service_type !== 'Chưa đăng ký') {
+          t.service_type.split(', ').forEach(function(s) { uniqueServices[s] = true; });
+        }
+      });
+      svcFilter.innerHTML = '<option value="">Loại dịch vụ</option>';
+      Object.keys(uniqueServices).sort().forEach(function(svc) {
+        var opt = document.createElement('option');
+        opt.value = svc;
+        opt.textContent = svc;
+        svcFilter.appendChild(opt);
+      });
+    }
+
+    // Bug Report20: Populate dropdown khu vực từ dữ liệu thực
+    var areaFilter = document.getElementById('tasker-area-filter');
+    if (areaFilter) {
+      var uniqueAreas = {};
+      allTaskers.forEach(function(t) {
+        if (t.area && t.area !== 'Chưa cập nhật') uniqueAreas[t.area] = true;
+      });
+      areaFilter.innerHTML = '<option value="">Khu vực</option>';
+      Object.keys(uniqueAreas).sort().forEach(function(area) {
+        var opt = document.createElement('option');
+        opt.value = area;
+        opt.textContent = area;
+        areaFilter.appendChild(opt);
+      });
+    }
+
+    // Bug Report20: Nút "Xóa lọc" - reset tất cả filter
+    var clearFilterBtn = document.getElementById('btn-clear-tasker-filter');
+    if (clearFilterBtn) {
+      clearFilterBtn.addEventListener('click', function() {
+        if (svcFilter) svcFilter.selectedIndex = 0;
+        if (areaFilter) areaFilter.selectedIndex = 0;
+        var statusFilter = document.getElementById('tasker-status-filter');
+        if (statusFilter) statusFilter.selectedIndex = 0;
+        if (searchInput) searchInput.value = '';
+        // Reset tab về "Tất cả"
+        currentFilter = 'all';
+        ['all','pending','active','locked'].forEach(function(t) {
+          var b = document.getElementById('tab-' + t);
+          if (b) { b.classList.remove('border-b-2','border-primary','text-primary','font-semibold'); b.classList.add('text-on-surface-variant'); }
+        });
+        var tabAllBtn = document.getElementById('tab-all');
+        if (tabAllBtn) { tabAllBtn.classList.add('border-b-2','border-primary','text-primary','font-semibold'); tabAllBtn.classList.remove('text-on-surface-variant'); }
+        filterAndRender('all', '');
+        showToastMsg('Đã xóa bộ lọc');
+      });
+    }
+
+    // Bug Report20: Nút "Lọc" chính
+    var filterBtn = document.getElementById('btn-tasker-filter');
+    if (filterBtn) {
+      filterBtn.addEventListener('click', function() {
+        filterAndRender(currentFilter, searchInput ? searchInput.value : '');
+      });
+    }
 
     renderTable(allTaskers);
     renderPendingPanel(pendingTaskers);

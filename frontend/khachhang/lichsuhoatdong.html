@@ -2,6 +2,7 @@
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -11,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -126,6 +128,7 @@
 </nav>
 
 <script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
@@ -240,6 +243,7 @@
 
     // Bug 3 FIX (report13): Cho phép hủy đơn khi status = PENDING hoặc ACCEPTED
     var canCancel = (order.status === 'PENDING' || order.status === 'ACCEPTED');
+    var isCompleted = order.status === 'COMPLETED';
 
     var overlay = document.createElement('div');
     overlay.id = 'order-modal';
@@ -248,6 +252,19 @@
     var cancelBtnHtml = '';
     if (canCancel) {
       cancelBtnHtml = '<button id="btn-cancel-order-' + order.order_id + '" class="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">cancel</span>Hủy đơn</button>';
+    }
+
+    // Action buttons based on order status
+    var actionBtnsHtml = '';
+    if (isCompleted) {
+      // Đơn hoàn thành → hiện nút Đánh giá thay vì Chat Tasker
+      actionBtnsHtml = '<button id="btn-review-order-' + order.order_id + '" class="flex-1 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: \'FILL\' 1;">star</span>Đánh giá Tasker</button>';
+    } else if (order.status !== 'CANCELLED') {
+      // Đang xử lý → hiện nút Theo dõi + Chat
+      actionBtnsHtml = '<button onclick="window.location.href=\'theodoidon.html?orderId=' + order.order_id + '\'" class="flex-1 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95">Theo dõi đơn</button>';
+      if (order.tasker_id) {
+        actionBtnsHtml += '<button onclick="window.location.href=\'chatvoitasker.html?orderId=' + order.order_id + '&receiverId=' + order.tasker_id + '\'" class="flex-1 py-3 rounded-xl bg-primary-container/20 text-primary border-2 border-primary font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">chat</span>Chat Tasker</button>';
+      }
     }
 
     overlay.innerHTML = '<div class="modal-box">' +
@@ -268,12 +285,9 @@
       '<span class="text-[20px] font-bold text-primary">' + formatVND(order.total_price) + '</span></div>' +
       '</div>' +
       '<div class="flex gap-3 mt-4">' +
-      (order.status !== 'COMPLETED' && order.status !== 'CANCELLED' ?
-        '<button onclick="window.location.href=\'theodoidon.html?orderId=' + order.order_id + '\'" class="flex-1 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95">Theo dõi đơn</button>' : '') +
-      (order.tasker_id ?
-        '<button onclick="window.location.href=\'chatvoitasker.html?orderId=' + order.order_id + '&receiverId=' + order.tasker_id + '\'" class="flex-1 py-3 rounded-xl bg-primary-container/20 text-primary border-2 border-primary font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">chat</span>Chat Tasker</button>' : '') +
+      actionBtnsHtml +
       cancelBtnHtml +
-      '<button onclick="document.getElementById(\'order-modal\').remove()" class="' + (order.status === 'COMPLETED' || order.status === 'CANCELLED' ? 'flex-1' : '') + ' py-3 px-6 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95">Đóng</button></div></div>';
+      '<button onclick="document.getElementById(\'order-modal\').remove()" class="' + (isCompleted || order.status === 'CANCELLED' ? 'flex-1' : '') + ' py-3 px-6 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95">Đóng</button></div></div>';
     overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
     document.body.appendChild(overlay);
 
@@ -300,6 +314,124 @@
         });
       }
     }
+
+    // BUG FIX: Gắn sự kiện đánh giá sao cho đơn hoàn thành
+    if (isCompleted) {
+      var reviewBtn = document.getElementById('btn-review-order-' + order.order_id);
+      if (reviewBtn) {
+        reviewBtn.addEventListener('click', function() { showReviewModal(order); });
+      }
+    }
+  }
+
+  // ===== POPUP ĐÁNH GIÁ SAO =====
+  function showReviewModal(order) {
+    var existing = document.getElementById('review-modal');
+    if (existing) existing.remove();
+
+    var taskerName = (order.taskers && order.taskers.users && order.taskers.users.full_name) ? order.taskers.users.full_name : 'Tasker';
+    var selectedRating = 0;
+
+    var modal = document.createElement('div');
+    modal.id = 'review-modal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = '<div class="modal-box" style="border-radius:24px 24px 0 0">' +
+      '<div class="flex justify-between items-center mb-4">' +
+      '<h2 class="text-[18px] font-bold">Đánh giá Tasker</h2>' +
+      '<button id="close-review-modal" class="text-outline"><span class="material-symbols-outlined">close</span></button></div>' +
+      '<div class="text-center mb-6">' +
+      '<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center mx-auto mb-3">' +
+      '<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: \'FILL\' 1;">person</span></div>' +
+      '<p class="text-body-lg font-bold">' + taskerName + '</p>' +
+      '<p class="text-body-sm text-on-surface-variant">Đơn hàng #' + order.order_id + '</p></div>' +
+      '<div class="text-center mb-4">' +
+      '<p class="text-body-sm text-on-surface-variant mb-3">Chạm vào số sao để đánh giá</p>' +
+      '<div id="star-container" class="flex justify-center gap-2">' +
+      buildStars(0) +
+      '</div>' +
+      '<p id="rating-text" class="text-body-sm font-semibold text-primary mt-2 h-5"></p></div>' +
+      '<textarea id="review-comment" class="w-full p-3 rounded-xl border border-outline-variant/30 text-body-sm resize-none focus:ring-1 focus:ring-primary focus:outline-none" rows="3" placeholder="Viết nhận xét (tùy chọn)..."></textarea>' +
+      '<button id="submit-review-btn" class="w-full mt-4 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95 disabled:opacity-50 transition-all" disabled>Gửi đánh giá</button>' +
+      '</div>';
+
+    modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+
+    document.getElementById('close-review-modal').addEventListener('click', function() { modal.remove(); });
+
+    // Gắn sự kiện click từng sao
+    var starContainer = document.getElementById('star-container');
+    var ratingLabels = ['', 'Rất tệ 😞', 'Tệ 😐', 'Bình thường 🙂', 'Tốt 😊', 'Tuyệt vời 🤩'];
+
+    starContainer.querySelectorAll('.star-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        selectedRating = parseInt(btn.getAttribute('data-star'));
+        starContainer.innerHTML = buildStars(selectedRating);
+        document.getElementById('rating-text').textContent = ratingLabels[selectedRating] || '';
+        document.getElementById('submit-review-btn').disabled = false;
+        // Re-bind click events
+        starContainer.querySelectorAll('.star-btn').forEach(function(b) {
+          b.addEventListener('click', function() {
+            selectedRating = parseInt(b.getAttribute('data-star'));
+            starContainer.innerHTML = buildStars(selectedRating);
+            document.getElementById('rating-text').textContent = ratingLabels[selectedRating] || '';
+            document.getElementById('submit-review-btn').disabled = false;
+            rebindStars();
+          });
+        });
+      });
+    });
+
+    function rebindStars() {
+      starContainer.querySelectorAll('.star-btn').forEach(function(b) {
+        b.addEventListener('click', function() {
+          selectedRating = parseInt(b.getAttribute('data-star'));
+          starContainer.innerHTML = buildStars(selectedRating);
+          document.getElementById('rating-text').textContent = ratingLabels[selectedRating] || '';
+          document.getElementById('submit-review-btn').disabled = false;
+          rebindStars();
+        });
+      });
+    }
+
+    // Submit review
+    document.getElementById('submit-review-btn').addEventListener('click', async function() {
+      if (selectedRating < 1) return;
+      var submitBtn = this;
+      var comment = document.getElementById('review-comment').value.trim();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Đang gửi...';
+      try {
+        await apiFetch('/api/orders/' + order.order_id + '/review', {
+          method: 'POST',
+          body: { rating: selectedRating, comment: comment }
+        });
+        showToastMsg('✅ Đã gửi đánh giá ' + selectedRating + ' sao thành công!');
+        modal.remove();
+        // Cập nhật nút trên modal gốc
+        var reviewBtn = document.getElementById('btn-review-order-' + order.order_id);
+        if (reviewBtn) {
+          reviewBtn.disabled = true;
+          reviewBtn.className = 'flex-1 py-3 rounded-xl bg-green-100 text-green-700 font-bold flex items-center justify-center gap-1';
+          reviewBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: \'FILL\' 1;">check_circle</span>Đã đánh giá (' + selectedRating + '⭐)';
+        }
+      } catch (e) {
+        showToastMsg('❌ ' + e.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Gửi đánh giá';
+      }
+    });
+  }
+
+  function buildStars(selected) {
+    var html = '';
+    for (var i = 1; i <= 5; i++) {
+      var filled = i <= selected;
+      html += '<button class="star-btn p-1 transition-transform active:scale-90 hover:scale-110" data-star="' + i + '">' +
+        '<span class="material-symbols-outlined text-[36px] ' + (filled ? 'text-yellow-500' : 'text-gray-300') + '" style="font-variation-settings: \'FILL\' ' + (filled ? '1' : '0') + ';">star</span>' +
+        '</button>';
+    }
+    return html;
   }
 
   // ===== Lỗi 7 FIX: Filter chips hoạt động =====

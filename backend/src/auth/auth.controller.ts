@@ -24,6 +24,10 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException('Sai số điện thoại hoặc mật khẩu.');
     }
+    // Bug Report20: Chặn login nếu tài khoản bị ban
+    if (user.status === 'BANNED') {
+      throw new UnauthorizedException('Tài khoản của bạn đã bị tạm khóa. Vui lòng liên hệ Admin để được hỗ trợ.');
+    }
     return this.authService.login(user);
   }
 

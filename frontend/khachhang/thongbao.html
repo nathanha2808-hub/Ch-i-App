@@ -2,6 +2,7 @@
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -11,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -34,8 +36,8 @@
         .soft-shadow { box-shadow: 0 4px 12px rgba(255, 126, 54, 0.08); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .tab-active { background: #ff7e36; color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(255,126,54,0.3); }
-        .tab-inactive { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+        .tab-active { background: #ff7e36; color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(255,126,54,0.3); font-weight: 700; }
+        .tab-inactive { background: #ffffff; color: #584238; border: 1.5px solid #dfc0b3; font-weight: 600; }
     </style>
 </head>
 <body class="bg-background text-on-surface antialiased min-h-screen pb-32">
@@ -96,6 +98,7 @@
 </nav>
 
 <script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('dangnhap.html')) return;

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
+<link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quản lý dịch vụ - Chị Ơi Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config={darkMode:"class",theme:{extend:{colors:{"background":"#fff8f6","surface-dim":"#ecd6cc","on-surface-variant":"#584238","tertiary":"#006780","secondary-container":"#ff8849","on-primary":"#ffffff","on-background":"#241914","error-container":"#ffdad6","inverse-surface":"#3b2e28","on-error":"#ffffff","outline-variant":"#dfc0b3","on-surface":"#241914","primary":"#a04100","inverse-primary":"#ffb693","surface":"#fff8f6","on-secondary":"#ffffff","surface-bright":"#fff8f6","on-error-container":"#93000a","surface-tint":"#a04100","outline":"#8b7266","surface-container-highest":"#f4ded5","surface-container-lowest":"#ffffff","primary-fixed":"#ffdbcc","on-tertiary":"#ffffff","surface-container-high":"#fae4da","surface-container":"#ffeae1","surface-container-low":"#fff1eb","secondary":"#a04100","on-primary-container":"#642600","error":"#ba1a1a","primary-container":"#ff7e36","surface-variant":"#f4ded5"},spacing:{container_padding:"32px",sidebar_width:"240px",gutter:"24px",stack_lg:"24px",stack_sm:"8px",stack_md:"16px"},fontFamily:{"title-sm":["Be Vietnam Pro"],"label-md":["Be Vietnam Pro"],"body-sm":["Be Vietnam Pro"],"body-md":["Be Vietnam Pro"],"headline-md":["Be Vietnam Pro"],"display-lg":["Be Vietnam Pro"]},fontSize:{"title-sm":["18px",{lineHeight:"1.4",fontWeight:"600"}],"label-md":["12px",{lineHeight:"1",fontWeight:"500"}],"body-sm":["14px",{lineHeight:"1.5",fontWeight:"400"}],"body-md":["16px",{lineHeight:"1.6",fontWeight:"400"}],"headline-md":["24px",{lineHeight:"1.3",fontWeight:"600"}],"display-lg":["32px",{lineHeight:"1.2",letterSpacing:"-0.02em",fontWeight:"700"}]}}}}
+</script>
+<style>
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;user-select:none}
+body{font-family:'Be Vietnam Pro',sans-serif}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(160,65,0,0.15);border-radius:10px}
+aside nav a{position:relative;border-radius:8px}aside nav a:hover{background:rgba(160,65,0,0.06)}
+.stat-card{transition:transform .2s,box-shadow .2s}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(88,66,56,0.08)}
+tbody tr{transition:background-color .15s}tbody tr:hover{background-color:rgba(255,126,54,0.04)}
+main{animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.admin-gradient{background:linear-gradient(135deg,#ff7e36 0%,#a04100 100%)}
+@keyframes scaleIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+</style>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest shadow-md flex flex-col py-stack_lg z-50">
+<div class="px-6 mb-8"><div class="flex items-center gap-3">
+<img src="../assets/images/logo.jpg" alt="Logo" class="w-12 h-12 rounded-full object-cover shadow-md border-2 border-primary/20"/>
+<div><h1 class="text-[20px] font-bold text-primary leading-tight">Chị Ơi</h1><p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin CMS</p></div>
+</div></div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="bangdieukhien.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Dashboard</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="quanlydonhang.html"><span class="material-symbols-outlined">receipt_long</span><span class="font-label-md text-label-md">Đơn hàng</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="canthiepdonhang.html"><span class="material-symbols-outlined">edit_note</span><span class="font-label-md text-label-md">Can thiệp</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="quanlytasker.html"><span class="material-symbols-outlined">engineering</span><span class="font-label-md text-label-md">Tasker</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="quanlycudan.html"><span class="material-symbols-outlined">groups</span><span class="font-label-md text-label-md">Cư dân</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="quanlyvigiaodich.html"><span class="material-symbols-outlined">account_balance_wallet</span><span class="font-label-md text-label-md">Quản lý ví</span></a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-primary border-l-4 border-primary transition-all" href="quanlydichvu.html"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">home_repair_service</span><span class="font-label-md text-label-md">Dịch vụ & Phí</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="hopthu.html"><span class="material-symbols-outlined">inbox</span><span class="font-label-md text-label-md">Inbox</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="xulykhieunai.html"><span class="material-symbols-outlined">report_problem</span><span class="font-label-md text-label-md">Khiếu nại</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all" href="baocaodoanhthu.html"><span class="material-symbols-outlined">bar_chart</span><span class="font-label-md text-label-md">Báo cáo</span></a>
+</nav>
+<div class="px-6 mt-auto pt-4 border-t border-outline-variant/30"><div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[20px]">person</span></div>
+<div class="flex-1 min-w-0"><p class="font-label-md text-label-md text-on-surface truncate">Admin</p><p class="text-[11px] text-on-surface-variant truncate">Quản trị viên</p></div>
+<button class="text-on-surface-variant hover:text-error transition-colors" title="Đăng xuất"><span class="material-symbols-outlined text-[20px]">logout</span></button>
+</div></div>
+</aside>
+
+<!-- Main Content -->
+<main class="ml-sidebar_width flex-1 p-gutter">
+<!-- Header -->
+<div class="flex justify-between items-center mb-6">
+<div>
+<h1 class="text-headline-md font-bold text-on-surface">Quản lý Dịch vụ & Phí</h1>
+<p class="text-body-sm text-on-surface-variant mt-1">Quản lý danh sách dịch vụ, giá cơ bản và trạng thái hoạt động</p>
+</div>
+<button id="btn-add-service" class="admin-gradient text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:shadow-lg transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px]">add</span> Thêm dịch vụ
+</button>
+</div>
+
+<!-- Stats Cards -->
+<div id="stats-row" class="grid grid-cols-4 gap-4 mb-6">
+<div class="stat-card bg-white rounded-xl p-5 border border-outline-variant/20">
+<p class="text-body-sm text-on-surface-variant">Tổng dịch vụ</p>
+<p id="stat-total" class="text-display-lg text-primary mt-1">—</p>
+</div>
+<div class="stat-card bg-white rounded-xl p-5 border border-outline-variant/20">
+<p class="text-body-sm text-on-surface-variant">Đang hoạt động</p>
+<p id="stat-active" class="text-display-lg text-green-600 mt-1">—</p>
+</div>
+<div class="stat-card bg-white rounded-xl p-5 border border-outline-variant/20">
+<p class="text-body-sm text-on-surface-variant">Đã tắt</p>
+<p id="stat-inactive" class="text-display-lg text-red-500 mt-1">—</p>
+</div>
+<div class="stat-card bg-white rounded-xl p-5 border border-outline-variant/20">
+<p class="text-body-sm text-on-surface-variant">Tổng đơn hàng</p>
+<p id="stat-orders" class="text-display-lg text-tertiary mt-1">—</p>
+</div>
+</div>
+
+<!-- Services Table -->
+<div class="bg-white rounded-xl border border-outline-variant/20 overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant/20">
+<tr>
+<th class="px-5 py-3 text-label-md text-on-surface-variant uppercase tracking-wider">ID</th>
+<th class="px-5 py-3 text-label-md text-on-surface-variant uppercase tracking-wider">Tên dịch vụ</th>
+<th class="px-5 py-3 text-label-md text-on-surface-variant uppercase tracking-wider">Mô tả</th>
+<th class="px-5 py-3 text-label-md text-on-surface-variant uppercase tracking-wider">Giá cơ bản</th>
+<th class="px-5 py-3 text-label-md text-on-surface-variant uppercase tracking-wider">Đơn hàng</th>
+<th class="px-5 py-3 text-label-md text-on-surface-variant uppercase tracking-wider">Tasker</th>
+<th class="px-5 py-3 text-label-md text-on-surface-variant uppercase tracking-wider">Trạng thái</th>
+<th class="px-5 py-3 text-label-md text-on-surface-variant uppercase tracking-wider">Thao tác</th>
+</tr>
+</thead>
+<tbody id="services-tbody"></tbody>
+</table>
+<div id="loading-row" class="p-8 text-center text-on-surface-variant">
+<span class="material-symbols-outlined animate-spin text-primary text-[32px]">progress_activity</span>
+<p class="mt-2">Đang tải danh sách dịch vụ...</p>
+</div>
+</div>
+</main>
+
+<script src="../shared/api.js?v=20260516"></script>
+<script src="../shared/prefetch.js" defer></script>
+<script>
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhapadmin.html')) return;
+
+  var services = [];
+
+  function fmt(n) { return Number(n).toLocaleString('vi-VN') + ' đ'; }
+
+  async function loadServices() {
+    try {
+      services = await apiFetch('/api/admin/services');
+      renderTable();
+      updateStats();
+    } catch (e) {
+      document.getElementById('loading-row').innerHTML = '<p class="text-error">❌ ' + e.message + '</p>';
+    }
+  }
+
+  function updateStats() {
+    var active = services.filter(function(s) { return s.is_active; }).length;
+    var totalOrders = services.reduce(function(sum, s) { return sum + (s._count ? s._count.orders : 0); }, 0);
+    document.getElementById('stat-total').textContent = services.length;
+    document.getElementById('stat-active').textContent = active;
+    document.getElementById('stat-inactive').textContent = services.length - active;
+    document.getElementById('stat-orders').textContent = totalOrders;
+  }
+
+  function renderTable() {
+    var tbody = document.getElementById('services-tbody');
+    document.getElementById('loading-row').style.display = 'none';
+    tbody.innerHTML = '';
+    if (!services.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-on-surface-variant">Chưa có dịch vụ nào</td></tr>';
+      return;
+    }
+    services.forEach(function(s) {
+      var tr = document.createElement('tr');
+      tr.className = 'border-b border-outline-variant/10';
+      var statusBadge = s.is_active
+        ? '<span class="px-2 py-1 rounded-full text-[11px] font-bold bg-green-100 text-green-700">Hoạt động</span>'
+        : '<span class="px-2 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-600">Đã tắt</span>';
+      tr.innerHTML = '<td class="px-5 py-4 font-mono text-body-sm">#' + s.service_id + '</td>' +
+        '<td class="px-5 py-4 font-bold text-body-sm">' + (s.name || '') + '</td>' +
+        '<td class="px-5 py-4 text-body-sm text-on-surface-variant max-w-[200px] truncate">' + (s.description || '—') + '</td>' +
+        '<td class="px-5 py-4 text-body-sm font-bold text-primary">' + fmt(s.base_price) + '</td>' +
+        '<td class="px-5 py-4 text-body-sm">' + (s._count ? s._count.orders : 0) + '</td>' +
+        '<td class="px-5 py-4 text-body-sm">' + (s._count ? s._count.tasker_services : 0) + '</td>' +
+        '<td class="px-5 py-4">' + statusBadge + '</td>' +
+        '<td class="px-5 py-4"><div class="flex gap-2">' +
+        '<button class="btn-edit w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-all" data-id="' + s.service_id + '" title="Sửa"><span class="material-symbols-outlined text-[18px]">edit</span></button>' +
+        '<button class="btn-toggle w-8 h-8 rounded-lg flex items-center justify-center transition-all ' + (s.is_active ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100') + '" data-id="' + s.service_id + '" data-active="' + s.is_active + '" title="' + (s.is_active ? 'Tắt' : 'Bật') + '"><span class="material-symbols-outlined text-[18px]">' + (s.is_active ? 'visibility_off' : 'visibility') + '</span></button>' +
+        '</div></td>';
+      tbody.appendChild(tr);
+    });
+
+    // Attach edit handlers
+    document.querySelectorAll('.btn-edit').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = parseInt(this.dataset.id);
+        var svc = services.find(function(s) { return s.service_id === id; });
+        if (svc) showEditModal(svc);
+      });
+    });
+    // Attach toggle handlers
+    document.querySelectorAll('.btn-toggle').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        var id = parseInt(this.dataset.id);
+        var isActive = this.dataset.active === 'true';
+        try {
+          await apiFetch('/api/services/' + id, { method: 'PUT', body: { is_active: !isActive } });
+          showToast(isActive ? '🔴 Đã tắt dịch vụ' : '🟢 Đã bật dịch vụ');
+          loadServices();
+        } catch (e) { showToast('❌ ' + e.message); }
+      });
+    });
+  }
+
+  // === Modal: Edit/Create Service ===
+  function showEditModal(svc) {
+    var isNew = !svc;
+    var existing = document.getElementById('svc-modal');
+    if (existing) existing.remove();
+    var overlay = document.createElement('div');
+    overlay.id = 'svc-modal';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = '<div style="background:#fff;border-radius:20px;width:480px;padding:28px;animation:scaleIn 0.2s ease-out">' +
+      '<h3 style="font-weight:700;font-size:18px;margin-bottom:20px">' + (isNew ? '➕ Thêm dịch vụ mới' : '✏️ Sửa dịch vụ #' + svc.service_id) + '</h3>' +
+      '<div style="display:flex;flex-direction:column;gap:14px">' +
+      '<div><label style="font-size:12px;font-weight:600;color:#584238;display:block;margin-bottom:4px">Tên dịch vụ *</label>' +
+      '<input id="m-name" type="text" value="' + (svc ? (svc.name||'') : '') + '" style="width:100%;padding:10px 14px;border:1px solid #dfc0b3;border-radius:10px;font-size:14px" placeholder="VD: Dọn dẹp nhà"/></div>' +
+      '<div><label style="font-size:12px;font-weight:600;color:#584238;display:block;margin-bottom:4px">Mô tả</label>' +
+      '<textarea id="m-desc" rows="2" style="width:100%;padding:10px 14px;border:1px solid #dfc0b3;border-radius:10px;font-size:14px;resize:none" placeholder="Mô tả dịch vụ...">' + (svc ? (svc.description||'') : '') + '</textarea></div>' +
+      '<div><label style="font-size:12px;font-weight:600;color:#584238;display:block;margin-bottom:4px">Giá cơ bản (đ/giờ) *</label>' +
+      '<input id="m-price" type="number" min="0" step="1000" value="' + (svc ? Number(svc.base_price) : 100000) + '" style="width:100%;padding:10px 14px;border:1px solid #dfc0b3;border-radius:10px;font-size:14px"/></div>' +
+      '<div><label style="font-size:12px;font-weight:600;color:#584238;display:block;margin-bottom:4px">Icon URL</label>' +
+      '<input id="m-icon" type="text" value="' + (svc ? (svc.icon_url||'') : '') + '" style="width:100%;padding:10px 14px;border:1px solid #dfc0b3;border-radius:10px;font-size:14px" placeholder="https://..."/></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:12px;margin-top:24px">' +
+      '<button id="m-cancel" style="flex:1;padding:12px;border-radius:12px;border:2px solid #dfc0b3;font-weight:700;color:#584238;background:white;cursor:pointer">Hủy</button>' +
+      '<button id="m-save" style="flex:1;padding:12px;border-radius:12px;background:linear-gradient(135deg,#ff7e36,#a04100);color:white;font-weight:700;border:none;cursor:pointer">' + (isNew ? 'Tạo mới' : 'Lưu') + '</button>' +
+      '</div></div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    document.getElementById('m-cancel').addEventListener('click', function() { overlay.remove(); });
+    document.getElementById('m-save').addEventListener('click', async function() {
+      var name = document.getElementById('m-name').value.trim();
+      var price = document.getElementById('m-price').value;
+      if (!name || !price) { showToast('Vui lòng nhập tên và giá'); return; }
+      var body = {
+        name: name,
+        description: document.getElementById('m-desc').value.trim(),
+        base_price: parseFloat(price),
+        icon_url: document.getElementById('m-icon').value.trim() || null
+      };
+      try {
+        if (isNew) {
+          await apiFetch('/api/services', { method: 'POST', body: body });
+          showToast('✅ Đã tạo dịch vụ mới');
+        } else {
+          await apiFetch('/api/services/' + svc.service_id, { method: 'PUT', body: body });
+          showToast('✅ Đã cập nhật dịch vụ');
+        }
+        overlay.remove();
+        loadServices();
+      } catch (e) { showToast('❌ ' + e.message); }
+    });
+  }
+
+  document.getElementById('btn-add-service').addEventListener('click', function() { showEditModal(null); });
+
+  function showToast(msg) {
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:32px;right:32px;z-index:999;padding:14px 24px;border-radius:14px;background:#241914;color:#fff;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.2);animation:scaleIn 0.2s ease-out;font-family:Be Vietnam Pro,sans-serif';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function() { t.remove(); }, 3000);
+  }
+
+  loadServices();
+})();
+</script>
+</body></html>

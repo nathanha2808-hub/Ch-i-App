@@ -382,4 +382,12 @@ export class ApiController {
   ) {
     return this.apiService.sendAdminMessage(req.user.userId, userId, content);
   }
+
+  // ===== Admin: Services List (including inactive) =====
+  @Get('admin/services')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Lấy tất cả dịch vụ (bao gồm ẩn) + thống kê' })
+  async getAdminServices() {
+    return this.apiService.getAdminServices();
+  }
 }

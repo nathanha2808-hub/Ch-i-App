@@ -189,6 +189,18 @@ export class OrdersService {
           console.warn('[Order] Không trừ phí nền tảng Tasker:', e.message);
         }
       }
+
+      // BUG FIX: Increment total_jobs cho Tasker khi đơn hoàn thành
+      if (order.tasker_id) {
+        try {
+          await this.prisma.taskers.update({
+            where: { tasker_id: order.tasker_id },
+            data: { total_jobs: { increment: 1 } },
+          });
+        } catch (e) {
+          console.warn('[Order] Không cập nhật total_jobs Tasker:', e.message);
+        }
+      }
     }
 
     return updatedOrder;

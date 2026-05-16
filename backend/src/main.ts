@@ -5,7 +5,15 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: true,
+  });
+
+  // Tăng giới hạn body size cho avatar upload (base64)
+  const expressApp = app.getHttpAdapter().getInstance();
+  const bodyParser = require('body-parser');
+  expressApp.use(bodyParser.json({ limit: '2mb' }));
+  expressApp.use(bodyParser.urlencoded({ limit: '2mb', extended: true }));
 
   app.enableCors(); // Enable CORS for frontend
 

@@ -24,7 +24,7 @@ export class ApiService {
     };
   }
 
-  async updateUserProfile(userId: number, data: { full_name?: string; gender?: string; email?: string; address?: string; bio?: string }) {
+  async updateUserProfile(userId: number, data: { full_name?: string; gender?: string; email?: string; address?: string; bio?: string; avatar_url?: string }) {
     // Input validation
     if (data.full_name !== undefined && (typeof data.full_name !== 'string' || data.full_name.trim().length === 0)) {
       throw new BadRequestException('Họ tên không được để trống');
@@ -47,6 +47,7 @@ export class ApiService {
     if (data.full_name !== undefined) updateData.full_name = data.full_name.trim();
     if (data.email !== undefined) updateData.email = data.email.trim() || null;
     if (data.gender !== undefined) updateData.gender = data.gender || null;
+    if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url || null;
 
     const user = await this.prisma.users.update({
       where: { user_id: userId },
@@ -295,7 +296,7 @@ export class ApiService {
     const finalStatus = status === 'APPROVED' ? 'VERIFIED' : status;
     const tasker = await this.prisma.taskers.update({
       where: { tasker_id: taskerId },
-      data: { kyc_status: finalStatus }, // 'VERIFIED' or 'REJECTED'
+      data: { kyc_status: finalStatus }, // 'VERIFIED', 'REJECTED', or 'SUSPENDED'
     });
     
     // Nếu duyệt → tự động approve tất cả dịch vụ PENDING_APPROVAL + set user ACTIVE
@@ -307,6 +308,20 @@ export class ApiService {
       await this.prisma.users.update({
         where: { user_id: taskerId },
         data: { status: 'ACTIVE' },
+      });
+    }
+
+    // Bug Report20: Khi SUSPENDED hoặc REJECTED → đồng bộ user.status = BANNED
+    // Tasker đang trong đơn vẫn hoàn thành được, nhưng không nhận đơn mới
+    if (finalStatus === 'SUSPENDED' || finalStatus === 'REJECTED') {
+      await this.prisma.users.update({
+        where: { user_id: taskerId },
+        data: { status: 'BANNED', updated_at: new Date() },
+      });
+      // Tắt trạng thái online để không nhận đơn mới
+      await this.prisma.taskers.update({
+        where: { tasker_id: taskerId },
+        data: { is_online: false },
       });
     }
 
@@ -423,7 +438,24 @@ export class ApiService {
         role: true, 
         status: true, 
         created_at: true,
-        taskers: true,
+        taskers: {
+          select: {
+            tasker_id: true,
+            bio: true,
+            address: true,
+            kyc_status: true,
+            average_rating: true,
+            total_jobs: true,
+            is_online: true,
+            tasker_services: {
+              select: {
+                service_id: true,
+                status: true,
+                services: { select: { name: true } }
+              }
+            }
+          }
+        },
         customers: { select: { default_address: true } }
       }
     });
@@ -1107,5 +1139,13 @@ export class ApiService {
       }
     });
     return message;
+  }
+
+  // ===== Admin: Services list (including inactive) =====
+  async getAdminServices() {
+    return this.prisma.services.findMany({
+      orderBy: { service_id: 'asc' },
+      include: { _count: { select: { orders: true, tasker_services: true } } }
+    });
   }
 }

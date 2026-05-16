@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chị Ơi! — Bug Tracker</title>
+  <meta name="description" content="Hệ thống quản lý & báo lỗi dự án Chị Ơi!"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐛</text></svg>"/>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <h1><span>🐛</span> Chị Ơi! — Bug Tracker</h1>
+    <div class="header-right">
+      <input type="text" id="searchInput" class="search-box" placeholder="🔍 Tìm bug..."/>
+      <button class="btn btn-primary" onclick="openModal()">+ Báo lỗi mới</button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-chip chip-all active" data-filter="all" onclick="setFilter('all')">📋 Tất cả (<span id="countAll">0</span>)</div>
+    <div class="stat-chip chip-open" data-filter="open" onclick="setFilter('open')">🔴 Chưa fix (<span id="countOpen">0</span>)</div>
+    <div class="stat-chip chip-fixing" data-filter="fixing" onclick="setFilter('fixing')">🟡 Đang fix (<span id="countFixing">0</span>)</div>
+    <div class="stat-chip chip-done" data-filter="done" onclick="setFilter('done')">✅ Đã fix (<span id="countDone">0</span>)</div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <select class="filter-select" onchange="onFilterPriority(this.value)">
+      <option value="">Tất cả mức độ</option>
+      <option value="CRITICAL">🔴 Critical</option>
+      <option value="HIGH">🟠 High</option>
+      <option value="MEDIUM">🟡 Medium</option>
+      <option value="LOW">🟢 Low</option>
+    </select>
+    <select class="filter-select" onchange="onFilterPlatform(this.value)">
+      <option value="">Tất cả nền tảng</option>
+      <option value="WebCMS">💻 WebCMS</option>
+      <option value="MobileCMS">📱 MobileCMS</option>
+      <option value="KhachHang">👤 Khách hàng</option>
+      <option value="GiupViec">🧹 Giúp việc</option>
+      <option value="Admin">⚙️ Admin</option>
+      <option value="Backend">🖥️ Backend</option>
+    </select>
+  </div>
+
+  <!-- Bug List -->
+  <div id="bugList" class="bug-list">
+    <div class="empty-state">
+      <div class="icon">🐛</div>
+      <h3>Đang tải...</h3>
+    </div>
+  </div>
+
+  <!-- Modal: Báo lỗi mới -->
+  <div id="bugModal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>🐛 Báo lỗi mới</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <form id="bugForm" onsubmit="submitBug(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Tiêu đề lỗi *</label>
+            <input type="text" name="title" class="form-input" placeholder="VD: Nút đăng nhập không hoạt động" required/>
+          </div>
+          <div class="form-group">
+            <label>Mô tả chi tiết</label>
+            <textarea name="description" class="form-textarea" rows="3" placeholder="Mô tả cách tái hiện lỗi..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Module</label>
+              <input type="text" name="module" class="form-input" placeholder="VD: Auth, Order, Chat"/>
+            </div>
+            <div class="form-group">
+              <label>Mức độ</label>
+              <select name="priority" class="form-select">
+                <option value="MEDIUM">🟡 Medium</option>
+                <option value="LOW">🟢 Low</option>
+                <option value="HIGH">🟠 High</option>
+                <option value="CRITICAL">🔴 Critical</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Người phát hiện</label>
+              <input type="text" name="reporter" class="form-input" placeholder="Tên bạn"/>
+            </div>
+            <div class="form-group">
+              <label>Nền tảng</label>
+              <select name="platform" class="form-select">
+                <option value="WebCMS">💻 WebCMS</option>
+                <option value="MobileCMS">📱 MobileCMS</option>
+                <option value="KhachHang">👤 Khách hàng</option>
+                <option value="GiupViec">🧹 Giúp việc</option>
+                <option value="Admin">⚙️ Admin</option>
+                <option value="Backend">🖥️ Backend</option>
+              </select>
+            </div>
+          </div>
+          <!-- Paste/Drop Zone -->
+          <div class="form-group">
+            <label>📎 Ảnh / Video chụp lỗi</label>
+            <div id="pasteZone" class="paste-zone">
+              <div class="icon">📋</div>
+              <p><strong>Ctrl+V</strong> dán ảnh · Kéo thả file · hoặc <strong>click chọn file</strong></p>
+            </div>
+            <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display:none"/>
+            <div id="pastePreviewContainer" class="paste-previews"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="submitBtn" class="btn-submit">Lưu Bug</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <button class="lb-close" onclick="closeLightbox()">✕</button>
+    <div id="lbContent"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
