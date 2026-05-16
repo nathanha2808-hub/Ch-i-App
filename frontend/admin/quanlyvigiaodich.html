@@ -248,6 +248,10 @@
   <!-- Filter Bar -->
   <div class="flex items-center justify-between gap-4">
     <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5 shadow-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-sm text-on-surface-variant">search</span>
+        <input id="tx-search" class="bg-transparent border-none text-body-sm focus:ring-0 outline-none w-48 placeholder-on-surface-variant/40" placeholder="Tìm tên, SĐT, mã GD..."/>
+      </div>
       <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 shadow-sm border border-outline-variant/20">
         <span class="material-symbols-outlined text-sm text-on-surface-variant">filter_list</span>
         <select id="tx-type-filter" class="bg-transparent border-none text-body-sm focus:ring-0 outline-none cursor-pointer pr-1">
@@ -652,14 +656,24 @@
 
   function applyFilter() {
     var val = (document.getElementById('tx-type-filter') || {}).value || '';
-    var filtered;
-    if (!val) {
-      filtered = allTransactions;
-    } else if (GROUP_FILTER[val]) {
+    var q = (document.getElementById('tx-search') || {}).value;
+    q = q ? q.toLowerCase().trim() : '';
+    var filtered = allTransactions;
+    // Type filter
+    if (val && GROUP_FILTER[val]) {
       var allowed = GROUP_FILTER[val];
-      filtered = allTransactions.filter(function(t) { return allowed.indexOf(t.type) !== -1; });
-    } else {
-      filtered = allTransactions.filter(function(t) { return t.type === val; });
+      filtered = filtered.filter(function(t) { return allowed.indexOf(t.type) !== -1; });
+    } else if (val) {
+      filtered = filtered.filter(function(t) { return t.type === val; });
+    }
+    // Search filter
+    if (q) {
+      filtered = filtered.filter(function(t) {
+        var user = t.wallets && t.wallets.users;
+        return (t.transaction_code && t.transaction_code.toLowerCase().includes(q)) ||
+          (user && user.full_name && user.full_name.toLowerCase().includes(q)) ||
+          (user && user.phone && user.phone.includes(q));
+      });
     }
     renderTxTable(filtered);
     var countEl = document.getElementById('tx-count');
@@ -670,18 +684,10 @@
   if (filterSelect) filterSelect.addEventListener('change', applyFilter);
 
   // ---- Search ----
-  var searchInput = document.querySelector('input[placeholder*="Tìm giao dịch"]');
+  var searchInput = document.getElementById('tx-search');
   if (searchInput) {
     searchInput.addEventListener('input', function() {
-      var q = searchInput.value.toLowerCase();
-      var filtered = allTransactions.filter(function(t) {
-        var user = t.wallets && t.wallets.users;
-        return !q ||
-          (t.transaction_code && t.transaction_code.toLowerCase().includes(q)) ||
-          (user && user.full_name && user.full_name.toLowerCase().includes(q)) ||
-          (user && user.phone && user.phone.includes(q));
-      });
-      renderTxTable(filtered);
+      applyFilter();
     });
   }
 
