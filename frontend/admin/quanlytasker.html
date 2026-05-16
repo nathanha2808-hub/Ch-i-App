@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -217,13 +217,13 @@
 <div class="flex-1 min-w-0">
 <!-- Tabs Section -->
 <div class="flex items-center gap-8 mb-6 border-b border-outline-variant">
-<button id="tab-all" class="pb-3 border-b-2 border-primary text-primary font-semibold text-body-md">Tất cả Tasker</button>
+<button id="tab-all" class="pb-3 border-b-2 border-primary text-primary font-semibold text-body-md flex items-center gap-2">Tất cả Tasker <span id="badge-all" class="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span></button>
 <button id="tab-pending" class="pb-3 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
     Chờ duyệt
     <span id="badge-pending" class="bg-error text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span>
 </button>
-<button id="tab-active" class="pb-3 text-on-surface-variant hover:text-primary transition-colors">Đang hoạt động</button>
-<button id="tab-locked" class="pb-3 text-on-surface-variant hover:text-primary transition-colors">Bị tạm khóa</button>
+<button id="tab-active" class="pb-3 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">Đang hoạt động <span id="badge-active" class="bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span></button>
+<button id="tab-locked" class="pb-3 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">Bị tạm khóa <span id="badge-locked" class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span></button>
 </div>
 <!-- Filters Section -->
 <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm mb-6 flex flex-wrap gap-3 items-center">
@@ -838,19 +838,17 @@ document.querySelectorAll('button').forEach(function(btn) {
     if (statTotal) statTotal.textContent = allTaskers.length;
     if (statPending) statPending.textContent = pendingTaskers.length;
 
-    // Bug Report20: Hiển thị số lượng trên mỗi tab
-    var tabAll = document.getElementById('tab-all');
-    var tabPending = document.getElementById('tab-pending');
-    var tabActive = document.getElementById('tab-active');
-    var tabLocked = document.getElementById('tab-locked');
-    if (tabAll) tabAll.textContent = 'Tất cả Tasker (' + allTaskers.length + ')';
-    if (tabActive) tabActive.textContent = 'Đang hoạt động (' + activeTaskers.length + ')';
-    if (tabLocked) tabLocked.textContent = 'Bị tạm khóa (' + lockedTaskers.length + ')';
-    // Tab pending giữ badge riêng
+    // Bug #40: Update badge counts on all tabs
+    var badgeAll = document.getElementById('badge-all');
+    if (badgeAll) badgeAll.textContent = allTaskers.length;
+    var badgeActive = document.getElementById('badge-active');
+    if (badgeActive) { badgeActive.textContent = activeTaskers.length; badgeActive.style.display = activeTaskers.length > 0 ? 'inline-block' : 'none'; }
+    var badgeLocked = document.getElementById('badge-locked');
+    if (badgeLocked) { badgeLocked.textContent = lockedTaskers.length; badgeLocked.style.display = lockedTaskers.length > 0 ? 'inline-block' : 'none'; }
+    // Tab pending badge
     var badgePending = document.getElementById('badge-pending');
-    if (badgePending) badgePending.textContent = pendingTaskers.length;
-    if (badgePending && pendingTaskers.length > 0) badgePending.style.display = 'inline-block';
-    else if (badgePending) badgePending.style.display = 'none';
+    if (badgePending) { badgePending.textContent = pendingTaskers.length; badgePending.style.display = pendingTaskers.length > 0 ? 'inline-block' : 'none'; }
+
 
     // Bug Report20: Populate dropdown dịch vụ từ dữ liệu thực
     var svcFilter = document.getElementById('tasker-svc-filter');
