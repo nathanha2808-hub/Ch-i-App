@@ -303,19 +303,26 @@
     }
   }
 
-  // ===== 3. Online/Offline Toggle — Bug 1 Report19: Mặc định luôn OFF khi mở app =====
+  // ===== 3. Online/Offline Toggle =====
   var toggleInput = document.querySelector('header input[type="checkbox"]');
   if (toggleInput) {
-    // Bug 1 FIX: Luôn bắt đầu ở trạng thái OFF — tasker phải chủ động bật
-    toggleInput.checked = false;
+    // Khôi phục trạng thái từ localStorage (nếu có), mặc định tắt nếu chưa từng bật
+    var storageKey = 'chioi_tasker_online_' + (user ? user.user_id : 'unknown');
+    var savedStatus = localStorage.getItem(storageKey);
+    var isOnline = (savedStatus === 'true');
+    toggleInput.checked = isOnline;
     
-    // Gửi status OFF lên server khi mở app
+    // Gửi status khôi phục lên server khi mở app
     apiFetch('/api/taskers/status', {
       method: 'PATCH',
-      body: { is_online: false }
+      body: { is_online: isOnline }
     }).catch(function(err) {
       console.warn('Lỗi đồng bộ trạng thái online:', err);
     });
+
+    if (isOnline) {
+      startGpsTracking();
+    }
 
     toggleInput.addEventListener('change', async function() {
       // Bật/tắt trạng thái nhận việc — KHÔNG block toggle bằng GPS
@@ -326,7 +333,7 @@
           method: 'PATCH',
           body: { is_online: toggleInput.checked }
         });
-        localStorage.setItem('chioi_tasker_online', String(toggleInput.checked));
+        localStorage.setItem(storageKey, String(toggleInput.checked));
         showToast(toggleInput.checked ? '🟢 Đã bật nhận việc' : '🔴 Đã tắt nhận việc');
         // TC_T04_012 FIX: Sync trạng thái sang các thiết bị khác qua Socket
         if (window.ChiOiSocket) {
@@ -846,6 +853,21 @@ function hideModal() {
 function showIdleState() {
   var idle = document.getElementById('idle-state');
   if (!idle) return; // FIX: prevent "Cannot read properties of null"
+  
+  var toggleInput = document.querySelector('header input[type="checkbox"]');
+  var idleText = document.querySelector('#idle-state .font-bold');
+  var idleSubText = document.querySelector('#idle-state .text-xs');
+  
+  if (toggleInput && idleText && idleSubText) {
+    if (toggleInput.checked) {
+      idleText.textContent = 'Đang tìm đơn hàng...';
+      idleSubText.textContent = 'Bạn đang ở chế độ trực tuyến';
+    } else {
+      idleText.textContent = 'Đang tắt nhận việc';
+      idleSubText.textContent = 'Bật lại để nhận đơn hàng mới';
+    }
+  }
+
   idle.classList.remove('hidden');
   setTimeout(function() {
     idle.classList.remove('translate-y-10', 'opacity-0');
