@@ -711,11 +711,11 @@
     } else if (order.status === 'TASKER_ARRIVED') {
       actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'IN_PROGRESS\')" class="w-full py-3 mt-3 rounded-full bg-[#ff7e36] text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">BẮT ĐẦU DỌN DẸP</button>';
     } else if (order.status === 'IN_PROGRESS') {
-      // FIX: Tasker báo hoàn thành → COMPLETED ngay lập tức
-      actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'COMPLETED\')" class="w-full py-3 mt-3 rounded-full bg-green-500 text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">HOÀN THÀNH ĐƠN</button>';
+      // FIX: Tasker báo hoàn thành → Gửi PENDING_COMPLETION nhưng phía Tasker coi như xong
+      actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'PENDING_COMPLETION\')" class="w-full py-3 mt-3 rounded-full bg-green-500 text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">HOÀN THÀNH ĐƠN</button>';
     } else if (order.status === 'PENDING_COMPLETION') {
-      // TC-T09-012 FIX: Đang chờ KH xác nhận
-      actionHtml = '<div class="w-full py-3 mt-3 rounded-full bg-yellow-500 text-white font-bold text-center animate-pulse">⏳ Chờ Khách hàng xác nhận</div>';
+      // Phía Tasker không cần màn hình chờ này nữa, nhưng cứ giữ HTML dự phòng
+      actionHtml = '<div class="w-full py-3 mt-3 rounded-full bg-yellow-500 text-white font-bold text-center animate-pulse">⏳ Đã hoàn thành, chờ KH xác nhận</div>';
     }
 
       // Nút Chat KH
@@ -741,16 +741,12 @@
       
       showToast('✅ Đã cập nhật thành công!');
       
-      if (newStatus === 'COMPLETED') {
+      if (newStatus === 'COMPLETED' || newStatus === 'PENDING_COMPLETION') {
         showSuccessNotification('🎉 Đã hoàn thành đơn!', 'Tiền đã được cộng vào ví của bạn.');
         isHandlingOrder = false;
         hideModal();
         showIdleState();
         currentOrder = null;
-      } else if (newStatus === 'PENDING_COMPLETION') {
-        // TC-T09-012 FIX: Hiển trạng thái chờ KH xác nhận
-        showToast('📩 Đã gửi thông báo cho KH. Chờ xác nhận...');
-        showActiveOrderCard(Object.assign({}, result, { status: 'PENDING_COMPLETION' }));
       } else {
         // Render lại card với trạng thái mới
         showActiveOrderCard(result);

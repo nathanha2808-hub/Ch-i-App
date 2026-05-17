@@ -173,8 +173,8 @@ export class OrdersService {
 
     // TC-T09-012 FIX: Khi PENDING_COMPLETION — KHÔNG tính tiền ngay, chờ KH xác nhận
 
-    // THỰC HIỆN TÍNH TIỀN KHI TASKER BÁO HOÀN THÀNH TRỰC TIẾP
-    if (status === 'COMPLETED') {
+    // THỰC HIỆN TÍNH TIỀN KHI TASKER BÁO HOÀN THÀNH (PENDING_COMPLETION) HOẶC COMPLETED
+    if (status === 'COMPLETED' || status === 'PENDING_COMPLETION') {
       const paymentMethod = order.payment_method || 'WALLET';
 
       if (paymentMethod === 'WALLET') {
@@ -218,25 +218,21 @@ export class OrdersService {
         include: { services: true },
       });
       const serviceName = fullOrder?.services?.name || 'Dịch vụ';
-      this.pushService.sendPushToUser(fullOrder!.customer_id, {
-        title: '🎉 Đơn đã hoàn thành!',
-        body: `Tasker đã hoàn thành đơn ${serviceName} #${orderId}. Cảm ơn bạn đã sử dụng dịch vụ!`,
-        url: '/khachhang/lichsuhoatdong.html',
-      }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
-    }
-
-    // TC-T09-025 FIX: Push notification cho KH khi Tasker báo hoàn thành (chờ xác nhận)
-    if (status === 'PENDING_COMPLETION') {
-      const fullOrder = await this.prisma.orders.findUnique({
-        where: { order_id: orderId },
-        include: { services: true },
-      });
-      const serviceName = fullOrder?.services?.name || 'Dịch vụ';
-      this.pushService.sendPushToUser(fullOrder!.customer_id, {
-        title: '✅ Tasker đã hoàn thành!',
-        body: `Đơn ${serviceName} #${orderId} đã xong. Xác nhận để hoàn tất.`,
-        url: '/khachhang/lichsuhoatdong.html',
-      }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
+      
+      // Nếu Tasker báo hoàn thành (PENDING_COMPLETION), báo cho KH xác nhận
+      if (status === 'PENDING_COMPLETION') {
+        this.pushService.sendPushToUser(fullOrder!.customer_id, {
+          title: '✅ Tasker đã hoàn thành!',
+          body: `Đơn ${serviceName} #${orderId} đã xong. Xác nhận để hoàn tất.`,
+          url: '/khachhang/lichsuhoatdong.html',
+        }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
+      } else if (status === 'COMPLETED') {
+        this.pushService.sendPushToUser(fullOrder!.customer_id, {
+          title: '🎉 Đơn đã hoàn thành!',
+          body: `Tasker đã hoàn thành đơn ${serviceName} #${orderId}. Cảm ơn bạn đã sử dụng dịch vụ!`,
+          url: '/khachhang/lichsuhoatdong.html',
+        }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
+      }
     }
 
     return updatedOrder;
@@ -265,48 +261,8 @@ export class OrdersService {
       data: { status: 'COMPLETED' },
     });
 
-    // Thực hiện tính tiền (wallet logic từ updateOrderStatus cũ)
-    if (order.status === 'PENDING_COMPLETION') {
-      const paymentMethod = order.payment_method || 'WALLET';
-
-      if (paymentMethod === 'WALLET') {
-        try {
-          await this.walletsService.addTransaction(
-            order.tasker_id!,
-            Number(order.tasker_earnings),
-            'EARNING',
-            order.order_id,
-            'Thu nhập đơn hàng #' + order.order_id + ' (thanh toán ví)'
-          );
-        } catch (e) {
-          console.warn('[Order] Không cộng thu nhập Tasker:', e.message);
-        }
-      } else if (paymentMethod === 'CASH') {
-        try {
-          await this.walletsService.addTransaction(
-            order.tasker_id!,
-            -Number(order.platform_fee),
-            'FEE',
-            order.order_id,
-            'Thu phí nền tảng đơn hàng #' + order.order_id + ' (tiền mặt)'
-          );
-        } catch (e) {
-          console.warn('[Order] Không trừ phí nền tảng Tasker:', e.message);
-        }
-      }
-
-      // Increment total_jobs cho Tasker
-      if (order.tasker_id) {
-        try {
-          await this.prisma.taskers.update({
-            where: { tasker_id: order.tasker_id },
-            data: { total_jobs: { increment: 1 } },
-          });
-        } catch (e) {
-          console.warn('[Order] Không cập nhật total_jobs Tasker:', e.message);
-        }
-      }
-    }
+    // Không tính tiền ở đây nữa vì đã tính lúc Tasker bấm PENDING_COMPLETION
+    // để Tasker nhận tiền ngay và luôn
 
     // TC-T09-025 FIX: Push notification cho Tasker khi KH xác nhận hoàn thành
     if (order.tasker_id) {
