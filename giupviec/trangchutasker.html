@@ -369,6 +369,25 @@
     });
 
     toggleInput.addEventListener('change', async function() {
+      // FIX: Yêu cầu quyền vị trí TRƯỚC KHI bật trạng thái online
+      if (toggleInput.checked) {
+        if (navigator.geolocation) {
+          try {
+            await new Promise(function(resolve, reject) {
+              navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+            });
+          } catch(gpsErr) {
+            showToast('⚠️ Vui lòng bật GPS/Vị trí để nhận đơn hàng!');
+            toggleInput.checked = false; // Revert
+            return;
+          }
+        } else {
+          showToast('⚠️ Thiết bị không hỗ trợ GPS!');
+          toggleInput.checked = false; // Revert
+          return;
+        }
+      }
+
       try {
         await apiFetch('/api/taskers/status', {
           method: 'PATCH',
