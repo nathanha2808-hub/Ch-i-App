@@ -2,13 +2,16 @@
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <title>Đăng nhập Tasker | Chị Ơi!</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -235,7 +238,8 @@
     <!-- Footer Spacer -->
     <div class="flex-1"></div>
 </main>
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 // Toggle password visibility
 var toggleBtn = document.getElementById('togglePassword');
@@ -315,13 +319,10 @@ async function handleTaskerLogin() {
       body: { phone: phone, password: pass }
     });
 
-    // Lưu token + user info
-    ChiOiAuth.saveLogin(data);
-
+    // Bug #16 FIX: Kiểm tra role TRƯỚC khi lưu token — tránh nhiễm session
     // Chỉ cho phép TASKER đăng nhập trang này
-    var user = ChiOiAuth.getUser();
-    if (user && user.role === 'TASKER') {
-      if (user.kyc_status && user.kyc_status === 'PENDING_APPROVAL') {
+    if (data && data.user && data.user.role === 'TASKER') {
+      if (data.user.status === 'PENDING') {
         infoEl.textContent = 'Tài khoản đang chờ Admin phê duyệt KYC.';
         infoEl.style.display = 'block';
         isSubmitting = false;
@@ -329,10 +330,11 @@ async function handleTaskerLogin() {
         loginBtn.innerHTML = '<span class="text-white text-[15px] font-bold tracking-wide">ĐĂNG NHẬP</span>';
         return;
       }
-      window.location.href = '/giupviec/trangchutasker.html';
+      ChiOiAuth.saveLogin(data);
+      window.location.href = 'trangchutasker.html';
     } else {
-      ChiOiAuth.logout();
-      errorEl.textContent = 'Tài khoản không tồn tại trong hệ thống Tasker.';
+      // KHÔNG saveLogin — không lưu token của role khác
+      errorEl.textContent = 'Tài khoản không thuộc hệ thống Tasker. Vui lòng đăng nhập đúng cổng.';
       errorEl.style.display = 'block';
       isSubmitting = false;
       loginBtn.disabled = false;

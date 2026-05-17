@@ -2,6 +2,7 @@
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -138,6 +139,7 @@
             box-shadow: 0 0 0 2px rgba(160,65,0,0.2); 
         }
     </style>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 </head>
 <body class="flex min-h-screen">
 <!-- Sidebar Component -->
@@ -175,6 +177,10 @@
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
 <span class="material-symbols-outlined">account_balance_wallet</span>
 <span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydichvu.html">
+<span class="material-symbols-outlined">home_repair_service</span>
+<span class="font-label-md text-label-md">Dịch vụ &amp; Phí</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
 <span class="material-symbols-outlined">inbox</span>
@@ -617,7 +623,8 @@ Thêm cư dân mới
 })();
 </script><!-- END-CHIOI-JS-INJECT -->
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('../khachhang/dangnhap.html')) return;
@@ -673,7 +680,7 @@ Thêm cư dân mới
       try {
         var body = { full_name: fullName, phone: phone, password: password, role: 'CUSTOMER' };
         if (email) body.email = email;
-        await apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify(body) });
+        await apiFetch('/api/auth/register', { method: 'POST', body: body });
         closeAddModal();
         showToastMsg('✅ Đã tạo tài khoản cư dân: ' + fullName);
         // Reload danh sách
@@ -748,7 +755,7 @@ Thêm cư dân mới
         '<td class="p-4 text-body-sm text-center font-medium">' + orders.length + '</td>' +
         '<td class="p-4 text-body-sm text-right font-medium text-primary">' + spentStr + '</td>' +
         '<td class="p-4">' + statusHtml + '</td>' +
-        '<td class="p-4"><div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">' +
+        '<td class="p-4"><div class="flex items-center gap-2">' +
           '<button class="view-btn text-primary hover:bg-primary-fixed p-1 rounded-lg" title="Xem hồ sơ" data-uid="' + u.user_id + '"><span class="material-symbols-outlined text-[20px]">visibility</span></button>' +
           (isActive
             ? '<button class="lock-btn text-error hover:bg-error-container p-1 rounded-lg" title="Kh\u00f3a" data-uid="' + u.user_id + '"><span class="material-symbols-outlined text-[20px]">lock</span></button>'

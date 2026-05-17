@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -82,6 +83,7 @@
         background: linear-gradient(180deg, #1b1c1c 0%, #303030 65%, #fcf9f8 100%);
     }
 </style>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 </head>
 <body class="bg-surface-dim text-on-surface h-[100dvh] overflow-hidden flex flex-col items-center">
     <div class="w-full max-w-[430px] h-[100dvh] bg-background relative shadow-2xl overflow-hidden flex flex-col">
@@ -145,7 +147,8 @@
 </main>
 </div>
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 document.getElementById('phoneInput').addEventListener('input', function() {
     var cleaned = this.value.replace(/[^\d]/g, '');
@@ -200,14 +203,13 @@ async function handleAdminLogin() {
             body: { phone: phone, password: pass }
         });
 
-        ChiOiAuth.saveLogin(data);
-        var user = ChiOiAuth.getUser();
-        
-        if (user && user.role === 'ADMIN') {
-            window.location.href = '/admin/bangdieukhien.html';
+        // Bug #16 FIX: Kiểm tra role TRƯỚC khi lưu token để tránh nhiễm session
+        if (data && data.user && data.user.role === 'ADMIN') {
+            ChiOiAuth.saveLogin(data);
+            window.location.href = 'bangdieukhien.html';
         } else {
-            ChiOiAuth.logout();
-            errorEl.textContent = 'Tài khoản không có quyền quản trị.';
+            // KHÔNG saveLogin — không lưu token của role khác vào localStorage
+            errorEl.textContent = 'Tài khoản không có quyền quản trị. Chỉ Admin mới được đăng nhập tại đây.';
             errorEl.style.display = 'block';
             loginBtn.disabled = false;
             loginBtn.innerHTML = '<span class="text-white text-[15px] font-bold tracking-wide">ĐĂNG NHẬP ADMIN</span>';

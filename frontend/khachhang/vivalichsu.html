@@ -2,14 +2,17 @@
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <title>Ví Chị Ơi!</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -116,7 +119,7 @@
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-lg min-h-screen pb-32">
-<div class="absolute top-0 left-0 w-full h-[300px] -z-10 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
 <!-- Header -->
 <header class="relative z-10 flex justify-between items-center w-full px-container-padding h-16 pt-4">
 <div class="flex items-center gap-3">
@@ -152,6 +155,7 @@
 <div class="filter-chip bg-surface-container-low text-on-surface-variant border border-outline-variant/30 px-5 py-2 rounded-full text-label-sm font-bold flex-shrink-0 cursor-pointer" data-type="DEPOSIT">Nạp tiền</div>
 <div class="filter-chip bg-surface-container-low text-on-surface-variant border border-outline-variant/30 px-5 py-2 rounded-full text-label-sm font-bold flex-shrink-0 cursor-pointer" data-type="PAYMENT">Thanh toán</div>
 <div class="filter-chip bg-surface-container-low text-on-surface-variant border border-outline-variant/30 px-5 py-2 rounded-full text-label-sm font-bold flex-shrink-0 cursor-pointer" data-type="REFUND">Hoàn tiền</div>
+<div class="filter-chip bg-surface-container-low text-on-surface-variant border border-outline-variant/30 px-5 py-2 rounded-full text-label-sm font-bold flex-shrink-0 cursor-pointer" data-type="WITHDRAW">Rút tiền</div>
 </div>
 </div>
 </section>
@@ -186,7 +190,8 @@
 </a>
 </nav>
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
@@ -226,7 +231,11 @@
     var filtered = allTransactions;
     if (filter && filter !== 'all') {
       filtered = allTransactions.filter(function(tx) {
-        return tx.tx_type === filter || tx.type === filter;
+        var txType = tx.tx_type || tx.type || '';
+        // TC_KH17-004 FIX: Filter DEPOSIT cũng match TOP_UP
+        if (filter === 'DEPOSIT') return txType === 'DEPOSIT' || txType === 'TOP_UP';
+        if (filter === 'WITHDRAW') return txType === 'WITHDRAW' || txType === 'WITHDRAWAL';
+        return txType === filter;
       });
     }
 
@@ -239,16 +248,17 @@
     filtered.forEach(function(tx) {
       var type = tx.tx_type || tx.type || '';
       var amount = tx.amount || 0;
-      var isIncome = type === 'DEPOSIT' || type === 'REFUND' || type === 'BONUS';
+      // TC_KH17-003 FIX: Nhận cả TOP_UP, DEPOSIT, WITHDRAW, WITHDRAWAL
+      var isIncome = type === 'DEPOSIT' || type === 'TOP_UP' || type === 'REFUND' || type === 'BONUS';
       var icon = 'receipt';
       var iconColor = 'text-primary';
       var iconBg = 'bg-primary-container/20';
       var label = type;
 
-      if (type === 'DEPOSIT') { icon = 'account_balance_wallet'; label = 'Nạp tiền'; iconColor = 'text-tertiary'; iconBg = 'bg-tertiary-container/20'; }
+      if (type === 'DEPOSIT' || type === 'TOP_UP') { icon = 'account_balance_wallet'; label = 'Nạp tiền'; iconColor = 'text-tertiary'; iconBg = 'bg-tertiary-container/20'; }
       else if (type === 'PAYMENT') { icon = 'shopping_cart'; label = 'Thanh toán dịch vụ'; }
       else if (type === 'REFUND') { icon = 'history'; label = 'Hoàn tiền'; iconColor = 'text-secondary'; iconBg = 'bg-secondary-container/20'; }
-      else if (type === 'WITHDRAWAL') { icon = 'download'; label = 'Rút tiền'; iconColor = 'text-error'; iconBg = 'bg-error-container/20'; }
+      else if (type === 'WITHDRAWAL' || type === 'WITHDRAW') { icon = 'download'; label = 'Rút tiền'; iconColor = 'text-error'; iconBg = 'bg-error-container/20'; }
       else if (type === 'BONUS') { icon = 'redeem'; label = 'Thưởng'; iconColor = 'text-primary'; }
 
       var dateStr = '';
@@ -295,9 +305,9 @@
   // Initial render
   renderTransactions('all');
 
-  // ===== Withdraw button =====
+  // ===== Withdraw button → UC-KH-19 =====
   document.getElementById('withdraw-btn').addEventListener('click', function() {
-    showToastMsg('Chức năng rút tiền đang phát triển');
+    window.location.href = 'ruttien.html';
   });
 })();
 </script>

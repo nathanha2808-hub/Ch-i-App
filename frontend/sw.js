@@ -1,23 +1,27 @@
 // Chị Ơi! — Service Worker for PWA
 // Strategy:
-//   - HTML pages: network-first, fallback cache (offline page)
+//   - HTML pages: stale-while-revalidate (serve cache NGAY, update background)
 //   - shared/api.js + pwa-register.js: network-first (luôn lấy bản mới — chứa API_BASE)
 //   - Static khác (CSS/JS/fonts/icons): cache-first, refresh background
 //   - API calls: network-only (real-time data, không cache)
 
-const VERSION = 'chioi-v1.0.6'; // Responsive UI/UX cho mobile cross-device (safe-area, dvh, clamp, landscape)
+const VERSION = 'chioi-v1.1.0'; // BUMP v1.1.0: prefetch + view-transitions + stale-while-revalidate
 const CACHE_STATIC = `${VERSION}-static`;
 const CACHE_PAGES  = `${VERSION}-pages`;
 
 // File luôn fetch network trước (không bị lock cache cũ). Quan trọng cho config API.
 const NETWORK_FIRST_PATHS = ['/shared/api.js', '/pwa-register.js', '/manifest.json'];
 
-// Pre-cache shell — minimal so install không fail
-// KHÔNG precache /shared/api.js để tránh giữ bản cũ
+// Pre-cache shell — core pages + shared assets để navigate siêu nhanh
 const PRECACHE = [
   '/',
   '/khachhang/dangnhap.html',
   '/khachhang/trangchu.html',
+  '/khachhang/lichsuhoatdong.html',
+  '/khachhang/thongbao.html',
+  '/khachhang/taikhoan.html',
+  '/shared/transitions.css',
+  '/shared/prefetch.js',
   '/icons/icon-192.png',
 ];
 
@@ -71,17 +75,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML pages: network-first
+  // HTML pages: stale-while-revalidate (tải ngay từ cache, update nền)
   if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
     event.respondWith(
-      fetch(req)
-        .then(resp => {
-          // Cache HTML responses cho lần sau (offline)
-          const copy = resp.clone();
-          caches.open(CACHE_PAGES).then(cache => cache.put(req, copy)).catch(() => {});
+      caches.match(req).then(cached => {
+        // Luôn fetch bản mới ở background
+        const fetchPromise = fetch(req).then(resp => {
+          if (resp && resp.status === 200) {
+            const copy = resp.clone();
+            caches.open(CACHE_PAGES).then(cache => cache.put(req, copy)).catch(() => {});
+          }
           return resp;
-        })
-        .catch(() => caches.match(req).then(cached => cached || caches.match('/khachhang/dangnhap.html')))
+        }).catch(() => cached);
+        // Trả cache ngay nếu có, nếu không chờ fetch
+        return cached || fetchPromise;
+      })
     );
     return;
   }

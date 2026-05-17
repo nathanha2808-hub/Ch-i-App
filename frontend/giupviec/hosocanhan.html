@@ -2,16 +2,20 @@
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <title>Chị Ơi! - Hồ sơ Cá nhân</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -135,23 +139,21 @@
 <div class="absolute top-0 left-0 w-full h-[300px] z-0" style="background: transparent; pointer-events: none;"></div>
 
 <!-- TopAppBar -->
-<header class="sticky top-0 z-50  dark:-dim shadow-sm flex justify-between items-center w-full px-md h-16 bg-transparent relative z-40">
-<div class="flex items-center gap-sm">
-<button class="transition-colors duration-200 active:scale-95 text-primary dark:text-primary-fixed-dim">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<h1 class="font-headline-md text-headline-md text-white">Cá nhân</h1>
-</div>
-<button id="btnSave" class="transition-colors duration-200 active:scale-95 text-white font-bold px-4 py-2 bg-white/20 rounded-xl hover:bg-white/30">
-            Lưu
-        </button>
+<header class="flex items-center justify-between px-md h-14 w-full sticky top-0 z-50 bg-surface/95 backdrop-blur-sm border-b border-outline-variant/20">
+  <div class="flex items-center gap-sm">
+    <span class="material-symbols-outlined text-primary text-[24px]">person</span>
+    <h1 class="font-title-sm text-title-sm text-on-surface">Cá nhân</h1>
+  </div>
+  <button id="btnSave" class="px-4 py-1.5 rounded-full bg-primary text-white text-sm font-bold hover:brightness-110 active:scale-95 transition-all">
+    Lưu
+  </button>
 </header>
 <main class="pb-24 px-container-padding space-y-lg pt-md relative z-10">
 <!-- Basic Info Section -->
 <section class="flex flex-col items-center justify-center">
 <div class="relative group">
 <div class="w-28 h-28 rounded-full overflow-hidden border-2 border-secondary-fixed ring-4 ring-primary-fixed/20 shadow-lg">
-<img class="w-full h-full object-cover" data-alt="A professional and friendly Vietnamese tasker in her 30s, smiling warmly at the camera. She has her hair neatly tied back and is wearing a clean, professional uniform. The background is a brightly lit, modern minimalist apartment with soft orange and white tones, reflecting a clean and trustworthy home environment. High-key lighting highlights her professional demeanor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYq7i4J5bIMDFDzLtWCKxvSdSs2buECaavm4ZYvxBB_j8Y1qw6ygVFIqtT2Y11vZBxh24CVGGAxTpdwDDxQp9eRgmryfWeysjWkuGQiN3uKyidOUhMZ2m_SvptyPq-pN8OF126iPa97leayNlQZh8OxtqvIccbwhTvI_BObXW6V5NyFFU2D_LCJhymXRGzvjd7nMo_g9j9tclfDJOmfjwWFyIbFPPzSP9rGDAmNyYxQWORJ42reruIrIQ2QjCLqo9acWzCOZR4Ycs"/>
+<img id="profileAvatar" class="w-full h-full object-cover" alt="Avatar" src="https://ui-avatars.com/api/?name=T&background=FF7E36&color=fff"/>
 </div>
 <button class="absolute bottom-0 right-0 p-2 primary-gradient rounded-full text-on-surface shadow-md active:scale-90 transition-transform">
 <span class="material-symbols-outlined text-sm" data-icon="photo_camera">photo_camera</span>
@@ -254,6 +256,14 @@
 </div>
 </section>
 
+<!-- Bug 10 Report19: Chat với CSKH (Admin) -->
+<section>
+<button onclick="window.location.href='../shared/chatadmin.html'" class="w-full level-1-card rounded-xl py-3 flex items-center justify-center gap-sm transition-transform active:scale-95 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">support_agent</span>
+<span class="font-title-sm">Chat với CSKH</span>
+</button>
+</section>
+
 <!-- Complaint Section -->
 <section>
 <button onclick="window.location.href='khieunai.html'" class="w-full level-1-card rounded-xl py-3 flex items-center justify-center gap-sm transition-transform active:scale-95 text-error">
@@ -296,7 +306,8 @@
     </a>
 </nav>
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
     if (!ChiOiAuth.requireAuth('dangnhaptasker.html')) return;
@@ -339,6 +350,13 @@
             if (profileData.phone && phoneEl) phoneEl.textContent = profileData.phone;
             var editNameEl2 = document.getElementById('editFullName');
             if (editNameEl2 && profileData.full_name) editNameEl2.value = profileData.full_name;
+            // BUG FIX: Hiển thị avatar từ server
+            var avatarEl = document.getElementById('profileAvatar');
+            if (avatarEl && profileData.avatar_url) {
+                avatarEl.src = profileData.avatar_url;
+            } else if (avatarEl && profileData.full_name) {
+                avatarEl.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(profileData.full_name) + '&background=FF7E36&color=fff';
+            }
         }
     } catch(e) {
         console.warn('[Profile] Không tải được rating:', e.message);
@@ -351,7 +369,7 @@
             if (window.history.length > 1) {
                 window.history.back();
             } else {
-                window.location.href = '/giupviec/trangchutasker.html';
+                window.location.href = 'trangchutasker.html';
             }
         });
     }
@@ -391,25 +409,43 @@
         });
     }
 
-    // ===== 4. Nút Camera (chọn ảnh avatar) =====
+    // ===== 4. Nút Camera (chọn ảnh avatar + upload lên server) =====
     var cameraBtn = document.querySelector('button span[data-icon="photo_camera"]');
     if (cameraBtn) {
         cameraBtn.parentElement.addEventListener('click', function() {
-            // Tạo input file ẩn để chọn ảnh
             var fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.accept = 'image/*';
-            fileInput.addEventListener('change', function(e) {
+            fileInput.addEventListener('change', async function(e) {
                 var file = e.target.files[0];
                 if (file) {
+                    if (file.size > 500 * 1024) {
+                        showToastMsg('❌ Ảnh quá lớn, tối đa 500KB');
+                        return;
+                    }
                     // Preview ảnh ngay lập tức
                     var reader = new FileReader();
-                    reader.onload = function(ev) {
-                        var avatarImg = document.querySelector('section img');
+                    reader.onload = async function(ev) {
+                        var avatarImg = document.getElementById('profileAvatar');
                         if (avatarImg) avatarImg.src = ev.target.result;
+                        // Upload avatar lên server
+                        try {
+                            await apiFetch('/api/users/profile', {
+                                method: 'PUT',
+                                body: { avatar_url: ev.target.result }
+                            });
+                            // Cập nhật localStorage
+                            var u = ChiOiAuth.getUser();
+                            if (u) {
+                                u.avatar_url = ev.target.result;
+                                localStorage.setItem('chioi_user', JSON.stringify(u));
+                            }
+                            showToastMsg('✅ Đã cập nhật ảnh đại diện!');
+                        } catch (err) {
+                            showToastMsg('❌ ' + err.message);
+                        }
                     };
                     reader.readAsDataURL(file);
-                    showToastMsg('Đã chọn ảnh đại diện mới! (Chưa upload lên server)');
                 }
             });
             fileInput.click();

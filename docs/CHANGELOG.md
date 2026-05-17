@@ -4,6 +4,41 @@
 
 ---
 
+## [1.5.0] — 2026-05-17
+
+### 💰 UC-KH-19 — Rút tiền từ ví Khách hàng (9 Test Cases)
+
+#### Added
+- **Frontend:** Tạo mới `khachhang/ruttien.html` — Trang rút tiền đầy đủ UI/UX
+  - Form nhập số tiền + preset amounts (100k/200k/500k/1tr)
+  - Dropdown 15 ngân hàng Việt Nam
+  - Form nhập STK + tên chủ TK
+  - Panel xác nhận hiển thị thông tin trước khi gửi
+  - Validation đầy đủ client-side + server-side
+
+#### Changed
+- **Frontend:** `khachhang/vivalichsu.html` — Nút "Rút tiền" redirect sang `ruttien.html` (trước đây chỉ hiện toast)
+- **Frontend:** `khachhang/vivalichsu.html` — Thêm filter chip "Rút tiền" (WITHDRAW) trong lịch sử giao dịch
+
+#### Test Cases Covered
+| TC | Mô tả | Priority |
+|----|-------|----------|
+| TC-KH19-001 | Rút tiền thành công | High |
+| TC-KH19-002 | Validate trống số tiền | High |
+| TC-KH19-003 | Rút vượt số dư | High |
+| TC-KH19-004 | Nhập số tiền không hợp lệ (chữ/âm) | Medium |
+| TC-KH19-005 | Chọn tài khoản ngân hàng nhận | Medium |
+| TC-KH19-006 | Chưa chọn ngân hàng → validate | High |
+| TC-KH19-007 | Cập nhật số dư sau rút | High |
+| TC-KH19-008 | Lịch sử giao dịch ghi nhận rút tiền | Medium |
+| TC-KH19-009 | Xử lý lỗi mất mạng | Medium |
+
+#### Files ảnh hưởng
+- `frontend/khachhang/ruttien.html` (MỚI)
+- `frontend/khachhang/vivalichsu.html` (SỬA)
+
+---
+
 ## [1.3.1] — 2026-05-15
 
 ### 🔒 Tiêu chuẩn hóa chính sách bảo mật mật khẩu

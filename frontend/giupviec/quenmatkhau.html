@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <title>Quên mật khẩu Tasker - Chị Ơi!</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
     tailwind.config = {
         darkMode: "class",
@@ -94,10 +97,10 @@
 </style>
 </head>
 <body class="bg-background text-on-background min-h-screen">
-<div class="absolute top-0 left-0 w-full h-[300px] -z-10 pointer-events-none" style="background: linear-gradient(rgba(255,126,54,0.9) 0%, rgba(255,248,246,1) 100%);"></div>
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgba(255,126,54,0.9) 0%, rgba(255,248,246,1) 100%);"></div>
 
 <!-- Header -->
-<header class="orange-gradient fixed top-0 left-0 right-0 z-50 shadow-md h-16 flex justify-between items-center px-container-padding">
+<header class="orange-gradient relative    z-50 shadow-md h-16 flex justify-between items-center px-container-padding">
 <button onclick="window.location.href='dangnhaptasker.html'" class="flex items-center justify-center p-2 text-on-primary hover:bg-primary/20 rounded-full transition-all active:scale-95" style="cursor:pointer">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
@@ -216,6 +219,7 @@
 <div class="fixed -top-20 -right-20 w-64 h-64 bg-outline-variant/10 rounded-full blur-3xl -z-10"></div>
 
 <script src="../shared/api.js?v=20260515"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (function() {
   var currentStep = 1;

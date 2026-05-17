@@ -2,18 +2,23 @@
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -260,8 +265,23 @@
 
     </div>
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260516"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
+// TC-KH01-021: Auto redirect nếu đã đăng nhập
+(function() {
+    var token = localStorage.getItem('chioi_token');
+    var user = localStorage.getItem('chioi_user');
+    if (token && user) {
+        try {
+            var userData = JSON.parse(user);
+            if (userData && userData.role === 'CUSTOMER') {
+                window.location.replace('trangchu.html');
+                return;
+            }
+        } catch(e) {}
+    }
+})();
 // ============================================================
 // TC-KH01-007,011: Real-time phone input — chỉ cho nhập số, không khoảng trắng
 // ============================================================
@@ -335,16 +355,13 @@ async function handleLogin() {
             body: { phone: phone, password: pass }
         });
 
-        // Lưu token + user info
-        ChiOiAuth.saveLogin(data);
-
-        // Bug 1 FIX (report14): Phân quyền đăng nhập
-        var user = ChiOiAuth.getUser();
-        if (user && user.role === 'CUSTOMER') {
-            window.location.href = '/khachhang/trangchu.html';
+        // Bug #16 FIX: Kiểm tra role TRƯỚC khi lưu token — tránh nhiễm session
+        if (data && data.user && data.user.role === 'CUSTOMER') {
+            ChiOiAuth.saveLogin(data);
+            window.location.href = 'trangchu.html';
         } else {
-            ChiOiAuth.logout();
-            errorEl.textContent = 'Tài khoản không tồn tại trong hệ thống khách hàng.';
+            // KHÔNG saveLogin — không lưu token của role khác
+            errorEl.textContent = 'Tài khoản không thuộc hệ thống khách hàng. Vui lòng đăng nhập đúng cổng.';
             errorEl.style.display = 'block';
             loginBtn.disabled = false;
             loginBtn.innerHTML = '<span class="text-white text-[15px] font-bold tracking-wide">ĐĂNG NHẬP</span>';
@@ -353,16 +370,18 @@ async function handleLogin() {
     } catch (err) {
         // TC-KH01-002,003,010,019: Dịch thông báo lỗi sang tiếng Việt
         var msg = err.message || '';
-        if (msg.includes('hết hạn') || msg.toLowerCase().includes('unauthorized') || msg.toLowerCase().includes('invalid')) {
-            msg = 'Sai số điện thoại hoặc mật khẩu. Vui lòng thử lại.';
+        if (msg.includes('hết hạn') || msg.toLowerCase().includes('unauthorized') || msg.toLowerCase().includes('invalid') || msg.includes('Sai số điện thoại')) {
+            msg = 'Số điện thoại chưa đăng ký hoặc sai mật khẩu. Vui lòng kiểm tra lại hoặc <a href="dangky.html" class="text-primary font-bold underline">đăng ký tài khoản mới</a>.';
         } else if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('không tồn tại') || msg.toLowerCase().includes('not exist')) {
-            msg = 'Tài khoản không tồn tại. Vui lòng kiểm tra lại số điện thoại.';
+            msg = 'Số điện thoại chưa được đăng ký. <a href="dangky.html" class="text-primary font-bold underline">Đăng ký ngay</a>.';
+        } else if (msg.toLowerCase().includes('tạm khóa') || msg.toLowerCase().includes('locked') || msg.toLowerCase().includes('blocked')) {
+            msg = 'Tài khoản đã bị tạm khóa. Vui lòng liên hệ CSKH.';
         } else if (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('kết nối')) {
             msg = 'Không có kết nối mạng. Vui lòng kiểm tra Internet và thử lại.';
         } else if (!msg) {
-            msg = 'Sai số điện thoại hoặc mật khẩu.';
+            msg = 'Đăng nhập thất bại. Vui lòng thử lại.';
         }
-        errorEl.textContent = msg;
+        errorEl.innerHTML = msg;
         errorEl.style.display = 'block';
         loginBtn.disabled = false;
         loginBtn.innerHTML = '<span class="text-white text-[15px] font-bold tracking-wide">ĐĂNG NHẬP</span>';

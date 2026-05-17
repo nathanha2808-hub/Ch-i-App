@@ -2,9 +2,11 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
     <title>Trang chủ Tasker</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
@@ -101,6 +103,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f8f9fa; }
@@ -148,7 +151,7 @@
 <!-- Top Gradient Overlay removed per Bug 2 -->
 
 <!-- Header -->
-<header class="fixed top-0 w-full z-40 px-4 h-20 flex justify-between items-center bg-transparent">
+<header class="relative w-full z-40 px-4 h-20 flex justify-between items-center" style="background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); border-radius: 0 0 20px 20px; box-shadow: 0 4px 16px rgba(160,65,0,0.25);">
     <div class="flex items-center gap-3">
         <div class="w-11 h-11 rounded-full border-2 border-white/50 overflow-hidden shadow-sm">
             <img alt="Lan Nguyễn" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdx_l7OLqkJhx3t8XNX3oPsNEZ_ogskiGRnrfncigojiUmOhgUgCBnzOtjAoqTw0VT8UhEJeg1dX9XGQ4Bv8H31CgwgWYchWXUkhmmRML2MH3UPlx8xcg7dwkz6qPuZ01IJyV4QcESVQIkgQGRLOgvy5_M9Iog2G7TdbmVv4W8YhbHeWC-14TUAIAeQf2cR_E1-AFVlyhYV578lUAfzmC9A7difRggk60mNGZ5r1AuzpEC7WSjzVzYTLk_lUCDfPp6S7TStIoHLIs"/>
@@ -159,9 +162,9 @@
         </div>
     </div>
     <div class="flex items-center gap-4">
-        <!-- Online/Offline Toggle -->
+        <!-- Online/Offline Toggle — Bug 1: Mặc định OFF -->
         <label class="relative inline-flex items-center cursor-pointer shadow-sm rounded-full">
-            <input type="checkbox" class="sr-only peer" checked>
+            <input type="checkbox" class="sr-only peer">
             <div class="w-12 h-6 bg-white/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00b1da]"></div>
         </label>
         <!-- Chat -->
@@ -278,7 +281,8 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (function() {
   // ===== 1. Kiểm tra đăng nhập =====
@@ -305,19 +309,16 @@
     }
   }
 
-  // ===== 3. Online/Offline Toggle — Bug 7 FIX: persist trạng thái =====
+  // ===== 3. Online/Offline Toggle — Bug 1 Report19: Mặc định luôn OFF khi mở app =====
   var toggleInput = document.querySelector('header input[type="checkbox"]');
   if (toggleInput) {
-    // Khôi phục trạng thái từ localStorage và ĐỒNG BỘ với server
-    var savedOnline = localStorage.getItem('chioi_tasker_online');
-    if (savedOnline !== null) {
-      toggleInput.checked = savedOnline === 'true';
-    }
+    // Bug 1 FIX: Luôn bắt đầu ở trạng thái OFF — tasker phải chủ động bật
+    toggleInput.checked = false;
     
-    // Gửi status hiện tại lên server để đảm bảo DB khớp với UI
+    // Gửi status OFF lên server khi mở app
     apiFetch('/api/taskers/status', {
       method: 'PATCH',
-      body: { is_online: toggleInput.checked }
+      body: { is_online: false }
     }).catch(function(err) {
       console.warn('Lỗi đồng bộ trạng thái online:', err);
     });
@@ -330,6 +331,13 @@
         });
         localStorage.setItem('chioi_tasker_online', String(toggleInput.checked));
         showToast(toggleInput.checked ? '🟢 Đã bật nhận việc' : '🔴 Đã tắt nhận việc');
+        // Bug 1 Report19: Bật/tắt GPS realtime tracking theo trạng thái
+        if (toggleInput.checked) {
+          startGpsTracking();
+          updateLocationAndSendGps();
+        } else {
+          stopGpsTracking();
+        }
         // Bug 4 FIX (report14): Khi tắt → ẩn modal đơn mới (nhưng giữ đơn đang xử lý)
         if (!toggleInput.checked && !isHandlingOrder) {
           clearInterval(countdownTimer);
@@ -384,9 +392,14 @@
 
   // ===== 6. Kết nối Socket Realtime =====
   var socket = connectSocket();
+  var gpsWatchId = null; // Bug 1: GPS realtime watch ID
 
-  // Hàm lấy vị trí và gửi GPS
+  // Hàm lấy vị trí và gửi GPS — Bug 1: Chỉ gửi GPS khi ONLINE
   function updateLocationAndSendGps() {
+    // Bug 1: Không gửi GPS nếu đang offline
+    var toggleCheck = document.querySelector('header input[type="checkbox"]');
+    if (toggleCheck && !toggleCheck.checked) return;
+
     function emitGps(lat, lng) {
       if (socket && socket.connected) {
         socket.emit('update_gps', { latitude: lat, longitude: lng });
@@ -413,8 +426,38 @@
     }
   }
 
-  // Cập nhật vị trí ngay khi load
-  updateLocationAndSendGps();
+  // Bug 1: Bật GPS realtime watchPosition khi online
+  function startGpsTracking() {
+    if (gpsWatchId !== null) return; // Đã bật rồi
+    if (navigator.geolocation) {
+      gpsWatchId = navigator.geolocation.watchPosition(function(pos) {
+        var lat = pos.coords.latitude;
+        var lng = pos.coords.longitude;
+        map.setView([lat, lng], 16);
+        taskerMarker.setLatLng([lat, lng]);
+        if (socket && socket.connected) {
+          socket.emit('update_gps', { latitude: lat, longitude: lng });
+        }
+      }, function() {
+        console.warn('[Map] GPS watch error');
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 });
+    }
+  }
+
+  function stopGpsTracking() {
+    if (gpsWatchId !== null && navigator.geolocation) {
+      navigator.geolocation.clearWatch(gpsWatchId);
+      gpsWatchId = null;
+    }
+  }
+
+  // Bug 1: Lấy vị trí hiện tại để hiện map nhưng KHÔNG gửi GPS (vì mặc định OFF)
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      map.setView([pos.coords.latitude, pos.coords.longitude], 16);
+      taskerMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
+    }, function() {}, { enableHighAccuracy: true, timeout: 10000 });
+  }
 
   if (socket) {
     // Nhận đơn hàng mới
@@ -432,8 +475,11 @@
       showNewOrderModal(data.order);
     });
 
-    // Gửi GPS mỗi 30 giây + cập nhật marker
-    setInterval(updateLocationAndSendGps, 30000);
+    // Bug 1: Gửi GPS mỗi 30 giây CHỈ KHI ONLINE
+    setInterval(function() {
+      var toggleCheck = document.querySelector('header input[type="checkbox"]');
+      if (toggleCheck && toggleCheck.checked) updateLocationAndSendGps();
+    }, 30000);
 
     // Nhận tin nhắn
     socket.on('receive_message', function(msg) {
@@ -454,9 +500,13 @@
   // ===== 10. Bug 8 FIX: Kiểm tra đơn đang thực hiện trước khi hiện đơn mới =====
   var isHandlingOrder = false; // Flag: đang xử lý đơn
 
-  (async function loadAvailableOrders() {
+  // Hàm check đơn hàng — reusable cho cả init lần đầu và polling
+  async function checkAvailableOrders() {
+    // Nếu đang xử lý đơn → không hiện đơn mới
+    if (isHandlingOrder) return;
+
     try {
-      // Bug 8 FIX: Check đơn hàng đang thực hiện (ACCEPTED / IN_PROGRESS / TASKER_ARRIVED)
+      // Check đơn hàng đang thực hiện (ACCEPTED / IN_PROGRESS / TASKER_ARRIVED)
       var history = await apiFetch('/api/taskers/history');
       if (history && history.length > 0) {
         var activeOrder = history.find(function(o) {
@@ -465,32 +515,47 @@
         if (activeOrder) {
           isHandlingOrder = true;
           showActiveOrderCard(activeOrder);
-          return; // Không hiện đơn mới
+          return;
         }
       }
     } catch (e) {
       console.warn('[Tasker] Không check được đơn đang xử lý:', e.message);
     }
 
-    // Bug 4 FIX (report14): Nếu đang offline → không load đơn mới
+    // Nếu đang offline → không load đơn mới
     var toggleCheck = document.querySelector('header input[type="checkbox"]');
     if (toggleCheck && !toggleCheck.checked) return;
 
-    // Nếu không có đơn đang xử lý, load đơn pending
+    // Nếu đang có đơn hiện trên modal → không ghi đè
+    if (currentOrder) return;
+
+    // Load đơn pending mới
     try {
       var orders = await apiFetch('/api/taskers/available-orders');
       if (orders && orders.length > 0) {
-        // Bug 3 FIX (report14): Lọc bỏ đơn đã skip
+        // Lọc bỏ đơn đã skip
         var filtered = orders.filter(function(o) { return skippedOrders.indexOf(o.order_id) === -1; });
         if (filtered.length > 0) {
           currentOrder = filtered[0];
+          playNotificationSound();
           showNewOrderModal(filtered[0]);
         }
       }
     } catch (e) {
       console.warn('[Tasker] Không load được đơn hàng có sẵn:', e.message);
     }
-  })();
+  }
+
+  // Chạy lần đầu khi mở trang
+  checkAvailableOrders();
+
+  // ===== REALTIME POLLING: Check đơn mới mỗi 15 giây khi đang online =====
+  setInterval(function() {
+    var toggleCheck = document.querySelector('header input[type="checkbox"]');
+    if (toggleCheck && toggleCheck.checked && !isHandlingOrder && !currentOrder) {
+      checkAvailableOrders();
+    }
+  }, 15000);
 
   // Hiển thị card đơn đang thực hiện (khóa nhận đơn mới)
   function showActiveOrderCard(order) {

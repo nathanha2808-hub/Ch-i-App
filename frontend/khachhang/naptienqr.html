@@ -2,13 +2,16 @@
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -115,7 +118,7 @@
     </style>
 </head>
 <body class="min-h-screen text-on-background relative pb-32">
-<div class="absolute top-0 left-0 w-full h-[300px] -z-10 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
 <!-- Header & Background Layer -->
 <!-- Top AppBar Component -->
 <header class="relative z-40 bg-transparent flex justify-between items-center w-full px-container-padding h-16 text-on-surface">
@@ -181,7 +184,7 @@
 <div class="flex justify-between items-center py-2 border-b border-surface-container">
 <div>
 <p class="text-label-caps font-label-caps text-on-surface-variant">NỘI DUNG CHUYỂN KHOẢN</p>
-<p class="text-body-lg font-bold text-primary">NAPVI 0987654321</p>
+<p id="transfer-content" class="text-body-lg font-bold text-primary">NAPVI 0987654321</p>
 </div>
 <button class="text-primary p-2 hover:bg-primary-fixed rounded-full transition-colors">
 <span class="material-symbols-outlined" data-icon="content_copy">content_copy</span>
@@ -226,7 +229,8 @@
 </a>
 </nav>
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
@@ -235,12 +239,11 @@
   var amountInput = document.getElementById('amount-input');
   var currentAmount = 0;
 
-  // ===== Update transfer content with user phone =====
-  if (user && user.phone) {
-    var transferContent = document.querySelector('.text-body-lg.font-bold.text-primary');
-    if (transferContent && transferContent.textContent.includes('NAPVI')) {
-      transferContent.textContent = 'NAPVI ' + user.phone;
-    }
+  // ===== TC-KH18-008 FIX: Update transfer content with user phone/ID =====
+  var transferContentEl = document.getElementById('transfer-content');
+  if (transferContentEl && user) {
+    var identifier = user.phone || ('UID' + user.user_id);
+    transferContentEl.textContent = 'NAPVI ' + identifier;
   }
 
   // ===== Amount Presets =====

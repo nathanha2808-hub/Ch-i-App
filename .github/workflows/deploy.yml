@@ -15,6 +15,7 @@ on:
   push:
     branches:
       - main
+      - testvps1
       - 'fix/**'
       - 'feature/**'
   workflow_dispatch:  # Cho phép trigger thủ công từ Actions tab

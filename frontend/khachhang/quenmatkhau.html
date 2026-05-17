@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <title>Quên mật khẩu - Chị Ơi!</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
     tailwind.config = {
         darkMode: "class",
@@ -106,10 +109,10 @@
 </style>
 </head>
 <body class="text-on-background min-h-screen">
-<div class="absolute top-0 left-0 w-full h-[300px] -z-10 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
 
 <!-- Header -->
-<header class="orange-gradient fixed top-0 left-0 right-0 z-50 shadow-md h-16 flex justify-between items-center px-container-padding">
+<header class="orange-gradient relative    z-50 shadow-md h-16 flex justify-between items-center px-container-padding">
 <button onclick="window.location.href='dangnhap.html'" class="flex items-center justify-center p-2 text-on-primary hover:bg-primary/20 rounded-full transition-all active:scale-95" style="cursor:pointer">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
@@ -117,7 +120,7 @@
 <div class="w-10"></div>
 </header>
 
-<main class="pt-24 pb-12 px-container-padding max-w-md mx-auto">
+<main class="pt-24 pb-12 px-container-padding max-w-md mx-auto relative z-10">
 
 <!-- Progress indicator -->
 <div class="flex items-center justify-center mb-6 px-8">
@@ -130,7 +133,7 @@
 
 <!-- Logo -->
 <div class="flex justify-center mb-4">
-<img src="../assets/images/logo.jpg" alt="Chị Ơi! Logo" class="w-24 h-24 rounded-full shadow-lg border-4 border-primary/20 object-cover"/>
+<img src="../assets/images/logo.jpg" alt="Chị Ơi! Logo" class="w-24 h-24 rounded-full shadow-lg border-4 border-white object-cover"/>
 </div>
 
 <!-- ==================== STEP 1: Nhập SĐT ==================== -->
@@ -141,7 +144,7 @@
 </div>
 <div class="relative">
     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">phone</span>
-    <input id="phoneInput" class="w-full h-14 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-2xl text-body-lg focus:ring-2 focus:ring-primary/20 focus:border-primary-container transition-all" placeholder="Số điện thoại (VD: 0901234567)" type="tel" inputmode="numeric"/>
+    <input id="phoneInput" class="w-full h-14 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-2xl text-body-lg focus:ring-2 focus:ring-primary/20 focus:border-primary-container transition-all" placeholder="Số điện thoại (VD: 0901234567)" type="tel" inputmode="numeric" maxlength="10"/>
 </div>
 <!-- Rate limit warning -->
 <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl">
@@ -230,7 +233,8 @@
 <div class="fixed -bottom-20 -left-20 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl -z-10"></div>
 <div class="fixed -top-20 -right-20 w-64 h-64 bg-outline-variant/10 rounded-full blur-3xl -z-10"></div>
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260515"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (function() {
   // ===== State =====
@@ -290,9 +294,21 @@
   }
 
   // ===== Step 1: Gửi OTP =====
+  // TC-KH02-012: Chỉ cho nhập số, giới hạn 10 ký tự
+  phoneInput.addEventListener('input', function() {
+    var cleaned = this.value.replace(/[^\d]/g, '');
+    if (cleaned.length > 10) cleaned = cleaned.substring(0, 10);
+    if (cleaned !== this.value) this.value = cleaned;
+  });
+
+  var serverOtp = ''; // Lưu OTP server trả về để verify tại step 2
+  var otpSentTime = 0; // Lưu thời điểm gửi OTP
+
   btnSendOtp.addEventListener('click', async function() {
     var phone = phoneInput.value.trim();
-    if (!phone || phone.length < 9) { showToastMsg('Vui lòng nhập số điện thoại hợp lệ'); return; }
+    // TC-KH02-012: Validate SĐT đúng 10 số, bắt đầu bằng 0
+    if (!phone) { showToastMsg('Vui lòng nhập số điện thoại'); return; }
+    if (!/^0\d{9}$/.test(phone)) { showToastMsg('Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0'); return; }
     storedPhone = phone;
     setLoading(btnSendOtp, true);
     try {
@@ -301,9 +317,14 @@
       });
       setLoading(btnSendOtp, false);
       if (result.masked_phone) maskedPhoneEl.textContent = result.masked_phone;
-      // Hiện thông báo SMS giả lập với mã OTP
-      if (result.dev_otp) showSmsNotification(result.dev_otp, result.masked_phone);
-      else showToastMsg('✅ ' + result.message);
+      // Lưu OTP để verify tại step 2
+      if (result.dev_otp) {
+        serverOtp = result.dev_otp;
+        otpSentTime = Date.now();
+        showSmsNotification(result.dev_otp, result.masked_phone);
+      } else {
+        showToastMsg('✅ ' + result.message);
+      }
       startOtpCountdown();
       startResendCountdown();
       goToStep(2);
@@ -334,10 +355,30 @@
   });
 
   // ===== Step 2: Verify OTP (chuyển sang step 3) =====
+  // TC-KH02-004: Kiểm tra OTP sai ngay tại step 2
+  // TC-KH02-005: Kiểm tra OTP hết hạn (5 phút)
   btnVerifyOtp.addEventListener('click', function() {
     var otp = '';
     otpInputs.forEach(function(input) { otp += input.value; });
     if (otp.length < 6) { showToastMsg('Vui lòng nhập đầy đủ 6 số OTP'); return; }
+
+    // TC-KH02-005: Kiểm tra OTP hết hạn (5 phút = 300000ms)
+    if (otpSentTime && (Date.now() - otpSentTime > 300000)) {
+      showToastMsg('❌ Mã OTP đã hết hạn. Vui lòng yêu cầu gửi lại.');
+      return;
+    }
+
+    // TC-KH02-004: Kiểm tra OTP đúng không
+    if (serverOtp && otp !== serverOtp) {
+      showToastMsg('❌ Mã OTP không chính xác. Vui lòng kiểm tra lại.');
+      // Highlight lỗi
+      otpInputs.forEach(function(input) { input.style.borderColor = '#ba1a1a'; });
+      setTimeout(function() {
+        otpInputs.forEach(function(input) { input.style.borderColor = ''; });
+      }, 2000);
+      return;
+    }
+
     storedOtp = otp;
     goToStep(3);
   });
@@ -351,9 +392,14 @@
         method: 'POST', body: { phone: storedPhone }
       });
       setLoading(btnResend, false);
-      // Hiện thông báo SMS giả lập với mã OTP mới
-      if (result.dev_otp) showSmsNotification(result.dev_otp, result.masked_phone);
-      else showToastMsg('✅ ' + result.message);
+      // Cập nhật OTP mới từ server
+      if (result.dev_otp) {
+        serverOtp = result.dev_otp;
+        otpSentTime = Date.now();
+        showSmsNotification(result.dev_otp, result.masked_phone);
+      } else {
+        showToastMsg('✅ ' + result.message);
+      }
       // Reset OTP inputs
       otpInputs.forEach(function(input) { input.value = ''; });
       otpInputs[0].focus();

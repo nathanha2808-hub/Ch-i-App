@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <title>Chat với Tasker | Chị Ơi!</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script id="tailwind-config">
     tailwind.config = {
         darkMode: "class",
@@ -65,13 +68,19 @@
     .message-gradient { background: linear-gradient(135deg, #ff7e36 0%, #a04100 100%); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* TC-KH11-016: Word break cho tin nhắn dài */
+    #chat-area p { word-break: break-word; overflow-wrap: break-word; }
+    /* TC-KH11-008: Textarea auto-height */
+    #msg-input { resize: none; overflow: hidden; min-height: 40px; max-height: 120px; line-height: 20px; }
+    /* TC-KH11-012: FAB scroll-to-bottom */
+    #scroll-fab { position: fixed; bottom: 80px; right: 20px; z-index: 100; width: 40px; height: 40px; border-radius: 50%; background: #a04100; color: #fff; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: none; align-items: center; justify-content: center; transition: opacity 0.3s; }
 </style>
 </head>
 <body class="text-on-surface min-h-screen flex flex-col relative bg-background">
-<div class="absolute top-0 left-0 w-full h-[300px] -z-10 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+<div class="absolute top-0 left-0 w-full h-[300px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
 
 <!-- Header -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-transparent h-16 px-container-padding flex justify-between items-center">
+<header class="relative    z-50 bg-transparent h-16 px-container-padding flex justify-between items-center">
 <div class="flex items-center gap-3">
     <button onclick="history.back()" class="text-on-primary active:scale-95 transition-all" style="cursor:pointer">
         <span class="material-symbols-outlined text-[28px]">arrow_back</span>
@@ -120,14 +129,19 @@
         <span class="material-symbols-outlined">image</span>
     </button>
     <input type="file" id="image-picker" accept="image/*" class="hidden" />
-    <div class="flex-1 h-10">
-        <input id="msg-input" class="w-full h-full bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-primary-container text-body-lg px-4 placeholder:text-outline-variant" placeholder="Nhập tin nhắn..." type="text"/>
+    <div class="flex-1">
+        <textarea id="msg-input" rows="1" class="w-full bg-surface-container-low border-none rounded-2xl focus:ring-2 focus:ring-primary-container text-body-lg px-4 py-2 placeholder:text-outline-variant" placeholder="Nhập tin nhắn..." style="resize:none;overflow:hidden;min-height:40px;max-height:120px;"></textarea>
     </div>
     <button id="btn-send" class="w-10 h-10 flex items-center justify-center bg-primary text-on-primary rounded-full shadow-md active:scale-90 transition-all">
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
     </button>
 </div>
 </footer>
+
+<!-- TC-KH11-012: FAB scroll-to-bottom -->
+<button id="scroll-fab" onclick="document.getElementById('chat-area').scrollTop=document.getElementById('chat-area').scrollHeight" title="Cuộn xuống">
+<span class="material-symbols-outlined" style="font-size:24px">keyboard_arrow_down</span>
+</button>
 
 <!-- ===== CALL OVERLAY ===== -->
 <div id="call-overlay" class="hidden fixed inset-0 z-[200] bg-black/85 flex flex-col items-center justify-center">
@@ -165,7 +179,8 @@
 
 <!-- Scripts -->
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script src="../shared/webrtc.js"></script>
 <script>
 (async function() {
@@ -301,7 +316,11 @@
       if (chiOiCall.remoteUserId) chiOiCall.acceptCall(chiOiCall.remoteUserId);
     });
     document.getElementById('btn-reject-call').addEventListener('click', function() {
-      if (chiOiCall.remoteUserId) chiOiCall.rejectCall(chiOiCall.remoteUserId);
+      if (chiOiCall.remoteUserId) {
+        chiOiCall.rejectCall(chiOiCall.remoteUserId);
+        // TC-KH11-021: Thông báo đã từ chối cuộc gọi
+        showToastMsg('❌ Bạn đã từ chối cuộc gọi');
+      }
     });
   }
 
@@ -330,8 +349,14 @@
   }
 
   btnSend.addEventListener('click', sendChatMessage);
+  // TC-KH11-008: Shift+Enter xuống dòng, Enter gửi tin nhắn
   msgInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') sendChatMessage();
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+  });
+  // TC-KH11-008: Auto-resize textarea
+  msgInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
   });
 
   // ===== 6. Gửi ảnh =====
@@ -419,6 +444,19 @@
   function scrollToBottom() {
     setTimeout(function() { chatArea.scrollTop = chatArea.scrollHeight; }, 100);
   }
+
+  // TC-KH11-012: Show/hide FAB scroll-to-bottom
+  var scrollFab = document.getElementById('scroll-fab');
+  chatArea.addEventListener('scroll', function() {
+    if (scrollFab) {
+      var distFromBottom = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight;
+      if (distFromBottom > 200) {
+        scrollFab.style.display = 'flex';
+      } else {
+        scrollFab.style.display = 'none';
+      }
+    }
+  });
 
   function formatTime(isoStr) {
     if (!isoStr) return '';

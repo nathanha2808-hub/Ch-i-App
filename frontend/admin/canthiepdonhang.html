@@ -2,6 +2,7 @@
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -134,6 +135,7 @@
             box-shadow: 0 0 0 2px rgba(160,65,0,0.2); 
         }
     </style>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 </head>
 <body class="flex min-h-screen text-on-surface">
 <!-- Sidebar -->
@@ -171,6 +173,10 @@
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
 <span class="material-symbols-outlined">account_balance_wallet</span>
 <span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydichvu.html">
+<span class="material-symbols-outlined">home_repair_service</span>
+<span class="font-label-md text-label-md">Dịch vụ &amp; Phí</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
 <span class="material-symbols-outlined">inbox</span>
@@ -226,6 +232,22 @@
 <main class="flex-1 ml-[240px] px-container_padding py-stack_lg pt-24">
 <div class="max-w-5xl space-y-gutter" id="intervention-list">
     <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Danh sách đơn hàng cần can thiệp</h2>
+    <!-- Search & Filter toolbar - Bug #19 -->
+    <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant/20 flex items-center gap-3 mb-4">
+      <div class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-outline-variant/20 flex-1 max-w-xs">
+        <span class="material-symbols-outlined text-sm text-on-surface-variant">search</span>
+        <input id="ct-search" class="bg-transparent border-none text-body-sm focus:ring-0 outline-none w-full placeholder-on-surface-variant/40" placeholder="Tìm mã đơn, tên khách..."/>
+      </div>
+      <select id="ct-status-filter" class="bg-white border border-outline-variant/20 text-body-sm rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary/20 outline-none">
+        <option value="">Tất cả trạng thái</option>
+        <option value="PENDING">Chờ xử lý</option>
+        <option value="SEARCHING">Đang tìm Tasker</option>
+        <option value="ACCEPTED">Đã nhận</option>
+        <option value="IN_PROGRESS">Đang thực hiện</option>
+        <option value="CANCELLED">Đã hủy</option>
+      </select>
+      <span id="ct-count" class="text-body-sm text-on-surface-variant ml-auto"></span>
+    </div>
     <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse min-w-[800px]">
@@ -236,7 +258,7 @@
                         <th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Dịch vụ</th>
                         <th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Trạng thái</th>
                         <th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Thời gian tạo</th>
-                        <th class="px-6 py-4 text-right"></th>
+                        <th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-right">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody id="ct-table-body">
@@ -571,7 +593,8 @@
 
 })();
 </script><!-- END-CHIOI-JS-INJECT -->
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('../khachhang/dangnhap.html')) return;
@@ -791,6 +814,30 @@
       }
     });
   }
+  // ===== Bug #19: Search & Filter for intervention =====
+  function applyCtFilter() {
+    var q = (document.getElementById('ct-search') || {}).value;
+    q = q ? q.toLowerCase().trim() : '';
+    var st = (document.getElementById('ct-status-filter') || {}).value || '';
+    var filtered = allOrders;
+    if (st) {
+      filtered = filtered.filter(function(o) { return o.status === st; });
+    }
+    if (q) {
+      filtered = filtered.filter(function(o) {
+        var customerName = (o.customers && o.customers.users && o.customers.users.full_name) ? o.customers.users.full_name.toLowerCase() : '';
+        var code = '#DH-' + String(o.order_id).padStart(4, '0');
+        return code.toLowerCase().includes(q) || customerName.includes(q);
+      });
+    }
+    renderOrderList(filtered);
+    var countEl = document.getElementById('ct-count');
+    if (countEl) countEl.textContent = filtered.length + ' đơn';
+  }
+  var ctSearch = document.getElementById('ct-search');
+  if (ctSearch) ctSearch.addEventListener('input', applyCtFilter);
+  var ctStatusFilter = document.getElementById('ct-status-filter');
+  if (ctStatusFilter) ctStatusFilter.addEventListener('change', applyCtFilter);
 
   // ===== Nút Đăng xuất =====
   var logoutBtn = document.querySelector('button[title="Đăng xuất"]');

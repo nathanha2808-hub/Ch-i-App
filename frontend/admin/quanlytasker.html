@@ -2,6 +2,7 @@
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -115,6 +116,7 @@
           },
         }
     </script>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 </head>
 <body class="bg-background text-on-surface">
 <!-- Sidebar Navigation -->
@@ -152,6 +154,10 @@
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlyvigiaodich.html">
 <span class="material-symbols-outlined">account_balance_wallet</span>
 <span class="font-label-md text-label-md">Quản lý ví</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="quanlydichvu.html">
+<span class="material-symbols-outlined">home_repair_service</span>
+<span class="font-label-md text-label-md">Dịch vụ &amp; Phí</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-variant/50 transition-all duration-200 ease-in-out" href="hopthu.html">
 <span class="material-symbols-outlined">inbox</span>
@@ -211,13 +217,13 @@
 <div class="flex-1 min-w-0">
 <!-- Tabs Section -->
 <div class="flex items-center gap-8 mb-6 border-b border-outline-variant">
-<button id="tab-all" class="pb-3 border-b-2 border-primary text-primary font-semibold text-body-md">Tất cả Tasker</button>
+<button id="tab-all" class="pb-3 border-b-2 border-primary text-primary font-semibold text-body-md flex items-center gap-2">Tất cả Tasker <span id="badge-all" class="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span></button>
 <button id="tab-pending" class="pb-3 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
     Chờ duyệt
     <span id="badge-pending" class="bg-error text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span>
 </button>
-<button id="tab-active" class="pb-3 text-on-surface-variant hover:text-primary transition-colors">Đang hoạt động</button>
-<button id="tab-locked" class="pb-3 text-on-surface-variant hover:text-primary transition-colors">Bị tạm khóa</button>
+<button id="tab-active" class="pb-3 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">Đang hoạt động <span id="badge-active" class="bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span></button>
+<button id="tab-locked" class="pb-3 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">Bị tạm khóa <span id="badge-locked" class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span></button>
 </div>
 <!-- Filters Section -->
 <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm mb-6 flex flex-wrap gap-3 items-center">
@@ -261,7 +267,6 @@
 <thead class="bg-surface-container-low border-b border-outline-variant">
 <tr>
 <th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider w-[50px] text-center">STT</th>
-<th class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></th>
 <th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Họ và Tên</th>
 <th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Dịch vụ</th>
 <th class="p-4 font-label-bold text-on-surface-variant uppercase tracking-wider">Khu vực</th>
@@ -273,209 +278,6 @@
 </thead>
 <tbody id="tasker-tbody" class="divide-y divide-outline-variant/10">
     <tr><td colspan="9" class="text-center py-8 text-on-surface-variant">Đang tải dữ liệu...</td></tr>
-<tr class="hover:bg-background transition-colors">
-<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
-<td class="p-4">
-<div class="flex items-center gap-3">
-<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A professional headshot of a friendly Vietnamese tasker woman in her late 30s, smiling warmly at the camera. She has her hair neatly tied back and wears a clean, professional uniform with a subtle brand logo. The lighting is soft and natural, emphasizing a trustworthy and dependable presence. The background is a clean, neutral interior setting typical of a high-end service application profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw0Km5FwSDnlgpOkpDKqA8lsme4C19vD5mBrFGMLG2AEDk1KFJF8nuwWWrofslxIQQ46wpsTUnoUJi9mhHvGJCznNRqs_zNcVtBas9Za1shWjeznTojoKIAs4kFIVlsJAik-HVd_KwPgittEKiubvtXs20bUc-ZuwGJFAdgbPgl3MJIL2L3uGtZ3fsajq13j1juFN8elFFiKb6ZPgWJk3tb5sbbH31xd5pH5PAFnjR2LZ61x0VPREfA7MuMpZZH1drBpbmBoW4mmk"/>
-<div>
-<p class="font-semibold text-body-md text-on-surface">Lê Thị Thu</p>
-<p class="text-body-sm text-on-surface-variant opacity-70">thu.le@email.com</p>
-</div>
-</div>
-</td>
-<td class="p-4 text-body-sm">Dọn dẹp nhà cửa</td>
-<td class="p-4 text-body-sm">Quận 1, HCM</td>
-<td class="p-4 text-body-sm">
-<div class="flex flex-col">
-<span>124 đơn</span>
-<div class="flex items-center text-yellow-500">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="ml-1 font-bold">4.9</span>
-</div>
-</div>
-</td>
-<td class="p-4">
-<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Hoạt động</span>
-</td>
-<td class="p-4 text-body-sm text-on-surface-variant">12/05/2023</td>
-<td class="p-4">
-<div class="flex gap-2">
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
-</div>
-</td>
-</tr>
-<!-- Row 2: Pending -->
-<tr class="bg-background/40 hover:bg-background transition-colors">
-<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
-<td class="p-4">
-<div class="flex items-center gap-3">
-<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A portrait of a young Vietnamese man in his 20s looking earnest and professional, suitable for a service worker profile. He is wearing a simple polo shirt. The lighting is clear and bright, consistent with a modern light-mode dashboard aesthetic. The overall mood is approachable and professional, set against a soft, out-of-focus urban background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe9MbNawDIt_ERtY44YJcMyfGyO93--65MY9wRpTil4-Rcx5a02CVNTlqA4knRNybySFoeZIesYTau1ivZewHqUjOZGyLfIPA2IL1pKSioPit-5KFrHNlSL1cB4pQXBNe9FtDCKbEstu_IgIuWGG3cjl43Lrvwuxc0Vn44GWPfx_78UmdNrAVTKiM8DwGU0CAvSd08PhMwefcHuf9Get5-urSDc6sbJp2-YSTj7Ap1uHVdpRDzaLPq7cTVCLxgsO1ylx9XXmNLehQ"/>
-<div>
-<p class="font-semibold text-body-md text-on-surface">Nguyễn Minh Quân</p>
-<p class="text-body-sm text-on-surface-variant opacity-70">quan.nm@email.com</p>
-</div>
-</div>
-</td>
-<td class="p-4 text-body-sm">Giặt ủi đồ len</td>
-<td class="p-4 text-body-sm">Quận 7, HCM</td>
-<td class="p-4 text-body-sm">
-<div class="flex flex-col">
-<span>0 đơn</span>
-<div class="flex items-center text-on-surface-variant/40">
-<span class="material-symbols-outlined text-[16px]">star</span>
-<span class="ml-1">--</span>
-</div>
-</div>
-</td>
-<td class="p-4">
-<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Chờ duyệt</span>
-</td>
-<td class="p-4 text-body-sm text-on-surface-variant">02/11/2023</td>
-<td class="p-4">
-<div class="flex gap-2">
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
-</div>
-</td>
-</tr>
-<!-- Row 3: Locked -->
-<tr class="hover:bg-background transition-colors">
-<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
-<td class="p-4">
-<div class="flex items-center gap-3">
-<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A profile photo of an older Vietnamese gentleman, perhaps in his 50s, looking serious yet professional. He is dressed in a collared shirt. The lighting is direct but soft, creating a sense of experience and reliability. The color palette of the image is muted and warm, blending seamlessly with the earth-toned design system of the administrative dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBrLUqZ7El-sjPOF82-fDcx6RVhmNJyyBcyTHNbYgr1Eqtm2BjFbyvLAe21nisFzs0FuDD-6kiyhJAu_H3eoYrYeL4Vy2ZSt5nGhYrNrkB2hSdjhG0HXxmSU94vuWt3rOrQvEU00lPUpGdl0ckL2Vofaa4xEq89RHW3vJMwGkslR41JypG3evocQlbrewjkFgFlBx7YrOFU2xXiMqQU7irg4_kJX19WsrdavHeFMAn-dJCRhR4RZ1ybleMunwJRa53b2--1a6F1lU"/>
-<div>
-<p class="font-semibold text-body-md text-on-surface">Trần Hữu Lộc</p>
-<p class="text-body-sm text-on-surface-variant opacity-70">loc.th@email.com</p>
-</div>
-</div>
-</td>
-<td class="p-4 text-body-sm">Sửa chữa điện nước</td>
-<td class="p-4 text-body-sm">Quận 3, HCM</td>
-<td class="p-4 text-body-sm">
-<div class="flex flex-col">
-<span>45 đơn</span>
-<div class="flex items-center text-yellow-500">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="ml-1 font-bold">4.2</span>
-</div>
-</div>
-</td>
-<td class="p-4">
-<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Tạm khóa</span>
-</td>
-<td class="p-4 text-body-sm text-on-surface-variant">15/01/2023</td>
-<td class="p-4">
-<div class="flex gap-2">
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
-</div>
-</td>
-</tr>
-<!-- Row 4: Active -->
-<tr class="bg-background/40 hover:bg-background transition-colors">
-<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
-<td class="p-4">
-<div class="flex items-center gap-3">
-<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A portrait of a cheerful young Vietnamese woman, smiling brightly, wearing a modest apron which suggests her service role. The lighting is warm and high-key, providing an optimistic and energetic feel for the profile. The visual style is crisp and modern, fitting perfectly into a sophisticated CMS interface focused on community and service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzITDyLk1MQvMI1PvsZppHsg7fs6mUY29j_A_MZfuRy-9MEbuulCnUfOcz7POZqlns1AihkUxmvJy7UfxZgKYa0mbL3vypUTF6pvQdKEIQ_sfWKup5yZrnvJwtB1Q9LgBlYXGImfPIYh_muX6TOnT3W59l9_pHKUia3ZxHLDQ3fb6Q3gLEcuSURR-flwtwlvMV001Kco9BVt7qdd4y8ydhUCI5TzcUvKYXr1MpnggyIxLCvXRypgLs9vEqT8ZBlp-Pgwv7qs4hiSs"/>
-<div>
-<p class="font-semibold text-body-md text-on-surface">Phạm Phương Anh</p>
-<p class="text-body-sm text-on-surface-variant opacity-70">anh.pp@email.com</p>
-</div>
-</div>
-</td>
-<td class="p-4 text-body-sm">Nấu ăn tại gia</td>
-<td class="p-4 text-body-sm">Bình Thạnh, HCM</td>
-<td class="p-4 text-body-sm">
-<div class="flex flex-col">
-<span>212 đơn</span>
-<div class="flex items-center text-yellow-500">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="ml-1 font-bold">5.0</span>
-</div>
-</div>
-</td>
-<td class="p-4">
-<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Hoạt động</span>
-</td>
-<td class="p-4 text-body-sm text-on-surface-variant">20/02/2023</td>
-<td class="p-4">
-<div class="flex gap-2">
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
-</div>
-</td>
-</tr>
-<!-- Row 5: Active -->
-<tr class="hover:bg-background transition-colors">
-<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
-<td class="p-4">
-<div class="flex items-center gap-3">
-<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A clean, professional headshot of a middle-aged Vietnamese man with glasses, conveying intelligence and reliability. He is wearing a simple casual shirt. The background is a soft blue, contrasting nicely with the warm tones of the dashboard. The lighting is balanced and soft, creating a modern, approachable aesthetic suitable for a professional CMS user list." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY0vsTUPpyNxE-2QUaHzPjNmH7wKo8KZWthrY2vH2mxWsZIkfJSJRhVfuqKABhJUACjcQf8t1qZ2TnZNwrn071GidtlobBM6WJqfTf-2Ilf_bkG7vCCJgJRCMFmBZwjAHxWJDpiL2pWegMPwbEtaBhgSH_fb7mUuTVoYsPUyv7VhAqJcgdifVHs-i93SYkQXWAXIT390srQT-0Up3a-dFyWoShwXH3LDZrv2SGinjCbpUFUazKdwawKxv_dpRNxty5rYdnpSQuS7U"/>
-<div>
-<p class="font-semibold text-body-md text-on-surface">Hoàng Văn Vinh</p>
-<p class="text-body-sm text-on-surface-variant opacity-70">vinh.hv@email.com</p>
-</div>
-</div>
-</td>
-<td class="p-4 text-body-sm">Vệ sinh máy lạnh</td>
-<td class="p-4 text-body-sm">Tân Bình, HCM</td>
-<td class="p-4 text-body-sm">
-<div class="flex flex-col">
-<span>89 đơn</span>
-<div class="flex items-center text-yellow-500">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="ml-1 font-bold">4.7</span>
-</div>
-</div>
-</td>
-<td class="p-4">
-<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Hoạt động</span>
-</td>
-<td class="p-4 text-body-sm text-on-surface-variant">08/04/2023</td>
-<td class="p-4">
-<div class="flex gap-2">
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
-</div>
-</td>
-</tr>
-<!-- Row 6: Pending -->
-<tr class="bg-background/40 hover:bg-background transition-colors">
-<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>
-<td class="p-4">
-<div class="flex items-center gap-3">
-<img alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" data-alt="A profile image of a pleasant-looking Vietnamese woman in her 20s, with a clean and professional appearance. Her expression is helpful and friendly. She is pictured in a well-lit, minimalist environment. The high-quality photography captures a sense of modern professionalism and reliability, aligning perfectly with a premium service application's visual identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwZPuTJ8xiik6BkvfR8G_Xzy4lUo3hayL1U9BnzbiLBnDhL_I-v64JvkEIJ5EC20yScftk3YobJ0RErMY6W7hPm9bsch1K0bYu8PE3FONZ4P6WQdEwCON3srjkec6YghomBIWNJZ7SaKtffiKlqBTekxq86KGOytbnUlDaElU_ErnNFY0Lk4KSoCvZoDNrZp-hBRL9vlNGzF7S7KPERrDfEjlH-W2u_gQSXtHL0ml-2U8gRLA5Mm-kL3SYhiGmVyWppipwBYFXVb8"/>
-<div>
-<p class="font-semibold text-body-md text-on-surface">Trần Tuyết Mai</p>
-<p class="text-body-sm text-on-surface-variant opacity-70">mai.tt@email.com</p>
-</div>
-</div>
-</td>
-<td class="p-4 text-body-sm">Trông trẻ</td>
-<td class="p-4 text-body-sm">Phú Nhuận, HCM</td>
-<td class="p-4 text-body-sm">
-<div class="flex flex-col">
-<span>0 đơn</span>
-<div class="flex items-center text-on-surface-variant/40">
-<span class="material-symbols-outlined text-[16px]">star</span>
-<span class="ml-1">--</span>
-</div>
-</div>
-</td>
-<td class="p-4">
-<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Chờ duyệt</span>
-</td>
-<td class="p-4 text-body-sm text-on-surface-variant">03/11/2023</td>
-<td class="p-4">
-<div class="flex gap-2">
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined" data-icon="visibility">visibility</span></button>
-<button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
-</div>
-</td>
-</tr>
 </tbody>
 </table>
 <!-- Pagination -->
@@ -737,7 +539,8 @@ document.querySelectorAll('button').forEach(function(btn) {
 })();
 </script><!-- END-CHIOI-JS-INJECT -->
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('../khachhang/dangnhap.html')) return;
@@ -782,12 +585,12 @@ document.querySelectorAll('button').forEach(function(btn) {
       var ks = getKycStatus(tasker);
       var s = kycStatusMap[ks] || { label: ks, cls: 'bg-gray-100 text-gray-700' };
       var isPending = ks === 'PENDING' || ks === 'PENDING_APPROVAL';
+      var isLocked = ks === 'REJECTED' || ks === 'SUSPENDED';
 
       var tr = document.createElement('tr');
       tr.className = (idx % 2 ? 'bg-background/40 ' : '') + 'hover:bg-background transition-colors';
       tr.innerHTML =
         '<td class="p-4 text-body-sm text-on-surface-variant text-center">' + (idx + 1) + '</td>' +
-        '<td class="p-4"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/></td>' +
         '<td class="p-4"><div class="flex items-center gap-3">' +
           '<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-[20px]">person</span></div>' +
           '<div><p class="font-semibold text-body-md text-on-surface">' + (tasker.full_name || '—') + '</p>' +
@@ -803,7 +606,10 @@ document.querySelectorAll('button').forEach(function(btn) {
           (isPending ?
             '<button class="approve-btn px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-[11px] font-bold transition-colors" data-uid="' + tasker.tasker_id + '">Duyệt</button>' +
             '<button class="reject-btn px-3 py-1.5 border border-error text-error hover:bg-error/10 rounded-lg text-[11px] font-bold transition-colors" data-uid="' + tasker.tasker_id + '">Từ chối</button>' :
-            '<button class="p-1.5 hover:bg-surface-container rounded-lg text-tertiary transition-colors"><span class="material-symbols-outlined">visibility</span></button>'
+            (isLocked ?
+              '<button class="unlock-btn px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-[11px] font-bold transition-colors" data-uid="' + tasker.tasker_id + '"><span class="material-symbols-outlined text-[14px] align-middle mr-1">lock_open</span>Mở khóa</button>' :
+              '<button class="lock-btn px-3 py-1.5 border border-error text-error hover:bg-error/10 rounded-lg text-[11px] font-bold transition-colors" data-uid="' + tasker.tasker_id + '"><span class="material-symbols-outlined text-[14px] align-middle mr-1">lock</span>Tạm khóa</button>'
+            )
           ) +
         '</div></td>';
 
@@ -832,6 +638,35 @@ document.querySelectorAll('button').forEach(function(btn) {
           await apiFetch('/api/admin/taskers/' + uid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'REJECTED' }) });
           hideLoading();
           showToastMsg('✅ Đã từ chối Tasker #' + uid);
+          setTimeout(function() { location.reload(); }, 1500);
+        } catch (e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+      });
+    });
+
+    // Bug 5 Report19: Nút tạm khóa Tasker
+    tbody.querySelectorAll('.lock-btn').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        if (!confirm('Tạm khóa tài khoản Tasker này?')) return;
+        var uid = btn.getAttribute('data-uid');
+        showLoading();
+        try {
+          await apiFetch('/api/admin/taskers/' + uid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'SUSPENDED' }) });
+          hideLoading();
+          showToastMsg('🔒 Đã tạm khóa Tasker #' + uid);
+          setTimeout(function() { location.reload(); }, 1500);
+        } catch (e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+      });
+    });
+
+    // Bug 5 Report19: Nút mở khóa Tasker
+    tbody.querySelectorAll('.unlock-btn').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        var uid = btn.getAttribute('data-uid');
+        showLoading();
+        try {
+          await apiFetch('/api/admin/taskers/' + uid + '/approve', { method: 'PATCH', body: JSON.stringify({ status: 'APPROVED' }) });
+          hideLoading();
+          showToastMsg('🔓 Đã mở khóa Tasker #' + uid);
           setTimeout(function() { location.reload(); }, 1500);
         } catch (e) { hideLoading(); showToastMsg('❌ ' + e.message); }
       });
@@ -972,6 +807,13 @@ document.querySelectorAll('button').forEach(function(btn) {
     hideLoading();
 
     allTaskers = (users || []).filter(function(u) { return u.role === 'TASKER' && u.taskers; }).map(function(u) {
+      // Bug Report20: Lấy danh sách dịch vụ từ tasker_services thay vì field không tồn tại
+      var serviceNames = [];
+      if (u.taskers.tasker_services && u.taskers.tasker_services.length > 0) {
+        serviceNames = u.taskers.tasker_services
+          .filter(function(ts) { return ts.services && ts.services.name; })
+          .map(function(ts) { return ts.services.name; });
+      }
       return {
         user_id: u.user_id,
         tasker_id: u.taskers.tasker_id,
@@ -979,20 +821,98 @@ document.querySelectorAll('button').forEach(function(btn) {
         phone: u.phone,
         created_at: u.created_at,
         kyc_status: u.taskers.kyc_status || u.status,
-        service_type: u.taskers.service_type,
-        area: u.taskers.area,
-        order_count: u.taskers.order_count || 0,
+        service_type: serviceNames.length > 0 ? serviceNames.join(', ') : 'Chưa đăng ký',
+        area: u.taskers.address || 'Chưa cập nhật',
+        order_count: u.taskers.total_jobs || 0,
         avg_rating: u.taskers.average_rating
       };
     });
 
     var pendingTaskers = allTaskers.filter(function(t) { return t.kyc_status === 'PENDING' || t.kyc_status === 'PENDING_APPROVAL' || t.kyc_status === 'UNVERIFIED'; });
+    var activeTaskers = allTaskers.filter(function(t) { return t.kyc_status === 'APPROVED' || t.kyc_status === 'ACTIVE' || t.kyc_status === 'VERIFIED'; });
+    var lockedTaskers = allTaskers.filter(function(t) { return t.kyc_status === 'REJECTED' || t.kyc_status === 'SUSPENDED'; });
 
     // Update stats
     var statTotal = document.getElementById('stat-total');
     var statPending = document.getElementById('stat-pending');
     if (statTotal) statTotal.textContent = allTaskers.length;
     if (statPending) statPending.textContent = pendingTaskers.length;
+
+    // Bug #40: Update badge counts on all tabs
+    var badgeAll = document.getElementById('badge-all');
+    if (badgeAll) badgeAll.textContent = allTaskers.length;
+    var badgeActive = document.getElementById('badge-active');
+    if (badgeActive) { badgeActive.textContent = activeTaskers.length; badgeActive.style.display = activeTaskers.length > 0 ? 'inline-block' : 'none'; }
+    var badgeLocked = document.getElementById('badge-locked');
+    if (badgeLocked) { badgeLocked.textContent = lockedTaskers.length; badgeLocked.style.display = lockedTaskers.length > 0 ? 'inline-block' : 'none'; }
+    // Tab pending badge
+    var badgePending = document.getElementById('badge-pending');
+    if (badgePending) { badgePending.textContent = pendingTaskers.length; badgePending.style.display = pendingTaskers.length > 0 ? 'inline-block' : 'none'; }
+
+
+    // Bug Report20: Populate dropdown dịch vụ từ dữ liệu thực
+    var svcFilter = document.getElementById('tasker-svc-filter');
+    if (svcFilter) {
+      var uniqueServices = {};
+      allTaskers.forEach(function(t) {
+        if (t.service_type && t.service_type !== 'Chưa đăng ký') {
+          t.service_type.split(', ').forEach(function(s) { uniqueServices[s] = true; });
+        }
+      });
+      svcFilter.innerHTML = '<option value="">Loại dịch vụ</option>';
+      Object.keys(uniqueServices).sort().forEach(function(svc) {
+        var opt = document.createElement('option');
+        opt.value = svc;
+        opt.textContent = svc;
+        svcFilter.appendChild(opt);
+      });
+    }
+
+    // Bug Report20: Populate dropdown khu vực từ dữ liệu thực
+    var areaFilter = document.getElementById('tasker-area-filter');
+    if (areaFilter) {
+      var uniqueAreas = {};
+      allTaskers.forEach(function(t) {
+        if (t.area && t.area !== 'Chưa cập nhật') uniqueAreas[t.area] = true;
+      });
+      areaFilter.innerHTML = '<option value="">Khu vực</option>';
+      Object.keys(uniqueAreas).sort().forEach(function(area) {
+        var opt = document.createElement('option');
+        opt.value = area;
+        opt.textContent = area;
+        areaFilter.appendChild(opt);
+      });
+    }
+
+    // Bug Report20: Nút "Xóa lọc" - reset tất cả filter
+    var clearFilterBtn = document.getElementById('btn-clear-tasker-filter');
+    if (clearFilterBtn) {
+      clearFilterBtn.addEventListener('click', function() {
+        if (svcFilter) svcFilter.selectedIndex = 0;
+        if (areaFilter) areaFilter.selectedIndex = 0;
+        var statusFilter = document.getElementById('tasker-status-filter');
+        if (statusFilter) statusFilter.selectedIndex = 0;
+        if (searchInput) searchInput.value = '';
+        // Reset tab về "Tất cả"
+        currentFilter = 'all';
+        ['all','pending','active','locked'].forEach(function(t) {
+          var b = document.getElementById('tab-' + t);
+          if (b) { b.classList.remove('border-b-2','border-primary','text-primary','font-semibold'); b.classList.add('text-on-surface-variant'); }
+        });
+        var tabAllBtn = document.getElementById('tab-all');
+        if (tabAllBtn) { tabAllBtn.classList.add('border-b-2','border-primary','text-primary','font-semibold'); tabAllBtn.classList.remove('text-on-surface-variant'); }
+        filterAndRender('all', '');
+        showToastMsg('Đã xóa bộ lọc');
+      });
+    }
+
+    // Bug Report20: Nút "Lọc" chính
+    var filterBtn = document.getElementById('btn-tasker-filter');
+    if (filterBtn) {
+      filterBtn.addEventListener('click', function() {
+        filterAndRender(currentFilter, searchInput ? searchInput.value : '');
+      });
+    }
 
     renderTable(allTaskers);
     renderPendingPanel(pendingTaskers);

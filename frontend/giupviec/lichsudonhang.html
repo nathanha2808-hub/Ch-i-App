@@ -2,14 +2,18 @@
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
       tailwind.config = {
@@ -143,25 +147,20 @@
     </style>
 </head>
 <body class="bg-background min-h-screen pb-24">
-<div class="absolute top-0 left-0 w-full h-[300px] z-0" style="background: linear-gradient(180deg, rgba(255,126,54,0.9) 0%, rgba(255,126,54,0) 100%); pointer-events: none;"></div>
 
-<!-- Header Section -->
-<header class="relative w-full pt-12 px-md overflow-hidden bg-transparent relative z-40">
-<div class="flex justify-between items-center w-full px-md h-16">
-<h1 class="text-headline-md font-headline-md font-bold text-white">Lịch sử đơn hàng</h1>
-<div class="flex gap-4">
-<button class="text-white-variant hover:opacity-90 transition-opacity active:scale-95 transition-transform duration-200">
-<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-</button>
-<button class="text-white-variant hover:opacity-90 transition-opacity active:scale-95 transition-transform duration-200">
-<span class="material-symbols-outlined" data-icon="menu">menu</span>
-</button>
-</div>
-</div>
-
+<!-- Header -->
+<header class="flex items-center justify-between px-md h-14 w-full sticky top-0 z-50 bg-surface/95 backdrop-blur-sm border-b border-outline-variant/20">
+  <div class="flex items-center gap-sm">
+    <span class="material-symbols-outlined text-primary text-[24px]">history</span>
+    <h1 class="font-title-sm text-title-sm text-on-surface">Lịch sử đơn hàng</h1>
+  </div>
+  <button id="btn-refresh" class="p-2 rounded-full hover:bg-surface-container-high active:scale-95 transition-all" title="Làm mới" onclick="location.reload()">
+    <span class="material-symbols-outlined text-on-surface-variant text-[22px]">refresh</span>
+  </button>
 </header>
+
 <!-- Main Content -->
-<main class="pt-6 px-md relative z-10">
+<main class="pt-4 px-md relative z-10">
 <!-- Filter Row -->
 <div class="flex gap-sm overflow-x-auto pb-4 no-scrollbar" id="filter-row">
 <button id="filter-month" class="flex items-center gap-1 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors whitespace-nowrap">
@@ -211,7 +210,8 @@
     </a>
 </nav>
 
-<script src="../shared/api.js?v=20260517"></script>
+<script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('dangnhaptasker.html')) return;
@@ -280,7 +280,8 @@
         card.innerHTML =
           '<div class="flex justify-between items-start">' +
             '<div><h3 class="text-title-sm font-title-sm text-on-surface">' + serviceName + '</h3>' +
-            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px]">schedule</span>' + formatDateTime(order.scheduled_time) + '</p></div>' +
+            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px]">schedule</span>' + formatDateTime(order.scheduled_time) + (order.duration_hours ? ' (' + order.duration_hours + ' giá»)' : '') + '</p>' +
+            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5"><span class="material-symbols-outlined text-[14px]">location_on</span>' + (order.address || 'ChÆ°a cáº­p nháº­t') + '</p></div>' +
             '<span class="' + s.bg + ' ' + s.text + ' px-3 py-1 rounded-full text-label-caps font-bold">' + s.label + '</span></div>' +
           '<div class="flex items-center justify-between border-t border-dashed border-outline-variant pt-3">' +
             '<span class="text-headline-md font-headline-md text-primary">' + formatVND(order.total_price) + '</span>' +

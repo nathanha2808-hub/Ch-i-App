@@ -2,12 +2,15 @@
 <html class="light" lang="vi">
 <head>
     <meta charset="utf-8"/>
+<meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ff7e36"/>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
+  <link rel="stylesheet" href="../shared/transitions.css"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -127,11 +130,23 @@
         .header-gradient {
             background: linear-gradient(180deg, #c2410c 0%, #ff7e36 65%, #fcf9f8 100%);
         }
+        /* Bug #26: Mobile responsive fix */
+        @media (max-width: 480px) {
+            body { padding: 0 !important; }
+            .card-premium { margin-left: 0; margin-right: 0; border-radius: 20px; }
+        }
+        /* Safe area padding for notched phones */
+        body {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        /* Prevent horizontal overflow on mobile */
+        html, body { max-width: 100vw; overflow-x: hidden; }
     </style>
 </head>
 <body class="bg-surface-dim text-on-surface min-h-screen flex flex-col items-center">
     <div class="w-full max-w-[430px] min-h-screen bg-background relative shadow-2xl overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-[250px] -z-10 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
+        <div class="absolute top-0 left-0 w-full h-[250px] z-0 pointer-events-none" style="background: linear-gradient(rgb(255, 126, 54) 0%, rgb(252, 249, 248) 100%);"></div>
         
         <!-- Header Section -->
         <header class="header-gradient w-full h-[220px] flex flex-col items-center justify-center relative overflow-hidden">
@@ -147,7 +162,7 @@
         </header>
 
         <!-- Main Content: Register Card -->
-        <main class="w-full max-w-md px-container-padding -mt-8 z-20 pb-xl">
+        <main class="w-full px-container-padding -mt-8 z-20 pb-xl relative mx-auto">
             <div class="bg-white rounded-[24px] card-premium border border-surface-container/40 px-6 py-5 flex flex-col gap-4 anim-form">
                 <!-- Register Form -->
                 <div class="flex flex-col gap-3">
@@ -222,7 +237,8 @@
         </footer>
     </div>
 
-    <script src="../shared/api.js?v=20260517"></script>
+    <script src="../shared/api.js?v=20260514"></script>
+<script src="../shared/prefetch.js" defer></script>
     <script>
         // ============================================================
         // VALIDATION HELPERS
@@ -391,7 +407,7 @@
                 });
 
                 ChiOiAuth.saveLogin(loginData);
-                window.location.href = '/khachhang/trangchu.html';
+                window.location.href = 'trangchu.html';
                 
             } catch (err) {
                 // UC-REG-24: Hiển thị thông báo tiếng Việt cho SĐT đã tồn tại

@@ -1,187 +1,341 @@
-/* ============================================================================
- * Chị Ơi! — Responsive UI/UX Cross-device
- * ============================================================================
- * Inject vào tất cả pages qua shared/api.js
- * Mục tiêu: render đẹp trên iPhone SE 320 → iPhone Pro Max 430 → iPad 1024
- *           landscape + portrait, iOS notch + Android display cutout
- * ============================================================================
- */
+/* ==========================================
+   Chị Ơi! — Global Responsive CSS
+   Tương thích mọi kích thước điện thoại
+   Mobile-first: 320px → 430px → tablet → desktop
+   ========================================== */
 
-/* ---------- Safe area CSS variables (iPhone notch + home indicator) ------- */
-:root {
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
+/* ===== VIEWPORT & BASE RESET ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
-
-/* ---------- Reset for mobile webview ---------- */
-html, body {
-  /* Prevent iOS Safari rubber-band scroll bouncing on body */
-  overscroll-behavior-y: none;
-  /* Prevent text size auto-adjust khi xoay landscape iOS */
+html {
   -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  /* Smooth scrolling */
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+body {
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 
-/* ---------- Fix viewport height bug iOS (URL bar hide/show) ----------------
- * Replace any `h-screen` or `min-h-screen` với dvh để KHÔNG bị URL bar che
- * (dvh = dynamic viewport height, native iOS Safari 15.4+ và Chrome 108+)
- */
-.h-screen,
-.min-h-screen {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
+/* ===== SAFE AREA (Notch iPhone X+, Dynamic Island) ===== */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
-/* Fallback browsers cũ KHÔNG support dvh */
-@supports not (height: 100dvh) {
-  .h-screen { height: 100vh !important; }
-  .min-h-screen { min-height: 100vh !important; }
-}
-
-/* ---------- Container width: max-w-[430px] but responsive on tablets ---- */
-.max-w-\[430px\] {
-  max-width: min(430px, 100vw) !important;
-  width: 100% !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* On tablets (>= 768px) và landscape: keep mobile-style narrow container
- * but center và thêm subtle shadow để tạo cảm giác "phone in tablet" */
-@media (min-width: 768px) {
-  .max-w-\[430px\] {
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.15) !important;
-  }
-}
-
-/* ---------- Safe area padding ---------- */
-/* Bottom navs (fixed/sticky) — đẩy lên trên home indicator iPhone */
-nav.fixed.bottom-0,
-nav[class*="bottom-0"][class*="fixed"],
-footer.fixed.bottom-0,
-[data-safe-bottom],
-.pb-safe {
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px) !important;
-}
-
-/* Headers fixed top — tránh notch */
-header.fixed.top-0,
-header[class*="top-0"][class*="fixed"],
-[data-safe-top],
-.pt-safe {
-  padding-top: max(env(safe-area-inset-top, 0px), 12px) !important;
-}
-
-/* Content area nếu có fixed header — thêm margin-top safe-area */
-main.with-safe-top {
-  margin-top: env(safe-area-inset-top, 0px) !important;
-}
-
-/* ---------- Touch targets: minimum 44×44pt (Apple HIG) ---------- */
-button, a[role="button"], input[type="button"], input[type="submit"] {
+/* ===== TOUCH TARGETS — min 44px theo Apple HIG ===== */
+button, a, input[type="submit"], select, [role="button"] {
   min-height: 44px;
-  touch-action: manipulation; /* loại bỏ 300ms tap delay iOS */
+  min-width: 44px;
+}
+/* Ngoại trừ inline links, small badges */
+a:not(.btn):not([class*="flex"]):not([class*="rounded"]) {
+  min-height: auto;
+  min-width: auto;
 }
 
-/* Exception: small icon buttons trong nav/header được giữ size hiện tại */
-nav button, header button, .icon-btn {
-  min-height: revert;
-}
-
-/* ---------- Inputs: prevent iOS zoom khi focus ---------- */
+/* ===== INPUTS — Chống zoom iOS khi focus (font < 16px) ===== */
 input, select, textarea {
-  font-size: max(16px, 1em) !important; /* < 16px iOS auto-zoom in */
+  font-size: 16px !important;
+}
+input[type="date"], input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-/* Exception cho compact UI (date input, time input nhỏ) */
-input[data-compact],
-.compact-input input {
-  font-size: 14px !important;
+/* ===== FLOATING NAV BAR — Responsive bottom spacing ===== */
+nav[class*="fixed"][class*="bottom"] {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  bottom: max(12px, env(safe-area-inset-bottom, 6px)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(92%, 430px) !important;
 }
 
-/* ---------- Form auto-fill background bug iOS Safari ----------------------
- * iOS Safari highlight autofilled input với màu vàng khó đọc → giữ design color
- */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px white inset !important;
-  -webkit-text-fill-color: #1b1c1c !important;
-  transition: background-color 5000s ease-in-out 0s !important;
+/* ===== MAIN CONTENT — Đủ padding cho bottom nav ===== */
+main, [class*="pb-32"] {
+  padding-bottom: max(120px, calc(80px + env(safe-area-inset-bottom, 0px))) !important;
 }
 
-/* ---------- Responsive typography (clamp) ---------- */
-/* Apply chỉ khi class "responsive-text" hoặc tự động cho h1/h2 */
-.text-responsive-lg { font-size: clamp(20px, 5vw, 28px) !important; }
-.text-responsive-md { font-size: clamp(16px, 4vw, 20px) !important; }
-.text-responsive-sm { font-size: clamp(13px, 3vw, 15px) !important; }
-
-/* ---------- Landscape mode adjustments ----------------------------------
- * Smartphone landscape: viewport thường < 500px height → bottom nav che content
- */
-@media (max-height: 500px) and (orientation: landscape) {
-  /* Compact bottom nav */
-  nav[class*="bottom-0"][class*="fixed"] {
-    height: 48px !important;
-  }
-  /* Reduce header padding */
-  header[class*="top-0"][class*="fixed"] {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-  }
-  /* Main content thêm bottom padding để không bị nav che */
-  main {
-    padding-bottom: 56px !important;
-  }
+/* ===== IMAGES — Không bao giờ tràn container ===== */
+img, video, svg {
+  max-width: 100%;
+  height: auto;
 }
 
-/* ---------- Small phones (iPhone SE 320px width) ---------- */
-@media (max-width: 360px) {
-  /* Reduce padding để không tràn */
-  .px-6, [class*="px-container-padding"] { padding-left: 12px !important; padding-right: 12px !important; }
-  .px-5 { padding-left: 10px !important; padding-right: 10px !important; }
-  /* Smaller font cho text quá dài */
-  .text-\[15px\] { font-size: 14px !important; }
-  .text-\[13px\] { font-size: 12px !important; }
+/* ===== TEXT OVERFLOW PREVENTION ===== */
+h1, h2, h3, h4, p, span, label {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-/* ---------- Tablets / Foldables (>= 600px width) ----------
- * Phone-style narrow column centered, không full-width
- */
-@media (min-width: 600px) {
-  body {
-    background: linear-gradient(135deg, #fcf9f8 0%, #fae4da 100%) !important;
-  }
+/* ===== PRESET BUTTONS (Nạp tiền) — Tự động xuống dòng ===== */
+#preset-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+#preset-container button {
+  flex: 1 1 calc(33.333% - 8px);
+  min-width: 90px;
+  white-space: nowrap;
+  font-size: 13px !important;
+  padding: 8px 12px !important;
 }
 
-/* ---------- Prevent horizontal scroll trên mọi viewport ---------- */
-html, body {
-  overflow-x: hidden !important;
+/* ===== OTP INPUTS — Responsive sizing ===== */
+.otp-input, input[maxlength="1"][class*="otp"] {
+  width: clamp(40px, 12vw, 52px) !important;
+  height: clamp(48px, 14vw, 60px) !important;
+  font-size: clamp(20px, 6vw, 28px) !important;
+}
+
+/* ===== HEADER — Safe cho tất cả kích thước ===== */
+header {
+  width: 100%;
   max-width: 100vw;
 }
 
-/* ---------- Accessibility: focus-visible cho keyboard navigation ------- */
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #ff7e36;
-  outline-offset: 2px;
+/* ===== MODAL — Full-width trên mobile ===== */
+[class*="modal"], .modal-overlay {
+  max-width: 100vw;
+  max-height: 100vh;
 }
 
-/* ---------- iOS bounce scroll cho modals ---------- */
-.modal-overlay, [class*="modal-overlay"] {
-  overscroll-behavior: contain;
+/* ===== SCROLLABLE TABS (Lịch sử hoạt động) ===== */
+[class*="overflow-x-auto"] {
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+[class*="overflow-x-auto"]::-webkit-scrollbar {
+  display: none;
 }
 
-/* ---------- Print styles (rare nhưng có thể) ---------- */
+/* ===============================================
+   BREAKPOINTS: Điện thoại nhỏ (320px - 374px)
+   Galaxy S5, iPhone SE 1st gen, etc.
+   =============================================== */
+@media (max-width: 374px) {
+  /* Giảm padding chung */
+  main, [class*="px-container-padding"] {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  header [class*="px-"] {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  
+  /* Font size nhỏ hơn cho header */
+  header h1 {
+    font-size: 16px !important;
+  }
+  
+  /* Nút preset nạp tiền — 2 cột trên màn hình nhỏ */
+  #preset-container button {
+    flex: 1 1 calc(50% - 8px);
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+  
+  /* Grid dịch vụ — nhỏ hơn */
+  .grid.grid-cols-3 img, [class*="w-28"] {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  
+  /* Service type buttons */
+  .service-type-btn {
+    font-size: 13px !important;
+    padding: 10px 8px !important;
+  }
+  
+  /* Tổng kết section text */
+  [id="summary-total"], [id="summary-service"] {
+    font-size: 14px !important;
+  }
+  
+  /* Bottom nav icons & text */
+  nav[class*="fixed"] span[class*="text-label"] {
+    font-size: 10px !important;
+  }
+  nav[class*="fixed"] span[class*="material-symbols"] {
+    font-size: 24px !important;
+  }
+  nav[class*="fixed"] {
+    padding: 8px 8px !important;
+  }
+  
+  /* Chat messages — smaller */
+  .chat-bubble, [class*="chat"] [class*="rounded"] {
+    max-width: 85% !important;
+    font-size: 13px !important;
+  }
+  
+  /* Balance card */
+  [class*="divide-x"] {
+    flex-direction: column !important;
+  }
+  [class*="divide-x"] > * {
+    border-left: none !important;
+    border-top: 1px solid #dfc0b3;
+    padding-top: 8px;
+    padding-left: 0 !important;
+  }
+  [class*="divide-x"] > *:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+/* ===============================================
+   BREAKPOINTS: Điện thoại trung bình (375px - 413px)
+   iPhone 12/13/14, Pixel 5, Galaxy S21
+   =============================================== */
+@media (min-width: 375px) and (max-width: 413px) {
+  /* Standard mobile — mặc định design đã OK */
+  #preset-container button {
+    flex: 1 1 calc(33.333% - 8px);
+    font-size: 13px !important;
+  }
+}
+
+/* ===============================================
+   BREAKPOINTS: Điện thoại lớn (414px - 480px)
+   iPhone Plus/Max, Galaxy S Ultra, Pixel 7 Pro
+   =============================================== */
+@media (min-width: 414px) and (max-width: 480px) {
+  #preset-container button {
+    flex: 1 1 calc(33.333% - 8px);
+  }
+}
+
+/* ===============================================
+   BREAKPOINTS: Tablet nhỏ / Landscape phone (481px+)
+   =============================================== */
+@media (min-width: 481px) {
+  /* Center content như app mobile */
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e8e5e5;
+  }
+  body > *:not(nav):not(script):not(link):not(style):not([class*="fixed"]):not([class*="toast"]):not([class*="modal"]):not([class*="sms-notification"]):not([id="loading-overlay"]) {
+    max-width: 430px;
+    width: 100%;
+  }
+  /* Background gradient cũng chỉ trong 430px */
+  body > div[class*="absolute"][class*="pointer-events-none"] {
+    max-width: 430px;
+    left: 50% !important;
+    transform: translateX(-50%);
+  }
+  /* Main container */
+  main {
+    max-width: 430px !important;
+    width: 100% !important;
+  }
+  header {
+    max-width: 430px !important;
+    width: 100% !important;
+  }
+  /* Vẫn giữ background toàn trang cho body */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(180deg, #fef6f0 0%, #e8e5e5 30%);
+    z-index: -1;
+  }
+}
+
+/* ===============================================
+   BREAKPOINTS: Desktop (768px+) — Hiển thị dạng phone mockup
+   =============================================== */
+@media (min-width: 768px) {
+  body {
+    min-height: 100vh;
+  }
+}
+
+/* ===== ANIMATION HELPERS ===== */
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+/* ===== LOADING OVERLAY — Global ===== */
+#loading-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+}
+
+/* ===== TOAST — Responsive positioning ===== */
+[class*="toast"], #toast-container, .toast-msg {
+  max-width: min(90vw, 380px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* ===== FORM ELEMENTS — Consistent mobile sizing ===== */
+input[type="text"], input[type="tel"], input[type="email"], 
+input[type="password"], input[type="number"], textarea, select {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== LONG TEXT HANDLING ===== */
+td, th {
+  word-break: break-word;
+}
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* ===== QR CODE IMAGE — Responsive ===== */
+img[alt*="QR"], img[alt*="qr"] {
+  width: min(200px, 50vw) !important;
+  height: min(200px, 50vw) !important;
+}
+
+/* ===== LANDSCAPE MODE — Điều chỉnh chiều cao ===== */
+@media (orientation: landscape) and (max-height: 500px) {
+  nav[class*="fixed"][class*="bottom"] {
+    padding: 6px 8px !important;
+  }
+  nav[class*="fixed"] span[class*="text-label"] {
+    display: none !important;
+  }
+  main {
+    padding-bottom: 80px !important;
+  }
+}
+
+/* ===== DARK MODE SUPPORT (tương lai) ===== */
+@media (prefers-color-scheme: dark) {
+  /* Placeholder cho dark mode */
+}
+
+/* ===== REDUCED MOTION — Accessibility ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== PRINT — Ẩn nav khi in ===== */
 @media print {
-  nav, header, footer, .no-print { display: none !important; }
+  nav[class*="fixed"] { display: none !important; }
+  body { background: white !important; }
 }
