@@ -598,15 +598,28 @@
 
           // ===== 4.1 Load Danh sách Tasker gần bạn =====
           var allTaskers = [];
-          var userLat = 10.8231; // Default: HCM
-          var userLng = 106.6297;
+          var userLat = null;
+          var userLng = null;
+          var MAX_DISTANCE_KM = 50; // Chỉ hiện Tasker trong bán kính 50km
 
-          // Try get real GPS
           function fetchTaskers(lat, lng) {
             var url = '/api/taskers/active';
             if (lat && lng) url += '?lat=' + lat + '&lng=' + lng;
             apiFetch(url).then(function (res) {
-              if (res && res.length > 0) allTaskers = res;
+              if (res && res.length > 0) {
+                // Chỉ giữ Tasker có khoảng cách thật (backend trả distance qua PostGIS)
+                if (lat && lng) {
+                  allTaskers = res.filter(function(t) {
+                    // Bỏ Tasker không có GPS hoặc quá xa
+                    if (t.distance === undefined || t.distance === null) return false;
+                    return (t.distance / 1000) <= MAX_DISTANCE_KM;
+                  });
+                  // Sắp xếp theo khoảng cách gần nhất
+                  allTaskers.sort(function(a, b) { return (a.distance || 0) - (b.distance || 0); });
+                } else {
+                  allTaskers = res;
+                }
+              }
               renderTaskerCards();
             }).catch(function (e) {
               console.warn('[ChiOi] Không thể load Tasker:', e.message);
@@ -621,19 +634,19 @@
               fetchTaskers(userLat, userLng);
             }, function () {
               fetchTaskers(); // fallback without GPS
-            }, { timeout: 5000 });
+            }, { timeout: 8000 });
           } else {
             fetchTaskers();
           }
 
-          function getTaskerDistance(t) {
-            // If backend provided distance (in meters), convert to km
+          // Format khoảng cách: <1km hiện mét, >=1km hiện km
+          function formatDistance(t) {
             if (t.distance !== undefined && t.distance !== null) {
-              return (t.distance / 1000).toFixed(1);
+              var meters = t.distance;
+              if (meters < 1000) return Math.round(meters) + 'm';
+              return (meters / 1000).toFixed(1) + 'km';
             }
-            // Fallback mock within 3km
-            if (!t._dist) t._dist = (Math.random() * 2.5 + 0.3).toFixed(1);
-            return t._dist;
+            return 'Gần đây';
           }
 
           function getTaskerServices(t) {
@@ -649,20 +662,19 @@
             taskerContainer.innerHTML = '';
 
             if (allTaskers.length === 0) {
-              taskerContainer.innerHTML = '<div class="w-full text-center text-on-surface-variant text-sm py-4">Hiện không có Tasker nào trực tuyến</div>';
+              taskerContainer.innerHTML = '<div class="w-full text-center text-on-surface-variant text-sm py-4">Hiện không có Tasker nào trực tuyến gần bạn</div>';
               return;
             }
 
             var bgColors = ['bg-primary-fixed', 'bg-tertiary-fixed', 'bg-secondary-fixed'];
             var textColors = ['text-primary', 'text-tertiary', 'text-secondary'];
 
-            allTaskers.slice(0, 5).forEach(function (t, idx) {
+            allTaskers.slice(0, 10).forEach(function (t, idx) {
               var bg = bgColors[idx % bgColors.length];
               var txt = textColors[idx % textColors.length];
-              var rating = (t.taskers && t.taskers.average_rating) ? Number(t.taskers.average_rating).toFixed(1) : '5.0';
-              var distance = getTaskerDistance(t) + 'km';
+              var rating = (t.taskers && t.taskers.average_rating) ? Number(t.taskers.average_rating).toFixed(1) : '0.0';
+              var distance = formatDistance(t);
               var svcName = getTaskerServices(t);
-              var totalJobs = (t.taskers && t.taskers.total_jobs) ? t.taskers.total_jobs : 0;
 
               var div = document.createElement('div');
               div.className = 'min-w-[160px] bg-white rounded-2xl overflow-hidden soft-shadow border border-surface-container-high cursor-pointer active:scale-95 transition-all';
@@ -685,7 +697,7 @@
             var totalJobs = (t.taskers && t.taskers.total_jobs) ? t.taskers.total_jobs : 0;
             var bio = (t.taskers && t.taskers.bio) ? t.taskers.bio : 'Chưa có mô tả';
             var svcName = getTaskerServices(t);
-            var distance = getTaskerDistance(t) + 'km';
+            var distance = formatDistance(t);
             var isOnline = t.taskers && t.taskers.is_online;
 
             var overlay = document.createElement('div');
@@ -728,7 +740,7 @@
               var txt = textColors[idx % textColors.length];
               var rating = (t.taskers && t.taskers.average_rating) ? Number(t.taskers.average_rating).toFixed(1) : '5.0';
               var totalJobs = (t.taskers && t.taskers.total_jobs) ? t.taskers.total_jobs : 0;
-              var distance = getTaskerDistance(t) + 'km';
+              var distance = formatDistance(t);
               var svcName = getTaskerServices(t);
               html += '<div class="tasker-item flex items-center gap-4 p-4 bg-surface-container-low rounded-2xl cursor-pointer active:scale-[0.98] transition-all" data-idx="' + idx + '">' +
                 '<div class="w-14 h-14 rounded-full ' + bg + ' flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined ' + txt + ' text-2xl" style="font-variation-settings: \'FILL\' 1;">person</span></div>' +
