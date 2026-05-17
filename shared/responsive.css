@@ -23,6 +23,11 @@ body {
   -webkit-overflow-scrolling: touch;/* VĐ1: Smooth scroll iOS */
   overscroll-behavior-y: none;      /* VĐ4: Chặn vertical bounce */
   min-height: 100%;                 /* VĐ1: Body chiếm full chiều cao */
+  scrollbar-width: none;            /* Ẩn scrollbar Firefox */
+  -ms-overflow-style: none;         /* Ẩn scrollbar IE/Edge cũ */
+}
+body::-webkit-scrollbar {
+  display: none;                    /* Ẩn scrollbar Chrome/Safari/Edge */
 }
 
 /* ===== SAFE AREA (Notch iPhone X+, Dynamic Island) ===== */
