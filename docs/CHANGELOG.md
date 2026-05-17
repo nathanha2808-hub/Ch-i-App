@@ -4,6 +4,15 @@
 
 ---
 
+## [1.5.1] — 2026-05-17
+
+### 🐛 Bug fixes — Tasker App (GPS Permission)
+
+#### Fixed
+- **Frontend:** `giupviec/trangchutasker.html` — Yêu cầu quyền truy cập GPS/Vị trí ngay khi Tasker BẬT trạng thái hoạt động, thay vì đợi đến lúc nhận đơn mới báo lỗi.
+
+---
+
 ## [1.5.0] — 2026-05-17
 
 ### 💰 UC-KH-19 — Rút tiền từ ví Khách hàng (9 Test Cases)
