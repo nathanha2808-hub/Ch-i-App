@@ -5,8 +5,12 @@
 <meta name="view-transition" content="same-origin"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/logo.jpg"/>
-<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
 <meta name="theme-color" content="#ff7e36"/>
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Tài khoản - Chị Ơi!</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -138,7 +142,7 @@
 </header>
 
 <!-- Scrollable Body Content -->
-<main class="relative z-10 pb-32 px-container-padding space-y-4 overflow-y-auto">
+<main class="relative z-10 pb-32 px-container-padding space-y-4">
 <!-- Lỗi 11 FIX: User Profile Card - hiển thị đúng thông tin từ DB -->
 <section class="bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container">
 <div class="flex items-center space-x-md mb-md">
