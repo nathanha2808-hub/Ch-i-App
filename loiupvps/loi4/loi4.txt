@@ -1,2 +1,0 @@
-thêm tìm kiếm và xóa lọc
-thêm nút tìm kiếm và xóa lọc ở các màn hình ở trang admin

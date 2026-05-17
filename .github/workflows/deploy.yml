@@ -79,8 +79,10 @@ jobs:
 
             echo "═══ [5/6] Copy frontend → /var/www ═══"
             rm -rf /var/www/chioi.vn/* /var/www/app.chioi.vn/*
-            cp -r ../frontend/* /var/www/chioi.vn/
-            cp -r ../frontend/* /var/www/app.chioi.vn/
+            cp -r ../khachhang ../giupviec ../admin ../shared ../assets ../icons ../.well-known /var/www/chioi.vn/
+            cp ../sw.js ../manifest.json ../pwa-register.js ../favicon.ico ../favicon-32.png ../apple-touch-icon.png ../privacy.html ../terms.html /var/www/chioi.vn/
+            cp -r ../khachhang ../giupviec ../admin ../shared ../assets ../icons ../.well-known /var/www/app.chioi.vn/
+            cp ../sw.js ../manifest.json ../pwa-register.js ../favicon.ico ../favicon-32.png ../apple-touch-icon.png ../privacy.html ../terms.html /var/www/app.chioi.vn/
             chown -R www-data:www-data /var/www/chioi.vn /var/www/app.chioi.vn
 
             echo "═══ [6/6] PM2 restart + verify ═══"

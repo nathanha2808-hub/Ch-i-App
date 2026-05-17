@@ -114,7 +114,8 @@ pm2 save
 # =============================================================================
 log "4/6 — Frontend (static files) — copy sang /var/www"
 sudo mkdir -p "/var/www/$DOMAIN_FRONTEND"
-sudo cp -r "$APP_DIR/frontend/"* "/var/www/$DOMAIN_FRONTEND/"
+sudo cp -r "$APP_DIR/khachhang" "$APP_DIR/giupviec" "$APP_DIR/admin" "$APP_DIR/shared" "$APP_DIR/assets" "$APP_DIR/icons" "$APP_DIR/.well-known" "/var/www/$DOMAIN_FRONTEND/"
+sudo cp "$APP_DIR/sw.js" "$APP_DIR/manifest.json" "$APP_DIR/pwa-register.js" "$APP_DIR/favicon.ico" "$APP_DIR/privacy.html" "$APP_DIR/terms.html" "/var/www/$DOMAIN_FRONTEND/"
 sudo chown -R www-data:www-data "/var/www/$DOMAIN_FRONTEND"
 
 # =============================================================================
