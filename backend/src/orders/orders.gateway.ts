@@ -8,8 +8,8 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  // Store connected clients: Map<userId, socketId>
-  private connectedUsers = new Map<number, string>();
+  // TC_T04_012 FIX: Support multi-device per user
+  private connectedUsers = new Map<number, Set<string>>();
 
   constructor(
     private ordersService: OrdersService,
@@ -26,7 +26,11 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       
       const payload = this.jwtService.verify(token.replace('Bearer ', ''), { secret: process.env.JWT_SECRET || 'super-secret' });
       const userId = Number(payload.sub);
-      this.connectedUsers.set(userId, client.id);
+      // TC_T04_012 FIX: Add socket to user's Set (multi-device)
+      if (!this.connectedUsers.has(userId)) {
+        this.connectedUsers.set(userId, new Set());
+      }
+      this.connectedUsers.get(userId)!.add(client.id);
       
       // Store userId in socket
       client.data.userId = userId;
@@ -38,8 +42,39 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket) {
     if (client.data.userId) {
-      this.connectedUsers.delete(Number(client.data.userId));
+      const userId = Number(client.data.userId);
+      const sockets = this.connectedUsers.get(userId);
+      if (sockets) {
+        sockets.delete(client.id);
+        if (sockets.size === 0) this.connectedUsers.delete(userId);
+      }
     }
+  }
+
+  // TC_T04_012 FIX: Helper — lấy tất cả socketId của 1 user
+  private getSocketIds(userId: number): string[] {
+    const sockets = this.connectedUsers.get(Number(userId));
+    return sockets ? Array.from(sockets) : [];
+  }
+
+  // TC_T04_012 FIX: Emit event tới TẤT CẢ device của 1 user
+  notifyUserAllDevices(userId: number, event: string, data: any) {
+    const socketIds = this.getSocketIds(userId);
+    socketIds.forEach(sid => this.server.to(sid).emit(event, data));
+  }
+
+  // TC_T04_012 FIX: Lắng nghe update_status từ FE → sync sang các tab khác
+  @SubscribeMessage('update_status')
+  handleStatusUpdate(@ConnectedSocket() client: Socket, @MessageBody() data: { is_online: boolean }) {
+    if (!client.data.userId) return;
+    const userId = Number(client.data.userId);
+    // Broadcast tới TẤT CẢ socket khác của CÙNG user (trừ sender)
+    const socketIds = this.getSocketIds(userId);
+    socketIds.forEach(sid => {
+      if (sid !== client.id) {
+        this.server.to(sid).emit('status_synced', { is_online: data.is_online });
+      }
+    });
   }
 
   @SubscribeMessage('update_gps')
@@ -51,44 +86,44 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   notifyTaskersNewOrder(taskerIds: number[], order: any) {
     taskerIds.forEach(id => {
-      const socketId = this.connectedUsers.get(Number(id));
-      if (socketId) {
-        this.server.to(socketId).emit('new_order', {
+      const socketIds = this.getSocketIds(Number(id));
+      socketIds.forEach(sid => {
+        this.server.to(sid).emit('new_order', {
           message: 'Ting ting! Có đơn hàng mới gần bạn',
           order,
         });
-      }
+      });
     });
   }
 
   notifyCustomerOrderAccepted(customerId: number, order: any) {
-    const socketId = this.connectedUsers.get(Number(customerId));
-    if (socketId) {
-      this.server.to(socketId).emit('order_accepted', {
+    const socketIds = this.getSocketIds(Number(customerId));
+    socketIds.forEach(sid => {
+      this.server.to(sid).emit('order_accepted', {
         message: 'Tasker đã nhận đơn của bạn',
         order,
       });
-    }
+    });
   }
 
   notifyCustomerOrderStatus(customerId: number, data: any) {
-    const socketId = this.connectedUsers.get(Number(customerId));
-    if (socketId) {
-      this.server.to(socketId).emit('order_status_updated', {
+    const socketIds = this.getSocketIds(Number(customerId));
+    socketIds.forEach(sid => {
+      this.server.to(sid).emit('order_status_updated', {
         message: `Đơn hàng của bạn đã chuyển sang trạng thái: ${data.status}`,
         data,
       });
-    }
+    });
   }
 
   notifyTaskerOrderCancelled(taskerId: number, orderId: number) {
-    const socketId = this.connectedUsers.get(Number(taskerId));
-    if (socketId) {
-      this.server.to(socketId).emit('order_cancelled', {
+    const socketIds = this.getSocketIds(Number(taskerId));
+    socketIds.forEach(sid => {
+      this.server.to(sid).emit('order_cancelled', {
         message: 'Rất tiếc, Khách hàng đã hủy đơn',
         orderId,
       });
-    }
+    });
   }
 
   // ===== BƯỚC 1.2: Join order room — xác thực user thuộc đơn hàng =====
@@ -157,11 +192,13 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    const receiverSocketId = this.connectedUsers.get(Number(data.receiverId));
-    if (receiverSocketId) {
-      this.server.to(receiverSocketId).emit('call_incoming', {
-        orderId: data.orderId,
-        callerId: client.data.userId,
+    const receiverSocketIds = this.getSocketIds(Number(data.receiverId));
+    if (receiverSocketIds.length > 0) {
+      receiverSocketIds.forEach(sid => {
+        this.server.to(sid).emit('call_incoming', {
+          orderId: data.orderId,
+          callerId: client.data.userId,
+        });
       });
     } else {
       client.emit('call_failed', { reason: 'Người dùng không trực tuyến' });
@@ -171,54 +208,54 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // 2. Chấp nhận cuộc gọi
   @SubscribeMessage('call_accepted')
   handleCallAccepted(@ConnectedSocket() client: Socket, @MessageBody() data: { orderId: number, callerId: number }) {
-    const callerSocketId = this.connectedUsers.get(Number(data.callerId));
-    if (callerSocketId) {
-      this.server.to(callerSocketId).emit('call_accepted', { orderId: data.orderId });
-    }
+    const callerSocketIds = this.getSocketIds(Number(data.callerId));
+    callerSocketIds.forEach(sid => {
+      this.server.to(sid).emit('call_accepted', { orderId: data.orderId });
+    });
   }
 
   // 3. Từ chối cuộc gọi
   @SubscribeMessage('call_rejected')
   handleCallRejected(@ConnectedSocket() client: Socket, @MessageBody() data: { callerId: number }) {
-    const callerSocketId = this.connectedUsers.get(Number(data.callerId));
-    if (callerSocketId) {
-      this.server.to(callerSocketId).emit('call_rejected', {});
-    }
+    const callerSocketIds = this.getSocketIds(Number(data.callerId));
+    callerSocketIds.forEach(sid => {
+      this.server.to(sid).emit('call_rejected', {});
+    });
   }
 
   // 4. WebRTC SDP Exchange — Offer
   @SubscribeMessage('webrtc_offer')
   handleOffer(@ConnectedSocket() client: Socket, @MessageBody() data: { receiverId: number, sdp: any }) {
-    const receiverSocketId = this.connectedUsers.get(Number(data.receiverId));
-    if (receiverSocketId) {
-      this.server.to(receiverSocketId).emit('webrtc_offer', { sdp: data.sdp, callerId: client.data.userId });
-    }
+    const receiverSocketIds = this.getSocketIds(Number(data.receiverId));
+    receiverSocketIds.forEach(sid => {
+      this.server.to(sid).emit('webrtc_offer', { sdp: data.sdp, callerId: client.data.userId });
+    });
   }
 
   // 5. WebRTC SDP Exchange — Answer
   @SubscribeMessage('webrtc_answer')
   handleAnswer(@ConnectedSocket() client: Socket, @MessageBody() data: { callerId: number, sdp: any }) {
-    const callerSocketId = this.connectedUsers.get(Number(data.callerId));
-    if (callerSocketId) {
-      this.server.to(callerSocketId).emit('webrtc_answer', { sdp: data.sdp });
-    }
+    const callerSocketIds = this.getSocketIds(Number(data.callerId));
+    callerSocketIds.forEach(sid => {
+      this.server.to(sid).emit('webrtc_answer', { sdp: data.sdp });
+    });
   }
 
   // 6. ICE Candidate
   @SubscribeMessage('ice_candidate')
   handleIceCandidate(@ConnectedSocket() client: Socket, @MessageBody() data: { receiverId: number, candidate: any }) {
-    const receiverSocketId = this.connectedUsers.get(Number(data.receiverId));
-    if (receiverSocketId) {
-      this.server.to(receiverSocketId).emit('ice_candidate', { candidate: data.candidate });
-    }
+    const receiverSocketIds = this.getSocketIds(Number(data.receiverId));
+    receiverSocketIds.forEach(sid => {
+      this.server.to(sid).emit('ice_candidate', { candidate: data.candidate });
+    });
   }
 
   // 7. Kết thúc cuộc gọi
   @SubscribeMessage('call_ended')
   handleCallEnded(@ConnectedSocket() client: Socket, @MessageBody() data: { receiverId: number }) {
-    const receiverSocketId = this.connectedUsers.get(Number(data.receiverId));
-    if (receiverSocketId) {
-      this.server.to(receiverSocketId).emit('call_ended', {});
-    }
+    const receiverSocketIds = this.getSocketIds(Number(data.receiverId));
+    receiverSocketIds.forEach(sid => {
+      this.server.to(sid).emit('call_ended', {});
+    });
   }
 }

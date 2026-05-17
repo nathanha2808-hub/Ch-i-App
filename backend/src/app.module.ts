@@ -11,6 +11,7 @@ import { WalletsModule } from './wallets/wallets.module';
 import { SmsModule } from './integrations/sms/sms.module';
 import { KycModule } from './integrations/kyc/kyc.module';
 import { PaymentsModule } from './integrations/payments/payments.module';
+import { PushModule } from './push/push.module';
 import { throttlerConfig } from './common/throttler.config';
 
 @Module({
@@ -26,6 +27,7 @@ import { throttlerConfig } from './common/throttler.config';
     SmsModule,
     KycModule,
     PaymentsModule,
+    PushModule,
   ],
   controllers: [AppController],
   providers: [

@@ -52,7 +52,7 @@ export class OrdersController {
 
   @Patch(':id/status')
   @Roles('TASKER')
-  @ApiOperation({ summary: 'Cập nhật trạng thái đơn: TASKER_ARRIVED, IN_PROGRESS, COMPLETED (Cần Token Tasker)' })
+  @ApiOperation({ summary: 'Cập nhật trạng thái đơn: TASKER_ARRIVED, IN_PROGRESS, PENDING_COMPLETION (Cần Token Tasker)' })
   @ApiBody({ type: UpdateOrderStatusDto })
   async updateStatus(@Request() req, @Param('id', ParseIntPipe) id: number, @Body() body: UpdateOrderStatusDto) {
     const order = await this.ordersService.updateOrderStatus(id, req.user.userId, body.status);
@@ -75,6 +75,24 @@ export class OrdersController {
     }
     
     return { message: 'Order cancelled successfully', order };
+  }
+
+  // TC-T09-013 FIX: KH xác nhận hoàn thành đơn
+  @Patch(':id/confirm')
+  @Roles('CUSTOMER')
+  @ApiOperation({ summary: 'Khách hàng xác nhận đơn hoàn thành (PENDING_COMPLETION → COMPLETED)' })
+  async confirmCompletion(@Request() req, @Param('id', ParseIntPipe) id: number) {
+    const order = await this.ordersService.confirmCompletion(id, req.user.userId);
+    
+    // Notify Tasker đơn đã được KH xác nhận
+    if (order.tasker_id) {
+      this.ordersGateway.notifyUserAllDevices(order.tasker_id, 'order_confirmed', {
+        message: '🎉 Khách hàng đã xác nhận hoàn thành đơn!',
+        orderId: id,
+      });
+    }
+    
+    return { message: 'Xác nhận hoàn thành thành công', order };
   }
 
   @Post(':id/review')

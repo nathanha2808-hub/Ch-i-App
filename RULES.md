@@ -155,4 +155,6 @@ Layer 6 (Polish) — Cuối cùng
 
 1. ✅ Cập nhật `docs/CHANGELOG.md` với những gì đã thay đổi
 2. ✅ Cập nhật docs nếu có thay đổi architecture/database/API
-3. ✅ Báo cáo tóm tắt cho user
+3. ✅ PHẢI dùng lệnh `scp` để upload trực tiếp các file frontend/backend vừa sửa lên VPS (IP: `188.166.210.73`, thư mục tương ứng trong `/var/www/chioi/` hoặc `/opt/chioi/`).
+4. ✅ PHẢI commit và push code lên nhánh `chioinhanh2` (`git add . ; git commit -m "..." ; git push origin chioinhanh2`).
+5. ✅ Báo cáo tóm tắt cho user sau khi hoàn tất các bước trên.

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi"><head>
 <meta charset="utf-8"/>
 <meta name="view-transition" content="same-origin"/>
@@ -569,6 +569,11 @@ tailwind.config = {
     if (walletBalance <= 0) { showToastMsg('Số dư không đủ để rút tiền'); return; }
     document.getElementById('withdraw-balance-info').textContent = 'Số dư khả dụng: ' + fmtVND(walletBalance);
     wdError.classList.add('hidden');
+    // TC-T13-xxx FIX: Tự động điền tên chủ tài khoản từ profile user
+    var currentUser = ChiOiAuth.getUser();
+    if (currentUser && currentUser.full_name && !wdHolder.value.trim()) {
+      wdHolder.value = currentUser.full_name.toUpperCase();
+    }
     wdModal.classList.remove('hidden');
     loadPendingWithdrawals();
   });
@@ -627,6 +632,13 @@ tailwind.config = {
     if (amountNum < 100000) { wdError.textContent = 'Số tiền tối thiểu 100.000 đ'; wdError.classList.remove('hidden'); return; }
     // TC-T13-004: Validate > balance
     if (amountNum > walletBalance) { wdError.textContent = 'Số dư không đủ. Hiện có: ' + fmtVND(walletBalance); wdError.classList.remove('hidden'); return; }
+
+    // TC-T13-020 FIX: Không cho rút khi chưa liên kết ngân hàng (chưa nhập đủ thông tin)
+    if (!bank || !account || account.length < 5 || !holder || holder.length < 2) {
+      wdError.textContent = 'Vui lòng điền đầy đủ thông tin ngân hàng trước khi rút tiền';
+      wdError.classList.remove('hidden');
+      return;
+    }
 
     // TC-T13-021: Loading + anti-spam
     isSubmitting = true;

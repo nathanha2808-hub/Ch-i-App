@@ -1,9 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PushService } from '../push/push.service';
 
 @Injectable()
 export class ApiService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private pushService: PushService,
+  ) {}
 
   // --- User Profile ---
   // Bug 13.1 FIX: GET endpoint cho FE booking lấy default address
@@ -417,6 +421,25 @@ export class ApiService {
         where: { wallet_id: transaction.wallet_id },
         data: { balance: { increment: transaction.amount } }
       });
+    }
+
+    // TC-T13-023 FIX: Push notification cho Tasker khi rút tiền được xử lý
+    const wallet = await this.prisma.wallets.findUnique({ where: { wallet_id: transaction.wallet_id } });
+    if (wallet) {
+      const amount = Number(transaction.amount).toLocaleString('vi-VN');
+      if (status === 'COMPLETED') {
+        this.pushService.sendPushToUser(wallet.user_id, {
+          title: '💰 Rút tiền thành công!',
+          body: `Yêu cầu rút ${amount}đ đã được duyệt.`,
+          url: '/giupviec/thunhapvathongke.html',
+        }).catch((e) => console.warn('[Push] Error:', e.message));
+      } else if (status === 'FAILED') {
+        this.pushService.sendPushToUser(wallet.user_id, {
+          title: '❌ Yêu cầu rút tiền bị từ chối',
+          body: `Yêu cầu rút ${amount}đ không được duyệt. Số tiền đã hoàn lại ví.`,
+          url: '/giupviec/thunhapvathongke.html',
+        }).catch((e) => console.warn('[Push] Error:', e.message));
+      }
     }
 
     return transaction;

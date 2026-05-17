@@ -111,6 +111,46 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
+// TC-T09-025 + TC-T13-023 FIX: Web Push Notification — nhận thông báo khi app ở background
+self.addEventListener('push', (event) => {
+  let data = { title: 'Chị Ơi!', body: 'Bạn có thông báo mới', icon: '/icons/icon-192.png', url: '/' };
+  try {
+    if (event.data) {
+      const json = event.data.json();
+      data = { ...data, ...json };
+    }
+  } catch (e) {
+    if (event.data) data.body = event.data.text();
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon || '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      vibrate: [200, 100, 200],
+      data: { url: data.url || '/' },
+      actions: [{ action: 'open', title: 'Mở ứng dụng' }],
+    })
+  );
+});
+
+// Click notification → mở đúng trang
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      // Nếu đang có tab mở → focus vào đó
+      for (const client of windowClients) {
+        if (client.url.includes(url) && 'focus' in client) return client.focus();
+      }
+      // Mở tab mới
+      return clients.openWindow(url);
+    })
+  );
+});
+
 // Listen for skipWaiting message từ page (nếu có update prompt)
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();

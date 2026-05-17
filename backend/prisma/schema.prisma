@@ -104,6 +104,19 @@ model otp_codes {
   @@index([expires_at])
 }
 
+// TC-T09-025 + TC-T13-023: Web Push Subscriptions for background notifications
+model push_subscriptions {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  users      users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id])
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model order_interventions {
   intervention_id Int       @id @default(autoincrement())
@@ -277,6 +290,7 @@ model users {
   taskers                              taskers?
   wallets                              wallets?
   otp_codes                            otp_codes[]
+  push_subscriptions                   push_subscriptions[]
 }
 
 model vouchers {

@@ -1,12 +1,14 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WalletsService } from '../wallets/wallets.service';
+import { PushService } from '../push/push.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private prisma: PrismaService,
-    private walletsService: WalletsService
+    private walletsService: WalletsService,
+    private pushService: PushService,
   ) {}
 
   async bookOrder(customerId: number, data: any) {
@@ -125,7 +127,7 @@ export class OrdersService {
     const validTransitions: Record<string, string[]> = {
       'ACCEPTED': ['TASKER_ARRIVED', 'CANCELLED'],
       'TASKER_ARRIVED': ['IN_PROGRESS'],
-      'IN_PROGRESS': ['COMPLETED'],
+      'IN_PROGRESS': ['PENDING_COMPLETION'],  // TC-T09-012 FIX: Tasker chỉ chuyển sang PENDING_COMPLETION
     };
 
     const currentStatus = order.status || '';
@@ -139,12 +141,50 @@ export class OrdersService {
       data: { status },
     });
 
-    if (status === 'COMPLETED') {
-      // Xử lý ví dựa trên payment_method
+    // TC-T09-012 FIX: Khi PENDING_COMPLETION — KHÔNG tính tiền ngay, chờ KH xác nhận
+    // Wallet logic đã chuyển sang confirmCompletion()
+
+    // TC-T09-025 FIX: Push notification cho KH khi Tasker báo hoàn thành
+    if (status === 'PENDING_COMPLETION') {
+      const fullOrder = await this.prisma.orders.findUnique({
+        where: { order_id: orderId },
+        include: { services: true },
+      });
+      const serviceName = fullOrder?.services?.name || 'Dịch vụ';
+      this.pushService.sendPushToUser(fullOrder!.customer_id, {
+        title: '✅ Tasker đã hoàn thành!',
+        body: `Đơn ${serviceName} #${orderId} đã xong. Xác nhận để hoàn tất.`,
+        url: '/khachhang/lichsuhoatdong.html',
+      }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
+    }
+
+    return updatedOrder;
+  }
+
+  // TC-T09-013 FIX: KH xác nhận hoàn thành đơn
+  async confirmCompletion(orderId: number, customerId: number) {
+    const order = await this.prisma.orders.findFirst({
+      where: { order_id: orderId, customer_id: customerId },
+    });
+
+    if (!order) {
+      throw new BadRequestException('Đơn hàng không tồn tại hoặc không thuộc về bạn');
+    }
+
+    if (order.status !== 'PENDING_COMPLETION') {
+      throw new BadRequestException(`Không thể xác nhận đơn ở trạng thái ${order.status}`);
+    }
+
+    const updatedOrder = await this.prisma.orders.update({
+      where: { order_id: orderId },
+      data: { status: 'COMPLETED' },
+    });
+
+    // Thực hiện tính tiền (wallet logic từ updateOrderStatus cũ)
+    if (order.status === 'PENDING_COMPLETION') {
       const paymentMethod = order.payment_method || 'WALLET';
 
       if (paymentMethod === 'WALLET') {
-        // Thanh toán ví: Trừ tiền KH + Cộng thu nhập Tasker (85%)
         try {
           await this.walletsService.addTransaction(
             order.customer_id,
@@ -157,7 +197,6 @@ export class OrdersService {
           console.warn('[Order] Không trừ được tiền ví KH:', e.message);
         }
 
-        // Cộng thu nhập cho Tasker (sau khi trừ phí nền tảng 20%)
         try {
           await this.walletsService.addTransaction(
             order.tasker_id!,
@@ -170,8 +209,6 @@ export class OrdersService {
           console.warn('[Order] Không cộng thu nhập Tasker:', e.message);
         }
       } else if (paymentMethod === 'CASH') {
-        // Thanh toán tiền mặt: Tasker giữ tiền mặt → Platform trừ phí nền tảng từ ví Tasker
-        // KHÔNG trừ ví khách hàng (KH đã trả mặt)
         try {
           await this.walletsService.addTransaction(
             order.tasker_id!,
@@ -185,7 +222,7 @@ export class OrdersService {
         }
       }
 
-      // BUG FIX: Increment total_jobs cho Tasker khi đơn hoàn thành
+      // Increment total_jobs cho Tasker
       if (order.tasker_id) {
         try {
           await this.prisma.taskers.update({
@@ -196,6 +233,15 @@ export class OrdersService {
           console.warn('[Order] Không cập nhật total_jobs Tasker:', e.message);
         }
       }
+    }
+
+    // TC-T09-025 FIX: Push notification cho Tasker khi KH xác nhận hoàn thành
+    if (order.tasker_id) {
+      this.pushService.sendPushToUser(order.tasker_id, {
+        title: '🎉 Đơn đã hoàn thành!',
+        body: `KH đã xác nhận đơn #${orderId}. Thu nhập đã được cộng vào ví.`,
+        url: '/giupviec/thunhapvathongke.html',
+      }).catch((e) => console.warn('[Push] Error sending to tasker:', e.message));
     }
 
     return updatedOrder;
