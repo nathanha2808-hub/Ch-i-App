@@ -186,59 +186,8 @@
 <!-- Main Content Area -->
 <main class="relative z-20 flex flex-col justify-center items-center h-screen pt-20 pb-24 px-4 pointer-events-none z-10">
     
-    <!-- ACTIVE ORDER MODAL -->
-    <div id="modal-don-moi" class="w-full max-w-sm pointer-events-auto transition-all duration-300">
-        <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100">
-            <!-- Header -->
-            <div class="bg-[#a04100] px-4 py-3 flex justify-center items-center gap-2 relative">
-                <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 10px 10px;"></div>
-                <span class="material-symbols-outlined text-white text-xl animate-pulse">notifications_active</span>
-                <h2 class="text-white font-bold tracking-wide relative z-10">ĐƠN DỌN NHÀ MỚI</h2>
-            </div>
-            <!-- Body -->
-            <div class="p-5 flex flex-col gap-4">
-                <div class="flex gap-3">
-                    <span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                    <div>
-                        <p class="font-bold text-gray-800">Vinhomes Central Park</p>
-                        <p class="text-sm text-gray-500">Cách bạn 1.2km</p>
-                    </div>
-                </div>
-                <div class="flex gap-3">
-                    <span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">schedule</span>
-                    <div>
-                        <p class="font-bold text-gray-800">Hôm nay, 14:00 (3 giờ)</p>
-                    </div>
-                </div>
-                <!-- Price -->
-                <div class="mt-2 flex items-center justify-between border-t border-b border-gray-100 py-3">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Thu nhập</span>
-                    <span class="text-3xl font-bold text-[#a04100]">150.000 đ</span>
-                </div>
-                <!-- Timer -->
-                <div class="flex flex-col gap-2 mt-1">
-                    <p class="text-red-600 font-semibold text-sm flex items-center justify-center gap-1">
-                        <span class="material-symbols-outlined text-[16px]">timer</span>
-                        Tự động bỏ qua sau: <span id="countdown">00:58</span>
-                    </p>
-                    <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-red-500 h-full w-[80%] rounded-full animate-pulse"></div>
-                    </div>
-                </div>
-                <!-- Actions -->
-                <div class="flex gap-3 pt-2">
-                    <button onclick="boQuaDon()" class="flex-1 py-3 px-4 rounded-full border border-gray-300 text-gray-600 font-bold hover:bg-gray-50 transition-all active:scale-95">
-                        BỎ QUA
-                    </button>
-                    <button onclick="nhanDon()" class="flex-1 py-3 px-4 rounded-full gradient-primary text-white font-bold shadow-lg hover:brightness-110 transition-all active:scale-95">
-                        NHẬN ĐƠN
-                    </button>
-                </div>
-                <p class="text-center text-[11px] text-gray-400 italic">
-                    * Bỏ qua >30% sẽ giảm đơn.
-                </p>
-            </div>
-        </div>
+    <!-- ACTIVE ORDER MODAL (ẩn mặc định, chỉ hiện khi có đơn thật từ socket) -->
+    <div id="modal-don-moi" class="w-full max-w-sm pointer-events-auto transition-all duration-300" style="display:none; opacity:0; transform:scale(0.95);">
     </div>
 
     <!-- IDLE STATE (Hidden initially) -->

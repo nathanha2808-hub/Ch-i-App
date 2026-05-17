@@ -343,6 +343,14 @@
 <!-- TC-T09-025 FIX: Đăng ký Push Notification cho KH -->
 <script>window.__CHIOI_API_BASE = typeof API_BASE !== 'undefined' ? API_BASE : '';</script>
 <script src="../pwa-register.js" defer></script>
+<script>
+// Force clear SW cache v2 — đảm bảo load file mới nhất
+if ('serviceWorker' in navigator && 'caches' in window) {
+  caches.keys().then(function(names) {
+    names.forEach(function(name) { if (name.indexOf('chioi-v1') > -1) caches.delete(name); });
+  });
+}
+</script>
     <script>
         (async function () {
           // ===== 1. Kiểm tra đăng nhập =====
