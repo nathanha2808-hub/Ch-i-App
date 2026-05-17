@@ -711,8 +711,8 @@
     } else if (order.status === 'TASKER_ARRIVED') {
       actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'IN_PROGRESS\')" class="w-full py-3 mt-3 rounded-full bg-[#ff7e36] text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">BẮT ĐẦU DỌN DẸP</button>';
     } else if (order.status === 'IN_PROGRESS') {
-      // TC-T09-012 FIX: Tasker báo hoàn thành → PENDING_COMPLETION (chờ KH xác nhận)
-      actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'PENDING_COMPLETION\')" class="w-full py-3 mt-3 rounded-full bg-green-500 text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">BÁO HOÀN THÀNH</button>';
+      // FIX: Tasker báo hoàn thành → COMPLETED ngay lập tức
+      actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'COMPLETED\')" class="w-full py-3 mt-3 rounded-full bg-green-500 text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">HOÀN THÀNH ĐƠN</button>';
     } else if (order.status === 'PENDING_COMPLETION') {
       // TC-T09-012 FIX: Đang chờ KH xác nhận
       actionHtml = '<div class="w-full py-3 mt-3 rounded-full bg-yellow-500 text-white font-bold text-center animate-pulse">⏳ Chờ Khách hàng xác nhận</div>';
@@ -741,7 +741,13 @@
       
       showToast('✅ Đã cập nhật thành công!');
       
-      if (newStatus === 'PENDING_COMPLETION') {
+      if (newStatus === 'COMPLETED') {
+        showSuccessNotification('🎉 Đã hoàn thành đơn!', 'Tiền đã được cộng vào ví của bạn.');
+        isHandlingOrder = false;
+        hideModal();
+        showIdleState();
+        currentOrder = null;
+      } else if (newStatus === 'PENDING_COMPLETION') {
         // TC-T09-012 FIX: Hiển trạng thái chờ KH xác nhận
         showToast('📩 Đã gửi thông báo cho KH. Chờ xác nhận...');
         showActiveOrderCard(Object.assign({}, result, { status: 'PENDING_COMPLETION' }));

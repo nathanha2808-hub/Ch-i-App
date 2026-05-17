@@ -40,6 +40,21 @@ export class OrdersService {
       ) RETURNING order_id, order_code;
     `;
 
+    // TRỪ TIỀN NGAY LÚC ĐẶT ĐƠN
+    if (paymentMethod === 'WALLET') {
+      try {
+        await this.walletsService.addTransaction(
+          customerId,
+          -Number(data.total_price),
+          'PAYMENT',
+          order.order_id,
+          'Thanh toán dịch vụ đơn hàng #' + order.order_id
+        );
+      } catch (e) {
+        console.warn('[Order] Không trừ được tiền ví KH lúc đặt đơn:', e.message);
+      }
+    }
+
     return {
       ...order,
       address: data.address,
@@ -127,7 +142,7 @@ export class OrdersService {
     const validTransitions: Record<string, string[]> = {
       'ACCEPTED': ['TASKER_ARRIVED', 'CANCELLED'],
       'TASKER_ARRIVED': ['IN_PROGRESS'],
-      'IN_PROGRESS': ['PENDING_COMPLETION'],  // TC-T09-012 FIX: Tasker chỉ chuyển sang PENDING_COMPLETION
+      'IN_PROGRESS': ['PENDING_COMPLETION', 'COMPLETED'],  // FIX: Tasker có thể chuyển thẳng sang COMPLETED
     };
 
     const currentStatus = order.status || '';
@@ -141,10 +156,76 @@ export class OrdersService {
       data: { status },
     });
 
-    // TC-T09-012 FIX: Khi PENDING_COMPLETION — KHÔNG tính tiền ngay, chờ KH xác nhận
-    // Wallet logic đã chuyển sang confirmCompletion()
+    // HOÀN TIỀN NẾU TASKER HỦY ĐƠN
+    if (status === 'CANCELLED' && order.payment_method === 'WALLET') {
+      try {
+        await this.walletsService.addTransaction(
+          order.customer_id,
+          Number(order.total_price),
+          'REFUND',
+          order.order_id,
+          'Hoàn tiền đơn hàng bị hủy #' + order.order_id
+        );
+      } catch (e) {
+        console.warn('[Order] Lỗi hoàn tiền ví KH:', e.message);
+      }
+    }
 
-    // TC-T09-025 FIX: Push notification cho KH khi Tasker báo hoàn thành
+    // TC-T09-012 FIX: Khi PENDING_COMPLETION — KHÔNG tính tiền ngay, chờ KH xác nhận
+
+    // THỰC HIỆN TÍNH TIỀN KHI TASKER BÁO HOÀN THÀNH TRỰC TIẾP
+    if (status === 'COMPLETED') {
+      const paymentMethod = order.payment_method || 'WALLET';
+
+      if (paymentMethod === 'WALLET') {
+        try {
+          await this.walletsService.addTransaction(
+            order.tasker_id!,
+            Number(order.tasker_earnings),
+            'EARNING',
+            order.order_id,
+            'Thu nhập đơn hàng #' + order.order_id + ' (thanh toán ví)'
+          );
+        } catch (e) {
+          console.warn('[Order] Không cộng thu nhập Tasker:', e.message);
+        }
+      } else if (paymentMethod === 'CASH') {
+        try {
+          await this.walletsService.addTransaction(
+            order.tasker_id!,
+            -Number(order.platform_fee),
+            'FEE',
+            order.order_id,
+            'Thu phí nền tảng đơn hàng #' + order.order_id + ' (tiền mặt)'
+          );
+        } catch (e) {
+          console.warn('[Order] Không trừ phí nền tảng Tasker:', e.message);
+        }
+      }
+
+      // Increment total_jobs cho Tasker
+      if (order.tasker_id) {
+        try {
+          await this.prisma.taskers.update({
+            where: { tasker_id: order.tasker_id },
+            data: { total_jobs: { increment: 1 } },
+          });
+        } catch (e) {}
+      }
+
+      const fullOrder = await this.prisma.orders.findUnique({
+        where: { order_id: orderId },
+        include: { services: true },
+      });
+      const serviceName = fullOrder?.services?.name || 'Dịch vụ';
+      this.pushService.sendPushToUser(fullOrder!.customer_id, {
+        title: '🎉 Đơn đã hoàn thành!',
+        body: `Tasker đã hoàn thành đơn ${serviceName} #${orderId}. Cảm ơn bạn đã sử dụng dịch vụ!`,
+        url: '/khachhang/lichsuhoatdong.html',
+      }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
+    }
+
+    // TC-T09-025 FIX: Push notification cho KH khi Tasker báo hoàn thành (chờ xác nhận)
     if (status === 'PENDING_COMPLETION') {
       const fullOrder = await this.prisma.orders.findUnique({
         where: { order_id: orderId },
@@ -171,6 +252,10 @@ export class OrdersService {
       throw new BadRequestException('Đơn hàng không tồn tại hoặc không thuộc về bạn');
     }
 
+    if (order.status === 'COMPLETED') {
+      return order; // Already completed
+    }
+
     if (order.status !== 'PENDING_COMPLETION') {
       throw new BadRequestException(`Không thể xác nhận đơn ở trạng thái ${order.status}`);
     }
@@ -185,18 +270,6 @@ export class OrdersService {
       const paymentMethod = order.payment_method || 'WALLET';
 
       if (paymentMethod === 'WALLET') {
-        try {
-          await this.walletsService.addTransaction(
-            order.customer_id,
-            -Number(order.total_price),
-            'PAYMENT',
-            order.order_id,
-            'Thanh toán dịch vụ đơn hàng #' + order.order_id
-          );
-        } catch (e) {
-          console.warn('[Order] Không trừ được tiền ví KH:', e.message);
-        }
-
         try {
           await this.walletsService.addTransaction(
             order.tasker_id!,
@@ -261,10 +334,27 @@ export class OrdersService {
       throw new BadRequestException(`Cannot cancel order in status ${currentStatus}`);
     }
 
-    return this.prisma.orders.update({
+    const updatedOrder = await this.prisma.orders.update({
       where: { order_id: orderId },
       data: { status: 'CANCELLED' },
     });
+
+    // HOÀN TIỀN NẾU KHÁCH HÀNG HỦY ĐƠN
+    if (order.payment_method === 'WALLET') {
+      try {
+        await this.walletsService.addTransaction(
+          customerId,
+          Number(order.total_price),
+          'REFUND',
+          order.order_id,
+          'Hoàn tiền đơn hàng bị hủy #' + order.order_id
+        );
+      } catch (e) {
+        console.warn('[Order] Lỗi hoàn tiền ví KH:', e.message);
+      }
+    }
+
+    return updatedOrder;
   }
 
   async reviewOrder(orderId: number, customerId: number, rating: number, comment: string) {
