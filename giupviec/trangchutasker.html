@@ -371,19 +371,24 @@
     toggleInput.addEventListener('change', async function() {
       // FIX: Yêu cầu quyền vị trí TRƯỚC KHI bật trạng thái online
       if (toggleInput.checked) {
-        if (navigator.geolocation) {
-          try {
-            await new Promise(function(resolve, reject) {
-              navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-            });
-          } catch(gpsErr) {
-            showToast('⚠️ Vui lòng bật GPS/Vị trí để nhận đơn hàng!');
-            toggleInput.checked = false; // Revert
-            return;
-          }
-        } else {
+        if (!navigator.geolocation) {
           showToast('⚠️ Thiết bị không hỗ trợ GPS!');
-          toggleInput.checked = false; // Revert
+          toggleInput.checked = false;
+          return;
+        }
+        try {
+          await new Promise(function(resolve, reject) {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true, timeout: 8000, maximumAge: 0
+            });
+          });
+        } catch(gpsErr) {
+          var gpsMsg = '⚠️ Vui lòng bật GPS/Vị trí để nhận đơn hàng!';
+          if (gpsErr && gpsErr.code === 1) gpsMsg = '⚠️ Bạn đã từ chối quyền truy cập vị trí. Vui lòng cấp quyền GPS trong cài đặt trình duyệt!';
+          else if (gpsErr && gpsErr.code === 2) gpsMsg = '⚠️ Không tìm thấy vị trí. Vui lòng bật GPS trên thiết bị!';
+          else if (gpsErr && gpsErr.code === 3) gpsMsg = '⚠️ Lấy vị trí quá lâu. Vui lòng bật GPS và thử lại!';
+          showToast(gpsMsg);
+          toggleInput.checked = false;
           return;
         }
       }
@@ -618,9 +623,11 @@
           showActiveOrderCard(activeOrder);
           return;
         }
-        // FIX: Nếu có đơn PENDING_COMPLETION → Tasker đã hoàn thành, bỏ qua không hiện lại
-        var pendingOrder = history.find(function(o) { return o.status === 'PENDING_COMPLETION'; });
-        if (pendingOrder) return; // Bỏ qua, không hiện lại modal
+        // FIX: Nếu có đơn PENDING_COMPLETION → Tasker đã hoàn thành, bỏ qua
+        var pendingOrder = history.find(function(o) {
+          return o.status === 'PENDING_COMPLETION' || o.status === 'COMPLETED';
+        });
+        if (pendingOrder) return;
       }
     } catch (e) {
       console.warn('[Tasker] Không check được đơn đang xử lý:', e.message);
@@ -763,7 +770,7 @@
     }
   };
 
-  // TC_T05_004/007/008 FIX: Hiển thị đầy đủ thông tin đơn mới
+  // TC_T05_004/007/008 FIX: Hiển thị đầy đủ thông tin đơn mới — REBUILD HTML hoàn toàn
   function showNewOrderModal(order) {
     var modal = document.getElementById('modal-don-moi');
     var idle = document.getElementById('idle-state');
@@ -771,8 +778,8 @@
       idle.classList.add('hidden');
       idle.classList.add('translate-y-10', 'opacity-0');
     }
+    if (!modal) return;
 
-    // TC_T05_004/008: Lấy thông tin dịch vụ, địa chỉ, giờ
     var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ';
     var address = order.address || 'Địa chỉ đơn hàng';
     var durationHours = order.duration_hours || order.estimated_hours || '';
@@ -780,24 +787,30 @@
     var timeText = scheduledTime;
     if (durationHours) timeText += ' (' + durationHours + ' giờ)';
 
-    // Cập nhật nội dung modal
-    var addressEl = modal.querySelector('.font-bold.text-gray-800');
-    if (addressEl) addressEl.textContent = address;
+    // Rebuild toàn bộ HTML modal để tránh lỗi querySelector trả null
+    modal.innerHTML = '<div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100">' +
+      '<div class="bg-[#a04100] px-4 py-3 flex justify-center items-center gap-2 relative">' +
+      '<div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:10px 10px;"></div>' +
+      '<span class="material-symbols-outlined text-white text-xl animate-pulse">notifications_active</span>' +
+      '<h2 class="text-white font-bold tracking-wide relative z-10">ĐƠN ' + serviceName.toUpperCase() + ' MỚI</h2></div>' +
+      '<div class="p-5 flex flex-col gap-4">' +
+      '<div class="flex gap-3"><span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings:\'FILL\' 1;">location_on</span>' +
+      '<div><p class="font-bold text-gray-800">' + address + '</p></div></div>' +
+      '<div class="flex gap-3"><span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings:\'FILL\' 1;">schedule</span>' +
+      '<div><p class="font-bold text-gray-800">' + (timeText || 'Chưa xác định') + '</p></div></div>' +
+      '<div class="mt-2 flex items-center justify-between border-t border-b border-gray-100 py-3">' +
+      '<span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Thu nhập</span>' +
+      '<span class="text-3xl font-bold text-[#a04100]">' + formatVND(order.total_price) + '</span></div>' +
+      '<div class="flex flex-col gap-2 mt-1">' +
+      '<p class="text-red-600 font-semibold text-sm flex items-center justify-center gap-1">' +
+      '<span class="material-symbols-outlined text-[16px]">timer</span>Tự động bỏ qua sau: <span id="countdown">01:00</span></p>' +
+      '<div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden"><div class="bg-red-500 h-full w-full rounded-full"></div></div></div>' +
+      '<div class="flex gap-3 pt-2">' +
+      '<button onclick="boQuaDon()" class="flex-1 py-3 px-4 rounded-full border border-gray-300 text-gray-600 font-bold hover:bg-gray-50 transition-all active:scale-95">BỎ QUA</button>' +
+      '<button onclick="nhanDon()" class="flex-1 py-3 px-4 rounded-full gradient-primary text-white font-bold shadow-lg hover:brightness-110 transition-all active:scale-95">NHẬN ĐƠN</button></div>' +
+      '<p class="text-center text-[11px] text-gray-400 italic">* Bỏ qua >30% sẽ giảm đơn.</p>' +
+      '</div></div>';
 
-    var priceEl = modal.querySelector('.text-3xl.font-bold');
-    if (priceEl) priceEl.textContent = formatVND(order.total_price);
-
-    // TC_T05_007: Hiển thị thời gian thực hiện + số giờ
-    var timeEl = modal.querySelectorAll('.font-bold.text-gray-800');
-    if (timeEl[1]) {
-      timeEl[1].textContent = timeText || formatDateTime(order.scheduled_time);
-    }
-
-    // Cập nhật title modal theo dịch vụ
-    var modalTitle = modal.querySelector('h2');
-    if (modalTitle) modalTitle.textContent = 'ĐƠN ' + serviceName.toUpperCase() + ' MỚI';
-
-    // Hiện modal
     modal.style.display = 'block';
     modal.style.opacity = '1';
     modal.style.transform = 'scale(1)';
@@ -918,6 +931,7 @@ function hideModal() {
 
 function showIdleState() {
   var idle = document.getElementById('idle-state');
+  if (!idle) return; // FIX: prevent "Cannot read properties of null"
   idle.classList.remove('hidden');
   setTimeout(function() {
     idle.classList.remove('translate-y-10', 'opacity-0');
