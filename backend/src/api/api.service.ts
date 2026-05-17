@@ -175,13 +175,12 @@ export class ApiService {
     const activeTaskers = await this.prisma.users.findMany({
       where: { role: 'TASKER', taskers: { is_online: true, kyc_status: 'VERIFIED' } },
       include: { taskers: { include: { tasker_services: { include: { services: { select: { name: true } } } } } } },
-      take: 20,
     });
 
     if (lat !== undefined && lng !== undefined) {
       const distances = await this.prisma.$queryRaw<any[]>`
         SELECT tasker_id, ST_DistanceSphere(current_location, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)) as distance
-        FROM taskers WHERE is_online = true AND current_location IS NOT NULL
+        FROM taskers WHERE is_online = true AND kyc_status = 'VERIFIED' AND current_location IS NOT NULL
       `;
       const distanceMap = new Map();
       distances.forEach(d => distanceMap.set(d.tasker_id, d.distance));
@@ -189,7 +188,7 @@ export class ApiService {
       return activeTaskers.map(t => ({
         ...t,
         distance: distanceMap.get(t.user_id) || null
-      }));
+      })).sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
     }
 
     return activeTaskers;
