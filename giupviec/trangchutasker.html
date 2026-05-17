@@ -369,29 +369,8 @@
     });
 
     toggleInput.addEventListener('change', async function() {
-      // FIX: Yêu cầu quyền vị trí TRƯỚC KHI bật trạng thái online
-      if (toggleInput.checked) {
-        if (!navigator.geolocation) {
-          showToast('⚠️ Thiết bị không hỗ trợ GPS!');
-          toggleInput.checked = false;
-          return;
-        }
-        try {
-          await new Promise(function(resolve, reject) {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              enableHighAccuracy: true, timeout: 8000, maximumAge: 0
-            });
-          });
-        } catch(gpsErr) {
-          var gpsMsg = '⚠️ Vui lòng bật GPS/Vị trí để nhận đơn hàng!';
-          if (gpsErr && gpsErr.code === 1) gpsMsg = '⚠️ Bạn đã từ chối quyền truy cập vị trí. Vui lòng cấp quyền GPS trong cài đặt trình duyệt!';
-          else if (gpsErr && gpsErr.code === 2) gpsMsg = '⚠️ Không tìm thấy vị trí. Vui lòng bật GPS trên thiết bị!';
-          else if (gpsErr && gpsErr.code === 3) gpsMsg = '⚠️ Lấy vị trí quá lâu. Vui lòng bật GPS và thử lại!';
-          showToast(gpsMsg);
-          toggleInput.checked = false;
-          return;
-        }
-      }
+      // Bật/tắt trạng thái nhận việc — KHÔNG block toggle bằng GPS
+      // GPS sẽ tự bật khi toggle ON thông qua startGpsTracking()
 
       try {
         await apiFetch('/api/taskers/status', {
@@ -725,11 +704,8 @@
     } else if (order.status === 'TASKER_ARRIVED') {
       actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'IN_PROGRESS\')" class="w-full py-3 mt-3 rounded-full bg-[#ff7e36] text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">BẮT ĐẦU DỌN DẸP</button>';
     } else if (order.status === 'IN_PROGRESS') {
-      // FIX: Tasker báo hoàn thành → Gửi PENDING_COMPLETION nhưng phía Tasker coi như xong
-      actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'PENDING_COMPLETION\')" class="w-full py-3 mt-3 rounded-full bg-green-500 text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">HOÀN THÀNH ĐƠN</button>';
-    } else if (order.status === 'PENDING_COMPLETION') {
-      // Phía Tasker không cần màn hình chờ này nữa, nhưng cứ giữ HTML dự phòng
-      actionHtml = '<div class="w-full py-3 mt-3 rounded-full bg-yellow-500 text-white font-bold text-center animate-pulse">⏳ Đã hoàn thành, chờ KH xác nhận</div>';
+      // FIX: Tasker bấm hoàn thành → Gửi COMPLETED trực tiếp
+      actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'COMPLETED\')" class="w-full py-3 mt-3 rounded-full bg-green-500 text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">HOÀN THÀNH ĐƠN</button>';
     }
 
       // Nút Chat KH
@@ -755,7 +731,7 @@
       
       showToast('✅ Đã cập nhật thành công!');
       
-      if (newStatus === 'COMPLETED' || newStatus === 'PENDING_COMPLETION') {
+      if (newStatus === 'COMPLETED') {
         showSuccessNotification('🎉 Đã hoàn thành đơn!', 'Tiền đã được cộng vào ví của bạn.');
         isHandlingOrder = false;
         hideModal();
@@ -844,23 +820,12 @@
     }, 1000);
   }
 
-  // ===== 8. Nhận đơn — Gọi API (Bug 8: block nếu đang có đơn) =====
+    // ===== 8. Nhận đơn — Gọi API (Bug 8: block nếu đang có đơn) =====
   window.nhanDon = async function() {
     if (!currentOrder) return;
     if (isHandlingOrder) {
       showToast('⚠️ Bạn đang có đơn, hoàn thành trước khi nhận đơn mới!');
       return;
-    }
-    // TC-T06-023 FIX: Kiểm tra GPS trước khi nhận đơn
-    if (navigator.geolocation) {
-      try {
-        await new Promise(function(resolve, reject) {
-          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
-        });
-      } catch(gpsErr) {
-        showToast('⚠️ Vui lòng bật GPS/Vị trí để nhận đơn hàng!');
-        return;
-      }
     }
     try {
       showToast('Đang nhận đơn...');
