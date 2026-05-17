@@ -618,6 +618,9 @@
           showActiveOrderCard(activeOrder);
           return;
         }
+        // FIX: Nếu có đơn PENDING_COMPLETION → Tasker đã hoàn thành, bỏ qua không hiện lại
+        var pendingOrder = history.find(function(o) { return o.status === 'PENDING_COMPLETION'; });
+        if (pendingOrder) return; // Bỏ qua, không hiện lại modal
       }
     } catch (e) {
       console.warn('[Tasker] Không check được đơn đang xử lý:', e.message);
@@ -660,6 +663,10 @@
 
   // Hiển thị card đơn đang thực hiện (khóa nhận đơn mới)
   function showActiveOrderCard(order) {
+    // FIX: Nếu đơn đã PENDING_COMPLETION → Tasker đã xong, không hiện modal nữa
+    if (order.status === 'PENDING_COMPLETION' || order.status === 'COMPLETED') {
+      return;
+    }
     var modal = document.getElementById('modal-don-moi');
     var idle = document.getElementById('idle-state');
     if (idle) { idle.classList.add('hidden'); idle.classList.add('translate-y-10', 'opacity-0'); }
