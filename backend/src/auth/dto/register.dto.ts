@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, Matches, MinLength, MaxLength, IsIn } from 'class-validator';
+import { IsString, IsNotEmpty, Matches, MinLength, MaxLength, IsIn, IsOptional, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
@@ -25,4 +25,14 @@ export class RegisterDto {
   @IsString()
   @IsIn(['CUSTOMER', 'TASKER', 'ADMIN'], { message: 'Role phải là CUSTOMER, TASKER hoặc ADMIN' })
   role: 'CUSTOMER' | 'TASKER' | 'ADMIN';
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  id_number?: string;
+
+  @ApiProperty({ required: false, type: [String] })
+  @IsOptional()
+  @IsArray()
+  services?: string[];
 }
