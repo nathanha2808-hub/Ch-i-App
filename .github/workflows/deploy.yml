@@ -15,6 +15,7 @@ on:
     branches:
       - main
       - testvps1
+      - chioinhanh2
       - 'fix/**'
       - 'feature/**'
   workflow_dispatch:  # Cho phép trigger thủ công từ Actions tab
@@ -77,12 +78,15 @@ jobs:
             npm run build
 
             echo "═══ [5/6] Copy frontend → /var/www ═══"
-            rm -rf /var/www/chioi.vn/* /var/www/app.chioi.vn/*
+            mkdir -p /var/www/chioi /var/www/chioi.vn /var/www/app.chioi.vn
+            rm -rf /var/www/chioi/* /var/www/chioi.vn/* /var/www/app.chioi.vn/*
+            cp -r ../khachhang ../giupviec ../admin ../shared ../assets ../icons ../.well-known /var/www/chioi/
+            cp ../sw.js ../manifest.json ../pwa-register.js ../favicon.ico ../privacy.html ../terms.html /var/www/chioi/
             cp -r ../khachhang ../giupviec ../admin ../shared ../assets ../icons ../.well-known /var/www/chioi.vn/
             cp ../sw.js ../manifest.json ../pwa-register.js ../favicon.ico ../privacy.html ../terms.html /var/www/chioi.vn/
             cp -r ../khachhang ../giupviec ../admin ../shared ../assets ../icons ../.well-known /var/www/app.chioi.vn/
             cp ../sw.js ../manifest.json ../pwa-register.js ../favicon.ico ../privacy.html ../terms.html /var/www/app.chioi.vn/
-            chown -R www-data:www-data /var/www/chioi.vn /var/www/app.chioi.vn
+            chown -R www-data:www-data /var/www/chioi /var/www/chioi.vn /var/www/app.chioi.vn
 
             echo "═══ [6/6] PM2 restart + verify ═══"
             pm2 restart chioi-backend --update-env
@@ -96,8 +100,9 @@ jobs:
         run: |
           # Đợi service stabilize
           sleep 5
-          # Check qua HTTPS frontend domain (dùng chioi.vn)
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://chioi.vn/api/docs --max-time 15 || echo "000")
+          # Check qua HTTPS direct IP hoặc domain (bỏ qua SSL invalid nếu IP)
+          STATUS=$(curl -s -k -o /dev/null -w "%{http_code}" https://$API_HOST/api/docs --max-time 15 || echo "000")
+          if [ "$STATUS" == "000" ] || [ "$STATUS" == "301" ]; then STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://$API_HOST/api/docs --max-time 15 || echo "000"); fi
           echo "Health check status: $STATUS"
           if [[ "$STATUS" != "200" && "$STATUS" != "401" ]]; then
             echo "❌ Health check failed (status=$STATUS)"
