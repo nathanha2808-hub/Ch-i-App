@@ -16,6 +16,11 @@ html {
   overscroll-behavior: none;        /* VĐ4: Chặn bounce effect khi cuộn quá đầu/cuối */
   background-color: #fcf9f8;        /* VĐ4: Nền khi bounce không lộ màu lạ */
   height: 100%;                     /* VĐ1: Đảm bảo cuộn tự nhiên */
+  scrollbar-width: none;            /* Ẩn scrollbar Firefox */
+  -ms-overflow-style: none;         /* Ẩn scrollbar IE/Edge cũ */
+}
+html::-webkit-scrollbar {
+  display: none;                    /* Ẩn scrollbar Chrome/Safari/Edge trên html */
 }
 body {
   overflow-x: hidden;
@@ -27,7 +32,14 @@ body {
   -ms-overflow-style: none;         /* Ẩn scrollbar IE/Edge cũ */
 }
 body::-webkit-scrollbar {
-  display: none;                    /* Ẩn scrollbar Chrome/Safari/Edge */
+  display: none;                    /* Ẩn scrollbar Chrome/Safari/Edge trên body */
+}
+/* Ẩn scrollbar toàn bộ app — giống app native */
+*::-webkit-scrollbar {
+  display: none !important;
+}
+* {
+  scrollbar-width: none !important;
 }
 
 /* ===== SAFE AREA (Notch iPhone X+, Dynamic Island) ===== */
