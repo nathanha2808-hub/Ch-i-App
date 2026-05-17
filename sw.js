@@ -5,7 +5,7 @@
 //   - Static khác (CSS/JS/fonts/icons): cache-first, refresh background
 //   - API calls: network-only (real-time data, không cache)
 
-const VERSION = 'chioi-v1.1.0'; // BUMP v1.1.0: prefetch + view-transitions + stale-while-revalidate
+const VERSION = 'chioi-v2.0.0'; // BUMP v2.0.0: HTML = network-first (không serve bản cũ nữa)
 const CACHE_STATIC = `${VERSION}-static`;
 const CACHE_PAGES  = `${VERSION}-pages`;
 
@@ -14,12 +14,6 @@ const NETWORK_FIRST_PATHS = ['/shared/api.js', '/pwa-register.js', '/manifest.js
 
 // Pre-cache shell — core pages + shared assets để navigate siêu nhanh
 const PRECACHE = [
-  '/',
-  '/khachhang/dangnhap.html',
-  '/khachhang/trangchu.html',
-  '/khachhang/lichsuhoatdong.html',
-  '/khachhang/thongbao.html',
-  '/khachhang/taikhoan.html',
   '/shared/transitions.css',
   '/shared/prefetch.js',
   '/icons/icon-192.png',
@@ -75,21 +69,18 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML pages: stale-while-revalidate (tải ngay từ cache, update nền)
+  // HTML pages: NETWORK-FIRST (luôn lấy bản mới, chỉ dùng cache khi offline)
   if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
     event.respondWith(
-      caches.match(req).then(cached => {
-        // Luôn fetch bản mới ở background
-        const fetchPromise = fetch(req).then(resp => {
+      fetch(req)
+        .then(resp => {
           if (resp && resp.status === 200) {
             const copy = resp.clone();
             caches.open(CACHE_PAGES).then(cache => cache.put(req, copy)).catch(() => {});
           }
           return resp;
-        }).catch(() => cached);
-        // Trả cache ngay nếu có, nếu không chờ fetch
-        return cached || fetchPromise;
-      })
+        })
+        .catch(() => caches.match(req)) // Fallback cache khi offline
     );
     return;
   }
