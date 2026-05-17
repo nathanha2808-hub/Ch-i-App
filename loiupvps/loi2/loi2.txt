@@ -1,2 +1,0 @@
-Chưa có cột STT
-Thêm STT là cột đầu tiên của các bảng dữ liệu
