@@ -1,0 +1,125 @@
+# ✅ Kết Quả Tái Cấu Trúc — Chị Ơi!
+
+## CẤU TRÚC MỚI (SẠCH)
+
+```
+d:\Chi_oi-main\
+│
+├── 📱 khachhang/              ← Frontend Khách hàng (18 files)
+│   ├── chatvoitasker.html
+│   ├── dangky.html
+│   ├── dangnhap.html
+│   ├── danhgiatasker.html
+│   ├── datdichvudonnha.html
+│   ├── datdichvumuaho.html
+│   ├── datdichvutrongtre.html
+│   ├── goigiadinh.html
+│   ├── khieunai.html
+│   ├── lichsuhoatdong.html
+│   ├── naptienqr.html
+│   ├── quenmatkhau.html
+│   ├── ruttien.html
+│   ├── taikhoan.html
+│   ├── theodoidon.html
+│   ├── thongbao.html
+│   ├── trangchu.html
+│   └── vivalichsu.html
+│
+├── 👷 giupviec/               ← Frontend Tasker (9 files)
+│   ├── chatvoikhachhang.html
+│   ├── dangkytasker.html
+│   ├── dangnhaptasker.html
+│   ├── hosocanhan.html
+│   ├── khieunai.html
+│   ├── lichsudonhang.html
+│   ├── quenmatkhau.html
+│   ├── thunhapvathongke.html
+│   └── trangchutasker.html
+│
+├── 🛡️ admin/                  ← Frontend Admin CMS (11 files)
+│   ├── bangdieukhien.html
+│   ├── baocaodoanhthu.html
+│   ├── canthiepdonhang.html
+│   ├── dangnhapadmin.html
+│   ├── hopthu.html
+│   ├── quanlycudan.html
+│   ├── quanlydichvu.html
+│   ├── quanlydonhang.html
+│   ├── quanlytasker.html
+│   ├── quanlyvigiaodich.html
+│   └── xulykhieunai.html
+│
+├── 🔗 shared/                 ← Code dùng chung 3 frontend
+│   ├── api.js
+│   ├── chatadmin.html
+│   ├── prefetch.js
+│   ├── responsive.css
+│   ├── transitions.css
+│   └── webrtc.js
+│
+├── 🖼️ assets/images/          ← Ảnh dùng chung
+│   ├── donnha.png
+│   ├── logo.jpg
+│   ├── muaho.png
+│   └── trongtre.png
+│
+├── 🔲 icons/                  ← PWA Icons
+│   ├── icon-192.png
+│   ├── icon-512.png
+│   ├── icon-maskable-512.png
+│   └── icon.svg
+│
+├── ⚙️ backend/                ← NestJS Backend (CHUNG)
+│   ├── src/
+│   │   ├── api/
+│   │   ├── auth/
+│   │   ├── common/
+│   │   ├── integrations/
+│   │   ├── orders/
+│   │   ├── prisma/
+│   │   └── wallets/
+│   ├── prisma/ (schema + migrations + seed)
+│   ├── scripts/ (test scripts)
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── 🗄️ database/               ← Database schema & seed
+│   ├── schema/
+│   ├── seed/
+│   └── docs/
+│
+├── 📚 docs/                   ← Technical docs (13 files)
+├── 🚀 deploy/                 ← Deploy scripts & nginx config
+│
+├── .github/workflows/deploy.yml
+├── .well-known/assetlinks.json
+├── .gitignore
+├── RULES.md
+├── codemagic.yaml
+├── start_all.ps1
+├── manifest.json
+├── pwa-register.js
+├── sw.js
+├── favicon.ico
+├── privacy.html
+└── terms.html
+```
+
+---
+
+## THỐNG KÊ
+
+| Hạng mục | Số lượng |
+|---|---|
+| 🗑️ File rác đã xóa | 30 files |
+| 📁 Thư mục rác đã xóa | 6 (loi, loiupvps, tailieu, logo, bugtracker, mobile-ios) |
+| 📂 Thư mục frontend/ | Đã giải thể → nội dung lên root |
+| ✅ Tổng file còn lại | Chỉ file cần thiết |
+
+## PATH REFERENCES
+
+> [!NOTE]
+> Tất cả relative path trong HTML files **VẪN HOẠT ĐỘNG** vì:
+> - `khachhang/`, `giupviec/`, `admin/` vẫn là siblings với `shared/`, `assets/`, `icons/`
+> - Relative paths như `../shared/api.js`, `../assets/images/logo.jpg` không thay đổi
+> - Backend paths không bị ảnh hưởng
