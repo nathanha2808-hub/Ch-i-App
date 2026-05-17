@@ -65,7 +65,7 @@ export class OrdersService {
     };
   }
 
-  async findNearbyTaskers(longitude: number, latitude: number, radiusMeters: number = 3000) {
+  async findNearbyTaskers(longitude: number, latitude: number, radiusMeters: number = 50000) {
     const taskers = await this.prisma.$queryRaw<any[]>`
       SELECT tasker_id, bio, average_rating, 
              ST_DistanceSphere(current_location, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)) as distance
@@ -74,7 +74,7 @@ export class OrdersService {
         AND current_location IS NOT NULL
         AND ST_DWithin(current_location::geography, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography, ${radiusMeters})
       ORDER BY distance ASC
-      LIMIT 3;
+      LIMIT 20;
     `;
     return taskers;
   }
