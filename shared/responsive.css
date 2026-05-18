@@ -89,13 +89,6 @@ img, video, svg {
   height: auto;
 }
 
-/* ===== GLOBAL SCROLL FIX FOR MOBILE APP / iOS WEBVIEW ===== */
-html, body {
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x pan-y;
-  overflow-x: hidden;
-}
-
 /* ===== TEXT OVERFLOW PREVENTION ===== */
 h1, h2, h3, h4, p, span, label {
   word-wrap: break-word;
