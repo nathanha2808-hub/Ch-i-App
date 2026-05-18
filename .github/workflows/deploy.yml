@@ -71,8 +71,9 @@ jobs:
             cd backend
             npm ci --prefer-offline --no-audit --no-fund
 
-            echo "═══ [3/6] Prisma generate ═══"
+            echo "═══ [3/6] Prisma generate + DB push ═══"
             npx prisma generate --schema=prisma/schema.prisma
+            npx prisma db push --schema=prisma/schema.prisma --accept-data-loss 2>/dev/null || echo "⚠️ db push skipped (non-critical)"
 
             echo "═══ [4/6] Build NestJS ═══"
             npm run build

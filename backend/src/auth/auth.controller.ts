@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -43,6 +43,16 @@ export class AuthController {
     return this.authService.register(body);
   }
 
+  // Lỗi 6 FIX: Check trùng CCCD trước khi đăng ký
+  @Get('check-cccd')
+  @ApiOperation({ summary: 'Kiểm tra CCCD đã được đăng ký chưa' })
+  async checkCCCD(@Query('id_number') idNumber: string) {
+    if (!idNumber || idNumber.length < 9) {
+      return { exists: false };
+    }
+    return this.authService.checkCCCDExists(idNumber);
+  }
+
   @Post('forgot-password')
   @Throttle({ otp: { limit: 3, ttl: 30 * 60_000 } })
   @ApiOperation({ summary: 'Yêu cầu OTP quên mật khẩu (MOCK) — rate limit 3 lần/30 phút/IP' })
@@ -82,22 +92,43 @@ export class AuthController {
 @Controller('api/ocr')
 export class OcrController {
   @Post('cccd')
-  @ApiOperation({ summary: 'OCR nhận diện CCCD từ ảnh base64' })
+  @ApiOperation({ summary: 'OCR nhận diện CCCD từ ảnh base64 — Lỗi 6 FIX: validate ảnh CCCD' })
   @ApiBody({ schema: { example: { image: 'data:image/jpeg;base64,...' } } })
   async ocrCCCD(@Body() body: any) {
     // Extract base64 data
     const imageData = body.image || '';
     if (!imageData) {
-      return { full_name: '', cccd_number: '', error: 'No image provided' };
+      return { is_valid_cccd: false, full_name: '', cccd_number: '', error: 'No image provided' };
+    }
+
+    // Lỗi 6 FIX: Validate ảnh base64 hợp lệ (image/jpeg hoặc image/png)
+    if (!imageData.startsWith('data:image/')) {
+      return { is_valid_cccd: false, full_name: '', cccd_number: '', error: 'Invalid image format' };
     }
 
     // In production, call Google Vision / FPT.AI eKYC API here
-    // For now, return empty to trigger manual input fallback
-    // The frontend handles this gracefully
+    // Phase hiện tại: Simple validation - check ảnh có data đủ lớn (CCCD thường > 50KB)
+    const base64Part = imageData.split(',')[1] || '';
+    const imageSizeKB = (base64Part.length * 3 / 4) / 1024;
+
+    if (imageSizeKB < 20) {
+      // Ảnh quá nhỏ, không phải ảnh CCCD
+      return {
+        is_valid_cccd: false,
+        full_name: '',
+        cccd_number: '',
+        error: 'Ảnh quá nhỏ hoặc không rõ. Vui lòng chụp lại CCCD rõ ràng hơn.'
+      };
+    }
+
+    // TODO: Tích hợp Google Vision / FPT.AI eKYC API để OCR thật
+    // Hiện tại trả về is_valid_cccd = true để cho phép flow hoạt động
+    // Trong production sẽ extract tên + số CCCD từ API OCR
     return {
+      is_valid_cccd: true,
       full_name: '',
       cccd_number: '',
-      message: 'OCR service chưa tích hợp. Vui lòng nhập thủ công.'
+      message: 'OCR service chưa tích hợp hoàn chỉnh. Ảnh hợp lệ nhưng chưa trích xuất được thông tin.'
     };
   }
 }

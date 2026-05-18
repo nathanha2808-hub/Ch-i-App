@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -133,6 +133,9 @@
 
 <script src="../shared/api.js?v=20260514"></script>
 <script src="../shared/prefetch.js" defer></script>
+<!-- TC-T09-025 FIX: Đăng ký Push Notification cho KH -->
+<script>window.__CHIOI_API_BASE = typeof API_BASE !== 'undefined' ? API_BASE : '';</script>
+<script src="../pwa-register.js" defer></script>
 <script>
 (async function() {
   if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
@@ -164,6 +167,7 @@
   var statusMap = {
     'COMPLETED': { label: '✅ Hoàn thành', bg: 'bg-green-100', text: 'text-green-700' },
     'IN_PROGRESS': { label: '🔵 Đang thực hiện', bg: 'bg-blue-100', text: 'text-blue-700' },
+    'PENDING_COMPLETION': { label: '⏳ Chờ xác nhận', bg: 'bg-amber-100', text: 'text-amber-700' },
     'TASKER_ARRIVED': { label: '📍 Tasker đã đến', bg: 'bg-blue-100', text: 'text-blue-700' },
     'ACCEPTED': { label: '✅ Đã nhận', bg: 'bg-green-100', text: 'text-green-700' },
     'SEARCHING': { label: '🔍 Đang tìm Tasker', bg: 'bg-yellow-100', text: 'text-yellow-700' },
@@ -269,7 +273,10 @@
 
     // Action buttons based on order status
     var actionBtnsHtml = '';
-    if (isCompleted) {
+    // TC-T09-013 FIX: Nút xác nhận hoàn thành cho KH
+    if (order.status === 'PENDING_COMPLETION') {
+      actionBtnsHtml = '<button id="btn-confirm-order-' + order.order_id + '" class="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold active:scale-95 flex items-center justify-center gap-1 animate-pulse"><span class="material-symbols-outlined text-[18px]">check_circle</span>Xác nhận hoàn thành</button>';
+    } else if (isCompleted) {
       // Đơn hoàn thành → hiện nút Đánh giá thay vì Chat Tasker
       actionBtnsHtml = '<button id="btn-review-order-' + order.order_id + '" class="flex-1 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: \'FILL\' 1;">star</span>Đánh giá Tasker</button>';
     } else if (order.status !== 'CANCELLED') {
@@ -333,6 +340,29 @@
       var reviewBtn = document.getElementById('btn-review-order-' + order.order_id);
       if (reviewBtn) {
         reviewBtn.addEventListener('click', function() { showReviewModal(order); });
+      }
+    }
+
+    // TC-T09-013 FIX: Gắn sự kiện xác nhận hoàn thành đơn
+    if (order.status === 'PENDING_COMPLETION') {
+      var confirmBtn = document.getElementById('btn-confirm-order-' + order.order_id);
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', async function() {
+          if (!confirm('Xác nhận Tasker đã hoàn thành công việc?')) return;
+          confirmBtn.disabled = true;
+          confirmBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Đang xác nhận...';
+          try {
+            await apiFetch('/api/orders/' + order.order_id + '/confirm', { method: 'PATCH' });
+            showToastMsg('🎉 Đã xác nhận hoàn thành đơn hàng #' + order.order_id);
+            overlay.remove();
+            allOrders = await apiFetch('/api/orders/customer/history') || [];
+            renderOrders();
+          } catch (e) {
+            showToastMsg('❌ ' + e.message);
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span>Xác nhận hoàn thành';
+          }
+        });
       }
     }
   }

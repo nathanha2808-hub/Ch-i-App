@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -277,8 +277,20 @@ Phương thức thanh toán
     selectedStore: 'WinMart Vinhomes A',
     products: [],
     budget: 500000,
-    paymentMethod: 'WALLET'
+    paymentMethod: 'WALLET',
+    hasFamilyPackage: false
   };
+
+  // ===== Kiểm tra gói gia đình =====
+  (async function checkFamilyPackage() {
+    try {
+      var activePkgs = await apiFetch('/api/packages/my-active');
+      if (activePkgs && activePkgs.length > 0) {
+        state.hasFamilyPackage = true;
+        updateSummary();
+      }
+    } catch (e) { console.warn('[Gói] Không check được gói:', e.message); }
+  })();
 
   var stores = [
     { name: 'WinMart Vinhomes A', distance: '500m' },
@@ -395,11 +407,38 @@ Phương thức thanh toán
 
   // ===== Update Summary =====
   function updateSummary() {
-    var total = state.budget + FEE;
+    var fee = FEE;
+    var discount = 0;
+    
+    if (state.hasFamilyPackage) {
+      discount = Math.round(fee * 0.15);
+      fee = fee - discount;
+    }
+
+    var total = state.budget + fee;
+
     document.getElementById('budget-display').textContent = formatVND(state.budget);
     document.getElementById('summary-store').textContent = state.selectedStore;
     document.getElementById('summary-product-count').textContent = state.products.length + ' mặt hàng';
     document.getElementById('summary-budget').textContent = formatVND(state.budget);
+
+    // Hiển thị giảm giá vào phần list
+    var summaryBudgetEl = document.getElementById('summary-budget').parentElement;
+    var existingDiscount = document.getElementById('summary-discount-fee');
+    if (discount > 0) {
+      if (!existingDiscount) {
+        var discDiv = document.createElement('div');
+        discDiv.id = 'summary-discount-fee';
+        discDiv.className = 'flex justify-between text-body-sm text-green-600 font-bold';
+        discDiv.innerHTML = '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">verified</span> Gói Gia Đình (-15% phí DV)</span><span>-' + formatVND(discount) + '</span>';
+        summaryBudgetEl.after(discDiv);
+      } else {
+        existingDiscount.innerHTML = '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">verified</span> Gói Gia Đình (-15% phí DV)</span><span>-' + formatVND(discount) + '</span>';
+      }
+    } else if (existingDiscount) {
+      existingDiscount.remove();
+    }
+
     document.getElementById('summary-total').textContent = formatVND(total);
     document.getElementById('submit-btn').textContent = 'Đặt mua hộ — ' + formatVND(total);
     // Sync custom input

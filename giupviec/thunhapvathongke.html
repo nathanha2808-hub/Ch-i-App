@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi"><head>
 <meta charset="utf-8"/>
 <meta name="view-transition" content="same-origin"/>
@@ -154,10 +154,16 @@ tailwind.config = {
         <span class="material-symbols-outlined text-primary text-[28px]">account_balance_wallet</span>
         <span id="wallet-balance" class="font-display-lg text-display-lg text-on-surface">0 đ</span>
       </div>
-      <!-- TC-T12-024,025: Nút rút tiền -->
-      <button id="btn-withdraw" class="mt-sm w-full py-3.5 bg-gradient-to-r from-primary to-primary-container text-white font-title-sm text-[15px] rounded-full shadow-lg active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100">
-        YÊU CẦU RÚT TIỀN
-      </button>
+      <!-- TC-T12-024,025: Nút rút tiền + Lỗi 5 FIX: Nút nạp tiền -->
+      <div class="mt-sm flex gap-2">
+        <button id="btn-deposit" class="flex-1 py-3.5 bg-green-600 text-white font-title-sm text-[15px] rounded-full shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          NẠP TIỀN
+        </button>
+        <button id="btn-withdraw" class="flex-1 py-3.5 bg-gradient-to-r from-primary to-primary-container text-white font-title-sm text-[15px] rounded-full shadow-lg active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100">
+          RÚT TIỀN
+        </button>
+      </div>
       <p class="text-[11px] text-on-surface-variant leading-tight mt-xs">* T+1 · Min 100k · Khấu trừ TNCN 10% nếu &gt;2tr</p>
     </div>
   </div>
@@ -514,6 +520,9 @@ tailwind.config = {
     }
     noMsg.classList.add('hidden');
 
+    // Lỗi 5 FIX: Sort mới nhất lên đầu
+    history.sort(function(a, b) { return new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0); });
+
     history.forEach(function(item) {
       var isWallet = (item.payment_method || 'WALLET') !== 'CASH';
       var div = document.createElement('div');
@@ -564,11 +573,21 @@ tailwind.config = {
     this.value = this.value.replace(/[^0-9]/g, '');
   });
 
+  // Lỗi 5 FIX: Nút nạp tiền
+  document.getElementById('btn-deposit').addEventListener('click', function() {
+    window.location.href = '../khachhang/naptienqr.html';
+  });
+
   // Mở modal
   document.getElementById('btn-withdraw').addEventListener('click', function() {
     if (walletBalance <= 0) { showToastMsg('Số dư không đủ để rút tiền'); return; }
     document.getElementById('withdraw-balance-info').textContent = 'Số dư khả dụng: ' + fmtVND(walletBalance);
     wdError.classList.add('hidden');
+    // TC-T13-xxx FIX: Tự động điền tên chủ tài khoản từ profile user
+    var currentUser = ChiOiAuth.getUser();
+    if (currentUser && currentUser.full_name && !wdHolder.value.trim()) {
+      wdHolder.value = currentUser.full_name.toUpperCase();
+    }
     wdModal.classList.remove('hidden');
     loadPendingWithdrawals();
   });
@@ -627,6 +646,13 @@ tailwind.config = {
     if (amountNum < 100000) { wdError.textContent = 'Số tiền tối thiểu 100.000 đ'; wdError.classList.remove('hidden'); return; }
     // TC-T13-004: Validate > balance
     if (amountNum > walletBalance) { wdError.textContent = 'Số dư không đủ. Hiện có: ' + fmtVND(walletBalance); wdError.classList.remove('hidden'); return; }
+
+    // TC-T13-020 FIX: Không cho rút khi chưa liên kết ngân hàng (chưa nhập đủ thông tin)
+    if (!bank || !account || account.length < 5 || !holder || holder.length < 2) {
+      wdError.textContent = 'Vui lòng điền đầy đủ thông tin ngân hàng trước khi rút tiền';
+      wdError.classList.remove('hidden');
+      return;
+    }
 
     // TC-T13-021: Loading + anti-spam
     isSubmitting = true;

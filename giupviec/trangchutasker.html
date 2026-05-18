@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8"/>
@@ -171,6 +171,11 @@
             <input type="checkbox" class="sr-only peer">
             <div class="w-12 h-6 bg-white/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00b1da]"></div>
         </label>
+        <!-- TC-T07-003 FIX: Notification Bell -->
+        <button id="header-bell" class="relative w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white backdrop-blur-md active:scale-95 transition-all" onclick="toggleNotifPanel()">
+            <span class="material-symbols-outlined text-[22px]">notifications</span>
+            <span id="bell-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">0</span>
+        </button>
         <!-- Chat -->
         <a id="header-chat-link" href="#" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white backdrop-blur-md active:scale-95 transition-all">
             <span class="material-symbols-outlined text-[22px]">chat_bubble</span>
@@ -181,59 +186,8 @@
 <!-- Main Content Area -->
 <main class="relative z-20 flex flex-col justify-center items-center h-screen pt-20 pb-24 px-4 pointer-events-none z-10">
     
-    <!-- ACTIVE ORDER MODAL -->
-    <div id="modal-don-moi" class="w-full max-w-sm pointer-events-auto transition-all duration-300">
-        <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100">
-            <!-- Header -->
-            <div class="bg-[#a04100] px-4 py-3 flex justify-center items-center gap-2 relative">
-                <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 10px 10px;"></div>
-                <span class="material-symbols-outlined text-white text-xl animate-pulse">notifications_active</span>
-                <h2 class="text-white font-bold tracking-wide relative z-10">ĐƠN DỌN NHÀ MỚI</h2>
-            </div>
-            <!-- Body -->
-            <div class="p-5 flex flex-col gap-4">
-                <div class="flex gap-3">
-                    <span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                    <div>
-                        <p class="font-bold text-gray-800">Vinhomes Central Park</p>
-                        <p class="text-sm text-gray-500">Cách bạn 1.2km</p>
-                    </div>
-                </div>
-                <div class="flex gap-3">
-                    <span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">schedule</span>
-                    <div>
-                        <p class="font-bold text-gray-800">Hôm nay, 14:00 (3 giờ)</p>
-                    </div>
-                </div>
-                <!-- Price -->
-                <div class="mt-2 flex items-center justify-between border-t border-b border-gray-100 py-3">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Thu nhập</span>
-                    <span class="text-3xl font-bold text-[#a04100]">150.000 đ</span>
-                </div>
-                <!-- Timer -->
-                <div class="flex flex-col gap-2 mt-1">
-                    <p class="text-red-600 font-semibold text-sm flex items-center justify-center gap-1">
-                        <span class="material-symbols-outlined text-[16px]">timer</span>
-                        Tự động bỏ qua sau: <span id="countdown">00:58</span>
-                    </p>
-                    <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-red-500 h-full w-[80%] rounded-full animate-pulse"></div>
-                    </div>
-                </div>
-                <!-- Actions -->
-                <div class="flex gap-3 pt-2">
-                    <button onclick="boQuaDon()" class="flex-1 py-3 px-4 rounded-full border border-gray-300 text-gray-600 font-bold hover:bg-gray-50 transition-all active:scale-95">
-                        BỎ QUA
-                    </button>
-                    <button onclick="nhanDon()" class="flex-1 py-3 px-4 rounded-full gradient-primary text-white font-bold shadow-lg hover:brightness-110 transition-all active:scale-95">
-                        NHẬN ĐƠN
-                    </button>
-                </div>
-                <p class="text-center text-[11px] text-gray-400 italic">
-                    * Bỏ qua >30% sẽ giảm đơn.
-                </p>
-            </div>
-        </div>
+    <!-- ACTIVE ORDER MODAL (ẩn mặc định, chỉ hiện khi có đơn thật từ socket) -->
+    <div id="modal-don-moi" class="w-full max-w-sm pointer-events-auto transition-all duration-300" style="display:none; opacity:0; transform:scale(0.95);">
     </div>
 
     <!-- IDLE STATE (Hidden initially) -->
@@ -283,10 +237,24 @@
     <span id="toast-msg">Thành công</span>
 </div>
 
+<!-- TC-T07-003 FIX: Notification Panel -->
+<div id="notif-panel" class="hidden fixed top-20 right-4 w-80 max-h-96 z-[110] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+    <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="font-bold text-gray-800 text-sm">Thông báo</h3>
+        <button onclick="clearNotifications()" class="text-xs text-gray-400 hover:text-gray-600">Xóa tất cả</button>
+    </div>
+    <div id="notif-list" class="max-h-72 overflow-y-auto">
+        <p class="text-center text-gray-400 text-sm py-6">Chưa có thông báo</p>
+    </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script src="../shared/api.js?v=20260514"></script>
 <script src="../shared/prefetch.js" defer></script>
+<!-- TC-T09-025 FIX: Đăng ký Push Notification cho Tasker -->
+<script>window.__CHIOI_API_BASE = typeof API_BASE !== 'undefined' ? API_BASE : '';</script>
+<script src="../pwa-register.js" defer></script>
 <script>
 (function() {
   // ===== 1. Kiểm tra đăng nhập =====
@@ -298,6 +266,28 @@
 
   // Bug 3 FIX (report14): Danh sách đơn đã bỏ qua — lưu vào localStorage
   var skippedOrders = JSON.parse(localStorage.getItem('chioi_skipped_orders') || '[]');
+
+  // TC-T07-009 FIX: BroadcastChannel sync đơn bỏ qua giữa các tab cùng browser
+  var _skipChannel = null;
+  try { _skipChannel = new BroadcastChannel('chioi_tasker_sync'); } catch(e) {}
+  if (_skipChannel) {
+    _skipChannel.onmessage = function(evt) {
+      if (evt.data && evt.data.type === 'skip_order') {
+        var oid = evt.data.orderId;
+        if (skippedOrders.indexOf(oid) === -1) {
+          skippedOrders.push(oid);
+          localStorage.setItem('chioi_skipped_orders', JSON.stringify(skippedOrders));
+        }
+        // Nếu đang hiển thị đúng đơn này → ẩn đi
+        if (currentOrder && currentOrder.order_id === oid) {
+          hideModal();
+          showToast('📢 Đơn #' + oid + ' đã bị bỏ qua từ thiết bị khác');
+          showIdleState();
+          currentOrder = null;
+        }
+      }
+    };
+  }
 
   // ===== 2. Hiển thị tên user lên Header =====
   if (user && user.full_name) {
@@ -313,28 +303,42 @@
     }
   }
 
-  // ===== 3. Online/Offline Toggle — Bug 1 Report19: Mặc định luôn OFF khi mở app =====
+  // ===== 3. Online/Offline Toggle =====
   var toggleInput = document.querySelector('header input[type="checkbox"]');
   if (toggleInput) {
-    // Bug 1 FIX: Luôn bắt đầu ở trạng thái OFF — tasker phải chủ động bật
-    toggleInput.checked = false;
+    // Khôi phục trạng thái từ localStorage (nếu có), mặc định tắt nếu chưa từng bật
+    var storageKey = 'chioi_tasker_online_' + (user ? user.user_id : 'unknown');
+    var savedStatus = localStorage.getItem(storageKey);
+    var isOnline = (savedStatus === 'true');
+    toggleInput.checked = isOnline;
     
-    // Gửi status OFF lên server khi mở app
+    // Gửi status khôi phục lên server khi mở app
     apiFetch('/api/taskers/status', {
       method: 'PATCH',
-      body: { is_online: false }
+      body: { is_online: isOnline }
     }).catch(function(err) {
       console.warn('Lỗi đồng bộ trạng thái online:', err);
     });
 
+    if (isOnline) {
+      startGpsTracking();
+    }
+
     toggleInput.addEventListener('change', async function() {
+      // Bật/tắt trạng thái nhận việc — KHÔNG block toggle bằng GPS
+      // GPS sẽ tự bật khi toggle ON thông qua startGpsTracking()
+
       try {
         await apiFetch('/api/taskers/status', {
           method: 'PATCH',
           body: { is_online: toggleInput.checked }
         });
-        localStorage.setItem('chioi_tasker_online', String(toggleInput.checked));
+        localStorage.setItem(storageKey, String(toggleInput.checked));
         showToast(toggleInput.checked ? '🟢 Đã bật nhận việc' : '🔴 Đã tắt nhận việc');
+        // TC_T04_012 FIX: Sync trạng thái sang các thiết bị khác qua Socket
+        if (window.ChiOiSocket) {
+          window.ChiOiSocket.emit('update_status', { is_online: toggleInput.checked });
+        }
         // Bug 1 Report19: Bật/tắt GPS realtime tracking theo trạng thái
         if (toggleInput.checked) {
           startGpsTracking();
@@ -365,6 +369,29 @@
         toggleInput.checked = !toggleInput.checked; // revert
       }
     });
+
+    // TC_T04_012 FIX: Lắng nghe sync trạng thái từ thiết bị khác
+    if (window.ChiOiSocket) {
+      window.ChiOiSocket.on('status_synced', function(data) {
+        if (toggleInput && typeof data.is_online === 'boolean') {
+          toggleInput.checked = data.is_online;
+          localStorage.setItem('chioi_tasker_online', String(data.is_online));
+          showToast(data.is_online ? '📡 Thiết bị khác đã bật nhận việc' : '📡 Thiết bị khác đã tắt nhận việc');
+          // Update UI text
+          var idleText = document.querySelector('#idle-state .font-bold');
+          var idleSubText = document.querySelector('#idle-state .text-xs');
+          if (data.is_online) {
+            if (idleText) idleText.textContent = 'Đang tìm đơn hàng...';
+            if (idleSubText) idleSubText.textContent = 'Bạn đang ở chế độ trực tuyến';
+            startGpsTracking();
+          } else {
+            if (idleText) idleText.textContent = 'Đang tắt nhận việc';
+            if (idleSubText) idleSubText.textContent = 'Bật lại để nhận đơn hàng mới';
+            stopGpsTracking();
+          }
+        }
+      });
+    }
   }
 
   // ===== 4. Ẩn modal đơn mới ban đầu, hiện trạng thái Idle =====
@@ -499,6 +526,16 @@
         currentOrder = null;
       }
     });
+
+    // TC-T09-013 FIX: KH xác nhận hoàn thành đơn → reset UI
+    socket.on('order_confirmed', function(data) {
+      showToast('🎉 ' + (data.message || 'Đơn đã được xác nhận hoàn thành!'));
+      addNotification('complete', 'Đơn #' + data.orderId + ' đã hoàn thành!', data);
+      isHandlingOrder = false;
+      hideModal();
+      showIdleState();
+      currentOrder = null;
+    });
   }
 
   // ===== 10. Bug 8 FIX: Kiểm tra đơn đang thực hiện trước khi hiện đơn mới =====
@@ -521,6 +558,11 @@
           showActiveOrderCard(activeOrder);
           return;
         }
+        // FIX: Nếu có đơn PENDING_COMPLETION → Tasker đã hoàn thành, bỏ qua
+        var pendingOrder = history.find(function(o) {
+          return o.status === 'PENDING_COMPLETION' || o.status === 'COMPLETED';
+        });
+        if (pendingOrder) return;
       }
     } catch (e) {
       console.warn('[Tasker] Không check được đơn đang xử lý:', e.message);
@@ -563,6 +605,10 @@
 
   // Hiển thị card đơn đang thực hiện (khóa nhận đơn mới)
   function showActiveOrderCard(order) {
+    // FIX: Nếu đơn đã PENDING_COMPLETION → Tasker đã xong, không hiện modal nữa
+    if (order.status === 'PENDING_COMPLETION' || order.status === 'COMPLETED') {
+      return;
+    }
     var modal = document.getElementById('modal-don-moi');
     var idle = document.getElementById('idle-state');
     if (idle) { idle.classList.add('hidden'); idle.classList.add('translate-y-10', 'opacity-0'); }
@@ -575,6 +621,16 @@
     var scheduledTime = order.scheduled_time ? formatDateTime(order.scheduled_time) : 'Chưa xác định';
     var durationHours = order.duration_hours || order.estimated_hours || '';
     var durationText = durationHours ? (durationHours + ' giờ') : '';
+
+    // TC-T08-024 FIX: Format thời gian hiển thị đúng HH:mm:ss
+    var startTimeFormatted = '';
+    if (order.scheduled_time) {
+      var dt = new Date(order.scheduled_time);
+      var hh = ('0' + dt.getHours()).slice(-2);
+      var mm = ('0' + dt.getMinutes()).slice(-2);
+      var ss = ('0' + dt.getSeconds()).slice(-2);
+      startTimeFormatted = hh + ':' + mm + ':' + ss;
+    }
 
     if (modal) {
       modal.innerHTML = '<div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100">' +
@@ -589,7 +645,7 @@
         '<div class="flex gap-3"><span class="material-symbols-outlined text-[#ff7e36]" style="font-variation-settings: \'FILL\' 1;">cleaning_services</span>' +
         '<p class="font-bold text-gray-800">' + serviceName + '</p></div>' +
         '<div class="flex gap-3"><span class="material-symbols-outlined text-[#ff7e36]" style="font-variation-settings: \'FILL\' 1;">schedule</span>' +
-        '<p class="text-sm text-gray-600">' + scheduledTime + (durationText ? ' (' + durationText + ')' : '') + '</p></div>' +
+        '<p class="text-sm text-gray-600">' + (startTimeFormatted ? startTimeFormatted + ' — ' : '') + scheduledTime + (durationText ? ' (' + durationText + ')' : '') + '</p></div>' +
         '<div class="mt-2 flex items-center justify-between border-t border-gray-100 pt-3">' +
         '<span class="text-xs font-bold text-gray-400 uppercase">Trạng thái</span>' +
         '<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold">' + (statusLabel[order.status] || order.status) + '</span></div>' +
@@ -604,6 +660,7 @@
     } else if (order.status === 'TASKER_ARRIVED') {
       actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'IN_PROGRESS\')" class="w-full py-3 mt-3 rounded-full bg-[#ff7e36] text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">BẮT ĐẦU DỌN DẸP</button>';
     } else if (order.status === 'IN_PROGRESS') {
+      // FIX: Tasker bấm hoàn thành → Gửi COMPLETED trực tiếp
       actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'COMPLETED\')" class="w-full py-3 mt-3 rounded-full bg-green-500 text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">HOÀN THÀNH ĐƠN</button>';
     }
 
@@ -631,9 +688,11 @@
       showToast('✅ Đã cập nhật thành công!');
       
       if (newStatus === 'COMPLETED') {
+        showSuccessNotification('🎉 Đã hoàn thành đơn!', 'Tiền đã được cộng vào ví của bạn.');
         isHandlingOrder = false;
         hideModal();
         showIdleState();
+        currentOrder = null;
       } else {
         // Render lại card với trạng thái mới
         showActiveOrderCard(result);
@@ -643,7 +702,7 @@
     }
   };
 
-  // TC_T05_004/007/008 FIX: Hiển thị đầy đủ thông tin đơn mới
+  // TC_T05_004/007/008 FIX: Hiển thị đầy đủ thông tin đơn mới — REBUILD HTML hoàn toàn
   function showNewOrderModal(order) {
     var modal = document.getElementById('modal-don-moi');
     var idle = document.getElementById('idle-state');
@@ -651,8 +710,8 @@
       idle.classList.add('hidden');
       idle.classList.add('translate-y-10', 'opacity-0');
     }
+    if (!modal) return;
 
-    // TC_T05_004/008: Lấy thông tin dịch vụ, địa chỉ, giờ
     var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ';
     var address = order.address || 'Địa chỉ đơn hàng';
     var durationHours = order.duration_hours || order.estimated_hours || '';
@@ -660,24 +719,30 @@
     var timeText = scheduledTime;
     if (durationHours) timeText += ' (' + durationHours + ' giờ)';
 
-    // Cập nhật nội dung modal
-    var addressEl = modal.querySelector('.font-bold.text-gray-800');
-    if (addressEl) addressEl.textContent = address;
+    // Rebuild toàn bộ HTML modal để tránh lỗi querySelector trả null
+    modal.innerHTML = '<div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100">' +
+      '<div class="bg-[#a04100] px-4 py-3 flex justify-center items-center gap-2 relative">' +
+      '<div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:10px 10px;"></div>' +
+      '<span class="material-symbols-outlined text-white text-xl animate-pulse">notifications_active</span>' +
+      '<h2 class="text-white font-bold tracking-wide relative z-10">ĐƠN ' + serviceName.toUpperCase() + ' MỚI</h2></div>' +
+      '<div class="p-5 flex flex-col gap-4">' +
+      '<div class="flex gap-3"><span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings:\'FILL\' 1;">location_on</span>' +
+      '<div><p class="font-bold text-gray-800">' + address + '</p></div></div>' +
+      '<div class="flex gap-3"><span class="material-symbols-outlined text-[#ff7e36] text-[20px] mt-0.5" style="font-variation-settings:\'FILL\' 1;">schedule</span>' +
+      '<div><p class="font-bold text-gray-800">' + (timeText || 'Chưa xác định') + '</p></div></div>' +
+      '<div class="mt-2 flex items-center justify-between border-t border-b border-gray-100 py-3">' +
+      '<span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Thu nhập</span>' +
+      '<span class="text-3xl font-bold text-[#a04100]">' + formatVND(order.total_price) + '</span></div>' +
+      '<div class="flex flex-col gap-2 mt-1">' +
+      '<p class="text-red-600 font-semibold text-sm flex items-center justify-center gap-1">' +
+      '<span class="material-symbols-outlined text-[16px]">timer</span>Tự động bỏ qua sau: <span id="countdown">01:00</span></p>' +
+      '<div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden"><div class="bg-red-500 h-full w-full rounded-full"></div></div></div>' +
+      '<div class="flex gap-3 pt-2">' +
+      '<button onclick="boQuaDon()" class="flex-1 py-3 px-4 rounded-full border border-gray-300 text-gray-600 font-bold hover:bg-gray-50 transition-all active:scale-95">BỎ QUA</button>' +
+      '<button onclick="nhanDon()" class="flex-1 py-3 px-4 rounded-full gradient-primary text-white font-bold shadow-lg hover:brightness-110 transition-all active:scale-95">NHẬN ĐƠN</button></div>' +
+      '<p class="text-center text-[11px] text-gray-400 italic">* Bỏ qua >30% sẽ giảm đơn.</p>' +
+      '</div></div>';
 
-    var priceEl = modal.querySelector('.text-3xl.font-bold');
-    if (priceEl) priceEl.textContent = formatVND(order.total_price);
-
-    // TC_T05_007: Hiển thị thời gian thực hiện + số giờ
-    var timeEl = modal.querySelectorAll('.font-bold.text-gray-800');
-    if (timeEl[1]) {
-      timeEl[1].textContent = timeText || formatDateTime(order.scheduled_time);
-    }
-
-    // Cập nhật title modal theo dịch vụ
-    var modalTitle = modal.querySelector('h2');
-    if (modalTitle) modalTitle.textContent = 'ĐƠN ' + serviceName.toUpperCase() + ' MỚI';
-
-    // Hiện modal
     modal.style.display = 'block';
     modal.style.opacity = '1';
     modal.style.transform = 'scale(1)';
@@ -711,7 +776,7 @@
     }, 1000);
   }
 
-  // ===== 8. Nhận đơn — Gọi API (Bug 8: block nếu đang có đơn) =====
+    // ===== 8. Nhận đơn — Gọi API (Bug 8: block nếu đang có đơn) =====
   window.nhanDon = async function() {
     if (!currentOrder) return;
     if (isHandlingOrder) {
@@ -727,6 +792,8 @@
       isHandlingOrder = true;
       // Lỗi 8 FIX: Hiển thị thông báo thành công rõ ràng với thời gian dài hơn
       showSuccessNotification('🎉 Nhận đơn thành công!', 'Bắt đầu di chuyển tới điểm dọn dẹp');
+      // TC-T07-003 FIX: Thêm notification bell
+      addNotification('accept', 'Đã nhận đơn #' + currentOrder.order_id + ' thành công!', currentOrder);
       // Bug 1 FIX (report13): Không gọi hideModal() vì nó có delay 300ms gây mất modal
       // Gọi thẳng showActiveOrderCard() — hàm này tự set display: block
       showActiveOrderCard(Object.assign({}, currentOrder, { status: 'ACCEPTED' }));
@@ -734,21 +801,38 @@
       // Rung thiết bị nếu hỗ trợ
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     } catch (err) {
-      showToast('❌ ' + err.message);
+      // TC-T06-005 FIX: Phân biệt lỗi race condition vs lỗi thường
+      var msg = err.message || '';
+      if (msg.indexOf('không còn khả dụng') !== -1 || msg.indexOf('đã được nhận') !== -1) {
+        showToast('⚡ Đơn này đã được Tasker khác nhận trước. Chờ đơn mới nhé!');
+        hideModal();
+        showIdleState();
+        currentOrder = null;
+      } else {
+        showToast('❌ ' + msg);
+      }
     }
   };
 
   // ===== 9. Bỏ qua đơn =====
   window.boQuaDon = function() {
+    // TC-T07-005 FIX: Check trạng thái mạng trước khi bỏ qua đơn
+    if (!navigator.onLine) {
+      showToast('⚠️ Mất kết nối mạng! Đơn hàng sẽ được giữ lại cho đến khi có mạng.');
+      return; // Giữ nguyên đơn trên UI, không bỏ qua
+    }
     clearInterval(countdownTimer);
     // Lưu đơn đã bỏ qua vào localStorage
     if (currentOrder && currentOrder.order_id) {
       skippedOrders.push(currentOrder.order_id);
       if (skippedOrders.length > 100) skippedOrders = skippedOrders.slice(-100);
       localStorage.setItem('chioi_skipped_orders', JSON.stringify(skippedOrders));
+      // TC-T07-009 FIX: Broadcast sang các tab khác
+      if (_skipChannel) _skipChannel.postMessage({ type: 'skip_order', orderId: currentOrder.order_id });
+      // TC-T07-003 FIX: Thêm vào notification bell
+      addNotification('skip', 'Đã bỏ qua đơn #' + currentOrder.order_id, currentOrder);
     }
     hideModal();
-    // TC-T07-003 FIX: Hiển thị thông báo rõ ràng khi bỏ qua đơn
     showToast('❌ Đã từ chối nhận đơn hàng. Chú ý tỷ lệ nhận đơn!');
     showIdleState();
     currentOrder = null;
@@ -768,6 +852,22 @@ function hideModal() {
 
 function showIdleState() {
   var idle = document.getElementById('idle-state');
+  if (!idle) return; // FIX: prevent "Cannot read properties of null"
+  
+  var toggleInput = document.querySelector('header input[type="checkbox"]');
+  var idleText = document.querySelector('#idle-state .font-bold');
+  var idleSubText = document.querySelector('#idle-state .text-xs');
+  
+  if (toggleInput && idleText && idleSubText) {
+    if (toggleInput.checked) {
+      idleText.textContent = 'Đang tìm đơn hàng...';
+      idleSubText.textContent = 'Bạn đang ở chế độ trực tuyến';
+    } else {
+      idleText.textContent = 'Đang tắt nhận việc';
+      idleSubText.textContent = 'Bật lại để nhận đơn hàng mới';
+    }
+  }
+
   idle.classList.remove('hidden');
   setTimeout(function() {
     idle.classList.remove('translate-y-10', 'opacity-0');
@@ -831,6 +931,98 @@ function playNotificationSound() {
     console.warn('[Sound] Không phát được âm thanh:', e);
   }
 }
+
+// ========================================
+// TC-T07-003 FIX: Notification Bell System
+// ========================================
+var _notifStore = JSON.parse(localStorage.getItem('chioi_notifications') || '[]');
+
+function addNotification(type, message, order) {
+  var icon = type === 'accept' ? 'check_circle' : type === 'skip' ? 'cancel' : 'notifications';
+  var color = type === 'accept' ? '#16a34a' : type === 'skip' ? '#ef4444' : '#ff7e36';
+  var notif = {
+    id: Date.now(),
+    type: type,
+    message: message,
+    icon: icon,
+    color: color,
+    time: new Date().toISOString(),
+    orderId: order ? order.order_id : null
+  };
+  _notifStore.unshift(notif);
+  if (_notifStore.length > 50) _notifStore = _notifStore.slice(0, 50);
+  localStorage.setItem('chioi_notifications', JSON.stringify(_notifStore));
+  updateBellBadge();
+  renderNotifList();
+}
+
+function updateBellBadge() {
+  var badge = document.getElementById('bell-badge');
+  if (!badge) return;
+  var unreadCount = _notifStore.length;
+  if (unreadCount > 0) {
+    badge.classList.remove('hidden');
+    badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+function toggleNotifPanel() {
+  var panel = document.getElementById('notif-panel');
+  if (panel) {
+    panel.classList.toggle('hidden');
+    renderNotifList();
+  }
+}
+
+function renderNotifList() {
+  var list = document.getElementById('notif-list');
+  if (!list) return;
+  if (_notifStore.length === 0) {
+    list.innerHTML = '<p class="text-center text-gray-400 text-sm py-6">Chưa có thông báo</p>';
+    return;
+  }
+  list.innerHTML = '';
+  _notifStore.forEach(function(n) {
+    var timeAgo = getTimeAgo(n.time);
+    var div = document.createElement('div');
+    div.className = 'flex items-start gap-3 px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors';
+    div.innerHTML = '<span class="material-symbols-outlined text-[20px] mt-0.5" style="color:' + n.color + ';font-variation-settings: \'FILL\' 1;">' + n.icon + '</span>' +
+      '<div class="flex-1"><p class="text-sm text-gray-800">' + n.message + '</p>' +
+      '<p class="text-[11px] text-gray-400 mt-0.5">' + timeAgo + '</p></div>';
+    list.appendChild(div);
+  });
+}
+
+function clearNotifications() {
+  _notifStore = [];
+  localStorage.removeItem('chioi_notifications');
+  updateBellBadge();
+  renderNotifList();
+}
+
+function getTimeAgo(isoStr) {
+  var diff = Date.now() - new Date(isoStr).getTime();
+  var mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Vừa xong';
+  if (mins < 60) return mins + ' phút trước';
+  var hours = Math.floor(mins / 60);
+  if (hours < 24) return hours + ' giờ trước';
+  return Math.floor(hours / 24) + ' ngày trước';
+}
+
+// Init badge on load
+updateBellBadge();
+
+// Click outside to close notif panel
+document.addEventListener('click', function(e) {
+  var panel = document.getElementById('notif-panel');
+  var bell = document.getElementById('header-bell');
+  if (panel && !panel.classList.contains('hidden') && !panel.contains(e.target) && !bell.contains(e.target)) {
+    panel.classList.add('hidden');
+  }
+});
 </script>
 <style>
     .animate-spin-slow {

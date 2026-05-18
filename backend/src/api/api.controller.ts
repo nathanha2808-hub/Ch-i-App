@@ -141,7 +141,7 @@ export class ApiController {
   @ApiOperation({ summary: 'Tạo ticket hỗ trợ/khiếu nại' })
   @ApiBody({ type: CreateTicketDto })
   async createTicket(@Request() req, @Body() body: CreateTicketDto) {
-    return this.apiService.createTicket(req.user.userId, body.subject, body.description);
+    return this.apiService.createTicket(req.user.userId, body.subject, body.description, body.order_id);
   }
 
   // ===== Chat User - Admin =====
@@ -216,6 +216,14 @@ export class ApiController {
   @ApiBody({ type: SubscribePackageDto })
   async subscribePackage(@Request() req, @Body() body: SubscribePackageDto) {
     return this.apiService.subscribePackage(req.user.userId, body.package_id);
+  }
+
+  // Lỗi 1 FIX: KH xem gói đang sử dụng
+  @Get('packages/my-active')
+  @Roles('CUSTOMER')
+  @ApiOperation({ summary: 'Lấy gói gia đình đang active của KH' })
+  async getMyActivePackages(@Request() req) {
+    return this.apiService.getCustomerActivePackages(req.user.userId);
   }
 
   @Post('packages')
@@ -389,5 +397,57 @@ export class ApiController {
   @ApiOperation({ summary: 'Lấy tất cả dịch vụ (bao gồm ẩn) + thống kê' })
   async getAdminServices() {
     return this.apiService.getAdminServices();
+  }
+
+  // Lỗi 2 FIX: Hoàn tiền cho KH khi khiếu nại
+  @Post('admin/tickets/:id/refund')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Hoàn tiền cho khách hàng qua khiếu nại (cộng ví KH, trừ ví Tasker)' })
+  async refundTicket(@Request() req, @Param('id', ParseIntPipe) id: number, @Body() body: any) {
+    return this.apiService.refundTicket(req.user.userId, id, body.order_id);
+  }
+
+  // Lỗi 4 FIX: Chat trong khiếu nại
+  @Get('support/tickets/:id/messages')
+  @Roles('CUSTOMER', 'TASKER')
+  @ApiOperation({ summary: 'Lấy tin nhắn trong ticket khiếu nại' })
+  async getTicketMessages(@Param('id', ParseIntPipe) id: number) {
+    return this.apiService.getTicketMessages(id);
+  }
+
+  @Post('support/tickets/:id/messages')
+  @Roles('CUSTOMER', 'TASKER')
+  @ApiOperation({ summary: 'Gửi tin nhắn trong ticket khiếu nại' })
+  async sendTicketMessage(@Request() req, @Param('id', ParseIntPipe) id: number, @Body() body: any) {
+    return this.apiService.sendTicketMessage(id, req.user.userId, body.content);
+  }
+
+  @Get('admin/tickets/:id/messages')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Admin xem tin nhắn ticket' })
+  async getAdminTicketMessages(@Param('id', ParseIntPipe) id: number) {
+    return this.apiService.getTicketMessages(id);
+  }
+
+  @Post('admin/tickets/:id/messages')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Admin trả lời ticket khiếu nại' })
+  async adminReplyTicket(@Request() req, @Param('id', ParseIntPipe) id: number, @Body() body: any) {
+    return this.apiService.sendTicketMessage(id, req.user.userId, body.content, true);
+  }
+
+  // Lỗi 3 FIX: Cấu hình phí nền tảng động
+  @Get('admin/system-settings/:key')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Lấy cấu hình hệ thống (ví dụ: platform_fee_pct)' })
+  async getSystemSetting(@Param('key') key: string) {
+    return this.apiService.getSystemSetting(key);
+  }
+
+  @Post('admin/system-settings')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Cập nhật cấu hình hệ thống' })
+  async setSystemSetting(@Body() body: any) {
+    return this.apiService.setSystemSetting(body.key, String(body.value), body.description);
   }
 }

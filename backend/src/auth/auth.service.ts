@@ -43,6 +43,16 @@ export class AuthService {
       throw new BadRequestException('Phone number already exists');
     }
 
+    // Lỗi 6 FIX: Check unique CCCD trước khi tạo user
+    if (data.id_number) {
+      const existingCCCD = await this.prisma.taskers.findFirst({
+        where: { bio: { contains: data.id_number } }
+      });
+      if (existingCCCD) {
+        throw new BadRequestException('Số CCCD này đã được đăng ký tài khoản. Mỗi CCCD chỉ được đăng ký 1 tài khoản.');
+      }
+    }
+
     const saltOrRounds = 10;
     const password_hash = await bcrypt.hash(data.password, saltOrRounds);
 
@@ -70,8 +80,36 @@ export class AuthService {
       });
     } else if (data.role === 'TASKER') {
       await this.prisma.taskers.create({
-        data: { tasker_id: user.user_id, kyc_status: 'PENDING_APPROVAL' },
+        data: { 
+          tasker_id: user.user_id, 
+          kyc_status: 'PENDING_APPROVAL',
+          bio: data.id_number ? `CCCD: ${data.id_number}` : null
+        },
       });
+
+      // Handle Tasker Services Mapping
+      if (data.services && Array.isArray(data.services) && data.services.length > 0) {
+        const serviceMap: Record<string, number> = {
+          'don_nha': 1,
+          'trong_tre': 2,
+          'mua_ho': 4
+        };
+        
+        const taskerServices = data.services
+          .map((svc: string) => serviceMap[svc])
+          .filter((id: number | undefined) => id !== undefined)
+          .map((service_id: number) => ({
+            tasker_id: user.user_id,
+            service_id,
+            status: 'PENDING_APPROVAL'
+          }));
+
+        if (taskerServices.length > 0) {
+          await this.prisma.tasker_services.createMany({
+            data: taskerServices
+          });
+        }
+      }
     } else if (data.role === 'ADMIN') {
       await this.prisma.admins.create({
         data: { admin_id: user.user_id, access_level: 'SUPPORT' },
@@ -259,5 +297,13 @@ export class AuthService {
     });
 
     return { message: 'Đổi mật khẩu thành công' };
+  }
+
+  // Lỗi 6 FIX: Check trùng CCCD
+  async checkCCCDExists(idNumber: string) {
+    const existing = await this.prisma.taskers.findFirst({
+      where: { bio: { contains: `CCCD: ${idNumber}` } }
+    });
+    return { exists: !!existing };
   }
 }

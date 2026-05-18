@@ -1,54 +1,116 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WalletsService } from '../wallets/wallets.service';
+import { PushService } from '../push/push.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private prisma: PrismaService,
-    private walletsService: WalletsService
+    private walletsService: WalletsService,
+    private pushService: PushService,
   ) {}
 
   async bookOrder(customerId: number, data: any) {
     const orderCode = 'ORD' + Date.now().toString().slice(-6);
     const paymentMethod = data.payment_method || 'WALLET';
 
+    // KIỂM TRA GÓI GIA ĐÌNH - ÁP DỤNG GIẢM GIÁ TỰ ĐỘNG
+    let originalPrice = Number(data.total_price);
+    let finalPrice = originalPrice;
+    let discountAmount = 0;
+    
+    try {
+      const activePackage = await this.prisma.customer_packages.findFirst({
+        where: {
+          customer_id: customerId,
+          status: 'ACTIVE',
+          end_date: { gt: new Date() }
+        }
+      });
+      if (activePackage) {
+        // Giảm 15% phí dịch vụ dọn dẹp
+        discountAmount = Math.round(originalPrice * 0.15);
+        finalPrice = originalPrice - discountAmount;
+      }
+    } catch (e) {
+      console.warn('[Order] Lỗi khi kiểm tra gói gia đình:', e.message);
+    }
+
     // Bug #34 FIX: Nếu thanh toán ví → PHẢI kiểm tra số dư, không bỏ qua lỗi
     if (paymentMethod === 'WALLET') {
       const wallet = await this.prisma.wallets.findUnique({ where: { user_id: customerId } });
       const balance = wallet ? Number(wallet.balance) : 0;
-      if (balance < Number(data.total_price)) {
+      if (balance < finalPrice) {
         throw new BadRequestException(
-          `Số dư ví không đủ. Cần ${Number(data.total_price).toLocaleString('vi-VN')}đ nhưng chỉ có ${balance.toLocaleString('vi-VN')}đ. Vui lòng nạp thêm tiền hoặc chọn thanh toán tiền mặt.`
+          `Số dư ví không đủ. Cần ${finalPrice.toLocaleString('vi-VN')}đ nhưng chỉ có ${balance.toLocaleString('vi-VN')}đ. Vui lòng nạp thêm tiền hoặc chọn thanh toán tiền mặt.`
         );
       }
     }
 
     // Insert order with PostGIS geometry using raw SQL
     // Bug 12.1 FIX: RETURNING thêm lat/lng để FE Tasker vẽ route map
+    // Lưu ý: data.total_price truyền vào là original, lưu DB là finalPrice
+    // Ta sử dụng notes để lưu vết áp dụng gói
+    const noteWithPkg = discountAmount > 0 
+      ? ((data.notes ? data.notes + '\n' : '') + `[Đã áp dụng giảm ${discountAmount.toLocaleString('vi-VN')}đ từ Gói Gia Đình]`)
+      : (data.notes ?? null);
+
+    // Lỗi 3 FIX: Fetch platform fee từ DB thay vì fix cứng 20%
+    let platformFeePct = 0.2; // mặc định 20%
+    try {
+      const setting = await this.prisma.system_settings.findUnique({ where: { setting_key: 'platform_fee_pct' } });
+      if (setting && setting.setting_value) {
+        const parsed = Number(setting.setting_value);
+        if (!isNaN(parsed) && parsed >= 0 && parsed <= 50) {
+          platformFeePct = parsed / 100;
+        }
+      }
+    } catch (e) {
+      console.warn('[Order] Lỗi khi lấy phí nền tảng:', e.message);
+    }
+    const taskerEarningsPct = 1 - platformFeePct;
+
     const [order] = await this.prisma.$queryRaw<any[]>`
       INSERT INTO orders (
         order_code, customer_id, service_id, status, scheduled_time, address, total_price,
         tasker_earnings, platform_fee, payment_method, location, notes, created_at, updated_at
       ) VALUES (
         ${orderCode}, ${customerId}, ${data.service_id}, 'PENDING', ${new Date(data.scheduled_time)},
-        ${data.address}, ${data.total_price}, ${data.total_price * 0.8}, ${data.total_price * 0.2},
-        ${paymentMethod}, ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326), ${data.notes ?? null},
+        ${data.address}, ${finalPrice}, ${finalPrice * taskerEarningsPct}, ${finalPrice * platformFeePct},
+        ${paymentMethod}, ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326), ${noteWithPkg},
         NOW(), NOW()
       ) RETURNING order_id, order_code;
     `;
+
+    // TRỪ TIỀN NGAY LÚC ĐẶT ĐƠN
+    if (paymentMethod === 'WALLET') {
+      try {
+        await this.walletsService.addTransaction(
+          customerId,
+          -finalPrice,
+          'PAYMENT',
+          order.order_id,
+          'Thanh toán dịch vụ đơn hàng #' + order.order_id
+        );
+      } catch (e) {
+        console.warn('[Order] Không trừ được tiền ví KH lúc đặt đơn:', e.message);
+      }
+    }
 
     return {
       ...order,
       address: data.address,
       latitude: Number(data.latitude),
       longitude: Number(data.longitude),
-      total_price: data.total_price,
+      total_price: finalPrice,
+      original_price: originalPrice,
+      discount_amount: discountAmount,
       payment_method: paymentMethod,
     };
   }
 
-  async findNearbyTaskers(longitude: number, latitude: number, radiusMeters: number = 3000) {
+  async findNearbyTaskers(longitude: number, latitude: number, radiusMeters: number = 50000) {
     const taskers = await this.prisma.$queryRaw<any[]>`
       SELECT tasker_id, bio, average_rating, 
              ST_DistanceSphere(current_location, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)) as distance
@@ -57,7 +119,7 @@ export class OrdersService {
         AND current_location IS NOT NULL
         AND ST_DWithin(current_location::geography, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography, ${radiusMeters})
       ORDER BY distance ASC
-      LIMIT 3;
+      LIMIT 20;
     `;
     return taskers;
   }
@@ -125,7 +187,7 @@ export class OrdersService {
     const validTransitions: Record<string, string[]> = {
       'ACCEPTED': ['TASKER_ARRIVED', 'CANCELLED'],
       'TASKER_ARRIVED': ['IN_PROGRESS'],
-      'IN_PROGRESS': ['COMPLETED'],
+      'IN_PROGRESS': ['PENDING_COMPLETION', 'COMPLETED'],  // FIX: Tasker có thể chuyển thẳng sang COMPLETED
     };
 
     const currentStatus = order.status || '';
@@ -139,25 +201,28 @@ export class OrdersService {
       data: { status },
     });
 
-    if (status === 'COMPLETED') {
-      // Xử lý ví dựa trên payment_method
+    // HOÀN TIỀN NẾU TASKER HỦY ĐƠN
+    if (status === 'CANCELLED' && order.payment_method === 'WALLET') {
+      try {
+        await this.walletsService.addTransaction(
+          order.customer_id,
+          Number(order.total_price),
+          'REFUND',
+          order.order_id,
+          'Hoàn tiền đơn hàng bị hủy #' + order.order_id
+        );
+      } catch (e) {
+        console.warn('[Order] Lỗi hoàn tiền ví KH:', e.message);
+      }
+    }
+
+    // TC-T09-012 FIX: Khi PENDING_COMPLETION — KHÔNG tính tiền ngay, chờ KH xác nhận
+
+    // THỰC HIỆN TÍNH TIỀN KHI TASKER BÁO HOÀN THÀNH (PENDING_COMPLETION) HOẶC COMPLETED
+    if (status === 'COMPLETED' || status === 'PENDING_COMPLETION') {
       const paymentMethod = order.payment_method || 'WALLET';
 
       if (paymentMethod === 'WALLET') {
-        // Thanh toán ví: Trừ tiền KH + Cộng thu nhập Tasker (85%)
-        try {
-          await this.walletsService.addTransaction(
-            order.customer_id,
-            -Number(order.total_price),
-            'PAYMENT',
-            order.order_id,
-            'Thanh toán dịch vụ đơn hàng #' + order.order_id
-          );
-        } catch (e) {
-          console.warn('[Order] Không trừ được tiền ví KH:', e.message);
-        }
-
-        // Cộng thu nhập cho Tasker (sau khi trừ phí nền tảng 20%)
         try {
           await this.walletsService.addTransaction(
             order.tasker_id!,
@@ -170,8 +235,6 @@ export class OrdersService {
           console.warn('[Order] Không cộng thu nhập Tasker:', e.message);
         }
       } else if (paymentMethod === 'CASH') {
-        // Thanh toán tiền mặt: Tasker giữ tiền mặt → Platform trừ phí nền tảng từ ví Tasker
-        // KHÔNG trừ ví khách hàng (KH đã trả mặt)
         try {
           await this.walletsService.addTransaction(
             order.tasker_id!,
@@ -185,17 +248,74 @@ export class OrdersService {
         }
       }
 
-      // BUG FIX: Increment total_jobs cho Tasker khi đơn hoàn thành
+      // Increment total_jobs cho Tasker
       if (order.tasker_id) {
         try {
           await this.prisma.taskers.update({
             where: { tasker_id: order.tasker_id },
             data: { total_jobs: { increment: 1 } },
           });
-        } catch (e) {
-          console.warn('[Order] Không cập nhật total_jobs Tasker:', e.message);
-        }
+        } catch (e) {}
       }
+
+      const fullOrder = await this.prisma.orders.findUnique({
+        where: { order_id: orderId },
+        include: { services: true },
+      });
+      const serviceName = fullOrder?.services?.name || 'Dịch vụ';
+      
+      // Nếu Tasker báo hoàn thành (PENDING_COMPLETION), báo cho KH xác nhận
+      if (status === 'PENDING_COMPLETION') {
+        this.pushService.sendPushToUser(fullOrder!.customer_id, {
+          title: '✅ Tasker đã hoàn thành!',
+          body: `Đơn ${serviceName} #${orderId} đã xong. Xác nhận để hoàn tất.`,
+          url: '/khachhang/lichsuhoatdong.html',
+        }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
+      } else if (status === 'COMPLETED') {
+        this.pushService.sendPushToUser(fullOrder!.customer_id, {
+          title: '🎉 Đơn đã hoàn thành!',
+          body: `Tasker đã hoàn thành đơn ${serviceName} #${orderId}. Cảm ơn bạn đã sử dụng dịch vụ!`,
+          url: '/khachhang/lichsuhoatdong.html',
+        }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
+      }
+    }
+
+    return updatedOrder;
+  }
+
+  // TC-T09-013 FIX: KH xác nhận hoàn thành đơn
+  async confirmCompletion(orderId: number, customerId: number) {
+    const order = await this.prisma.orders.findFirst({
+      where: { order_id: orderId, customer_id: customerId },
+    });
+
+    if (!order) {
+      throw new BadRequestException('Đơn hàng không tồn tại hoặc không thuộc về bạn');
+    }
+
+    if (order.status === 'COMPLETED') {
+      return order; // Already completed
+    }
+
+    if (order.status !== 'PENDING_COMPLETION') {
+      throw new BadRequestException(`Không thể xác nhận đơn ở trạng thái ${order.status}`);
+    }
+
+    const updatedOrder = await this.prisma.orders.update({
+      where: { order_id: orderId },
+      data: { status: 'COMPLETED' },
+    });
+
+    // Không tính tiền ở đây nữa vì đã tính lúc Tasker bấm PENDING_COMPLETION
+    // để Tasker nhận tiền ngay và luôn
+
+    // TC-T09-025 FIX: Push notification cho Tasker khi KH xác nhận hoàn thành
+    if (order.tasker_id) {
+      this.pushService.sendPushToUser(order.tasker_id, {
+        title: '🎉 Đơn đã hoàn thành!',
+        body: `KH đã xác nhận đơn #${orderId}. Thu nhập đã được cộng vào ví.`,
+        url: '/giupviec/thunhapvathongke.html',
+      }).catch((e) => console.warn('[Push] Error sending to tasker:', e.message));
     }
 
     return updatedOrder;
@@ -215,10 +335,27 @@ export class OrdersService {
       throw new BadRequestException(`Cannot cancel order in status ${currentStatus}`);
     }
 
-    return this.prisma.orders.update({
+    const updatedOrder = await this.prisma.orders.update({
       where: { order_id: orderId },
       data: { status: 'CANCELLED' },
     });
+
+    // HOÀN TIỀN NẾU KHÁCH HÀNG HỦY ĐƠN
+    if (order.payment_method === 'WALLET') {
+      try {
+        await this.walletsService.addTransaction(
+          customerId,
+          Number(order.total_price),
+          'REFUND',
+          order.order_id,
+          'Hoàn tiền đơn hàng bị hủy #' + order.order_id
+        );
+      } catch (e) {
+        console.warn('[Order] Lỗi hoàn tiền ví KH:', e.message);
+      }
+    }
+
+    return updatedOrder;
   }
 
   async reviewOrder(orderId: number, customerId: number, rating: number, comment: string) {

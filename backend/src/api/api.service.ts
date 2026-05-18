@@ -1,9 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PushService } from '../push/push.service';
 
 @Injectable()
 export class ApiService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private pushService: PushService,
+  ) {}
 
   // --- User Profile ---
   // Bug 13.1 FIX: GET endpoint cho FE booking lấy default address
@@ -155,6 +159,25 @@ export class ApiService {
     };
   }
 
+  // Lỗi 1 FIX: KH xem gói đang sử dụng
+  async getCustomerActivePackages(userId: number) {
+    const subs = await this.prisma.customer_packages.findMany({
+      where: { customer_id: userId, status: 'ACTIVE', end_date: { gte: new Date() } },
+      include: { family_packages: true },
+      orderBy: { start_date: 'desc' },
+    });
+    return subs.map(s => ({
+      id: s.customer_package_id,
+      package_name: s.family_packages?.name || 'Gói',
+      package_desc: s.family_packages?.description || '',
+      price: Number(s.family_packages?.price || 0),
+      start_date: s.start_date,
+      end_date: s.end_date,
+      remaining_days: Math.max(0, Math.ceil((new Date(s.end_date).getTime() - Date.now()) / 86400000)),
+      status: s.status,
+    }));
+  }
+
   async getPackages() {
     return this.prisma.family_packages.findMany({ where: { is_active: true } });
   }
@@ -171,13 +194,12 @@ export class ApiService {
     const activeTaskers = await this.prisma.users.findMany({
       where: { role: 'TASKER', taskers: { is_online: true, kyc_status: 'VERIFIED' } },
       include: { taskers: { include: { tasker_services: { include: { services: { select: { name: true } } } } } } },
-      take: 20,
     });
 
     if (lat !== undefined && lng !== undefined) {
       const distances = await this.prisma.$queryRaw<any[]>`
         SELECT tasker_id, ST_DistanceSphere(current_location, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)) as distance
-        FROM taskers WHERE is_online = true AND current_location IS NOT NULL
+        FROM taskers WHERE is_online = true AND kyc_status = 'VERIFIED' AND current_location IS NOT NULL
       `;
       const distanceMap = new Map();
       distances.forEach(d => distanceMap.set(d.tasker_id, d.distance));
@@ -185,7 +207,7 @@ export class ApiService {
       return activeTaskers.map(t => ({
         ...t,
         distance: distanceMap.get(t.user_id) || null
-      }));
+      })).sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
     }
 
     return activeTaskers;
@@ -278,16 +300,17 @@ export class ApiService {
     });
   }
 
-  async createTicket(userId: number, subject: string, description: string) {
-    return this.prisma.support_tickets.create({
-      data: {
-        ticket_code: `TCK${Date.now()}`,
-        user_id: userId,
-        subject,
-        description,
-        status: 'OPEN',
-      },
-    });
+  async createTicket(userId: number, subject: string, description: string, orderId?: number) {
+    const data: any = {
+      ticket_code: `TCK${Date.now()}`,
+      user_id: userId,
+      subject,
+      description,
+      status: 'OPEN',
+    };
+    // Lỗi 2 FIX: Gắn order_id nếu có
+    if (orderId) data.order_id = orderId;
+    return this.prisma.support_tickets.create({ data });
   }
 
   // --- Admin APIs ---
@@ -417,6 +440,25 @@ export class ApiService {
         where: { wallet_id: transaction.wallet_id },
         data: { balance: { increment: transaction.amount } }
       });
+    }
+
+    // TC-T13-023 FIX: Push notification cho Tasker khi rút tiền được xử lý
+    const wallet = await this.prisma.wallets.findUnique({ where: { wallet_id: transaction.wallet_id } });
+    if (wallet) {
+      const amount = Number(transaction.amount).toLocaleString('vi-VN');
+      if (status === 'COMPLETED') {
+        this.pushService.sendPushToUser(wallet.user_id, {
+          title: '💰 Rút tiền thành công!',
+          body: `Yêu cầu rút ${amount}đ đã được duyệt.`,
+          url: '/giupviec/thunhapvathongke.html',
+        }).catch((e) => console.warn('[Push] Error:', e.message));
+      } else if (status === 'FAILED') {
+        this.pushService.sendPushToUser(wallet.user_id, {
+          title: '❌ Yêu cầu rút tiền bị từ chối',
+          body: `Yêu cầu rút ${amount}đ không được duyệt. Số tiền đã hoàn lại ví.`,
+          url: '/giupviec/thunhapvathongke.html',
+        }).catch((e) => console.warn('[Push] Error:', e.message));
+      }
     }
 
     return transaction;
@@ -1147,5 +1189,155 @@ export class ApiService {
       orderBy: { service_id: 'asc' },
       include: { _count: { select: { orders: true, tasker_services: true } } }
     });
+  }
+
+  // Lỗi 2 FIX: Hoàn tiền qua khiếu nại
+  async refundTicket(adminId: number, ticketId: number, orderId: number) {
+    // 1. Lấy ticket + order
+    const ticket = await this.prisma.support_tickets.findUnique({ where: { ticket_id: ticketId } });
+    if (!ticket) throw new BadRequestException('Không tìm thấy ticket');
+
+    const order = await this.prisma.orders.findUnique({ where: { order_id: orderId } });
+    if (!order) throw new BadRequestException('Không tìm thấy đơn hàng');
+    if (order.status !== 'COMPLETED') throw new BadRequestException('Chỉ hoàn tiền đơn hàng đã hoàn thành');
+
+    const refundAmount = Number(order.tasker_earnings); // Hoàn lại phần Tasker nhận
+    if (refundAmount <= 0) throw new BadRequestException('Số tiền hoàn không hợp lệ');
+
+    // 2. Lấy ví KH + ví Tasker
+    const customerWallet = await this.prisma.wallets.findUnique({ where: { user_id: order.customer_id } });
+    if (!customerWallet) throw new BadRequestException('Không tìm thấy ví khách hàng');
+
+    if (!order.tasker_id) throw new BadRequestException('Đơn hàng chưa có Tasker');
+    const taskerWallet = await this.prisma.wallets.findUnique({ where: { user_id: order.tasker_id } });
+    if (!taskerWallet) throw new BadRequestException('Không tìm thấy ví Tasker');
+
+    // 3. Transaction: cộng ví KH + trừ ví Tasker + tạo records + update ticket
+    await this.prisma.$transaction([
+      // Cộng tiền vào ví KH
+      this.prisma.wallets.update({
+        where: { wallet_id: customerWallet.wallet_id },
+        data: { balance: { increment: refundAmount }, updated_at: new Date() },
+      }),
+      // Trừ tiền từ ví Tasker
+      this.prisma.wallets.update({
+        where: { wallet_id: taskerWallet.wallet_id },
+        data: { balance: { decrement: refundAmount }, updated_at: new Date() },
+      }),
+      // Transaction record cho KH (REFUND)
+      this.prisma.transactions.create({
+        data: {
+          transaction_code: `RFD${Date.now()}`,
+          wallet_id: customerWallet.wallet_id,
+          amount: refundAmount,
+          type: 'REFUND',
+          status: 'COMPLETED',
+          order_id: orderId,
+          description: `Hoàn tiền khiếu nại #${ticket.ticket_code}`,
+        },
+      }),
+      // Transaction record cho Tasker (PLATFORM_DEDUCT)
+      this.prisma.transactions.create({
+        data: {
+          transaction_code: `DED${Date.now()}`,
+          wallet_id: taskerWallet.wallet_id,
+          amount: refundAmount,
+          type: 'PLATFORM_DEDUCT',
+          status: 'COMPLETED',
+          order_id: orderId,
+          description: `Trừ tiền hoàn khiếu nại #${ticket.ticket_code}`,
+        },
+      }),
+      // Update ticket status
+      this.prisma.support_tickets.update({
+        where: { ticket_id: ticketId },
+        data: { status: 'RESOLVED', admin_id: adminId, updated_at: new Date() },
+      }),
+      // Audit log
+      this.prisma.admin_audit_logs.create({
+        data: {
+          admin_id: adminId,
+          action: 'REFUND_ORDER',
+          target_table: 'orders',
+          target_id: orderId,
+          new_data: { refund_amount: refundAmount, ticket_id: ticketId },
+        },
+      }),
+    ]);
+
+    return {
+      success: true,
+      message: `Hoàn tiền ${refundAmount.toLocaleString('vi-VN')}đ thành công`,
+      refund_amount: refundAmount,
+    };
+  }
+
+  // Lỗi 4 FIX: Chat trong khiếu nại
+  private async ensureTicketMessagesTable() {
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS ticket_messages (
+        id SERIAL PRIMARY KEY,
+        ticket_id INT NOT NULL,
+        sender_id INT NOT NULL,
+        content TEXT NOT NULL,
+        is_admin BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+  }
+
+  async getTicketMessages(ticketId: number) {
+    await this.ensureTicketMessagesTable();
+    const messages = await this.prisma.$queryRawUnsafe(`
+      SELECT tm.*, u.full_name, u.role, u.avatar_url
+      FROM ticket_messages tm
+      LEFT JOIN users u ON u.user_id = tm.sender_id
+      WHERE tm.ticket_id = $1
+      ORDER BY tm.created_at ASC
+    `, ticketId);
+    return messages;
+  }
+
+  async sendTicketMessage(ticketId: number, senderId: number, content: string, isAdmin = false) {
+    if (!content || !content.trim()) {
+      throw new BadRequestException('Nội dung tin nhắn không được để trống');
+    }
+    await this.ensureTicketMessagesTable();
+
+    // Verify ticket exists
+    const ticket = await this.prisma.support_tickets.findUnique({ where: { ticket_id: ticketId } });
+    if (!ticket) throw new BadRequestException('Không tìm thấy ticket');
+
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO ticket_messages (ticket_id, sender_id, content, is_admin, created_at)
+      VALUES ($1, $2, $3, $4, NOW())
+    `, ticketId, senderId, content.trim(), isAdmin);
+
+    // If admin replies, update ticket status to IN_PROGRESS
+    if (isAdmin && ticket.status === 'OPEN') {
+      await this.prisma.support_tickets.update({
+        where: { ticket_id: ticketId },
+        data: { status: 'IN_PROGRESS', admin_id: senderId, updated_at: new Date() },
+      });
+    }
+
+    return { success: true, message: 'Đã gửi tin nhắn' };
+  }
+
+  // Lỗi 3 FIX: Cấu hình phí nền tảng động
+  async getSystemSetting(key: string) {
+    const setting = await this.prisma.system_settings.findUnique({
+      where: { setting_key: key },
+    });
+    return { key, value: setting ? setting.setting_value : null, description: setting?.description };
+  }
+
+  async setSystemSetting(key: string, value: string, description?: string) {
+    const updated = await this.prisma.system_settings.upsert({
+      where: { setting_key: key },
+      update: { setting_value: value, description, updated_at: new Date() },
+      create: { setting_key: key, setting_value: value, description },
+    });
+    return { success: true, data: updated };
   }
 }

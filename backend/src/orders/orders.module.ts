@@ -4,6 +4,7 @@ import { OrdersController } from './orders.controller';
 import { OrdersGateway } from './orders.gateway';
 import { JwtModule } from '@nestjs/jwt';
 import { WalletsModule } from '../wallets/wallets.module';
+import { PushModule } from '../push/push.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { WalletsModule } from '../wallets/wallets.module';
       secret: process.env.JWT_SECRET || 'super-secret',
     }),
     WalletsModule,
+    PushModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersGateway],

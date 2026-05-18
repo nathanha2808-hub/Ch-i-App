@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -365,6 +365,18 @@ Phương thức thanh toán
     }
   })();
 
+  // ===== Kiểm tra gói gia đình =====
+  (async function checkFamilyPackage() {
+    try {
+      var activePkgs = await apiFetch('/api/packages/my-active');
+      if (activePkgs && activePkgs.length > 0) {
+        state.hasFamilyPackage = true;
+        // Có thể hiện popup thông báo
+        updateSummary();
+      }
+    } catch (e) { console.warn('[Gói] Không check được gói:', e.message); }
+  })();
+
   // ===== Payment Method Toggle =====
   function setPaymentMethod(method) {
     state.paymentMethod = method;
@@ -504,11 +516,20 @@ Phương thức thanh toán
   // ===== Lỗi 4 FIX: Update Summary hiển thị đúng thông tin =====
   function updateSummary() {
     var total = state.hours * state.pricePerHour;
+    var originalTotal = total;
+    var discount = 0;
+
+    // KIỂM TRA GÓI GIA ĐÌNH ĐỂ HIỂN THỊ
+    if (state.hasFamilyPackage) {
+      discount = Math.round(originalTotal * 0.15);
+      total = originalTotal - discount;
+    }
+
     if (hourDisplay) hourDisplay.textContent = state.hours;
 
     // Update "Tạm tính" in Number section
     var tempPrice = document.getElementById('temp-price-display');
-    if (tempPrice) tempPrice.textContent = 'Tạm tính: ' + formatVND(total);
+    if (tempPrice) tempPrice.textContent = 'Tạm tính: ' + formatVND(originalTotal);
 
     // Update Summary Section
     var summaryService = document.getElementById('summary-service');
@@ -522,6 +543,24 @@ Phương thức thanh toán
       summaryTime.textContent = dateFormatted + ' - ' + state.time;
     }
     if (summaryHours) summaryHours.textContent = state.hours + ' giờ';
+    
+    // Nếu có giảm giá, hiển thị thêm dòng "Ưu đãi Gói gia đình"
+    var summaryBlock = document.getElementById('summary-discount-block');
+    if (discount > 0) {
+      if (!summaryBlock) {
+        summaryBlock = document.createElement('div');
+        summaryBlock.id = 'summary-discount-block';
+        summaryBlock.className = 'flex justify-between mt-2 pt-2 border-t border-surface-variant/50';
+        summaryBlock.innerHTML = '<span class="text-green-600 font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">verified</span> Gói Gia Đình (-15%)</span><span class="font-bold text-green-600">-' + formatVND(discount) + '</span>';
+        var hoursEl = document.getElementById('summary-hours').parentElement;
+        hoursEl.after(summaryBlock);
+      } else {
+        summaryBlock.innerHTML = '<span class="text-green-600 font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">verified</span> Gói Gia Đình (-15%)</span><span class="font-bold text-green-600">-' + formatVND(discount) + '</span>';
+      }
+    } else if (summaryBlock) {
+      summaryBlock.remove();
+    }
+
     if (summaryTotal) summaryTotal.textContent = formatVND(total);
 
     // Bottom button

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
@@ -171,6 +171,12 @@
   <span class="material-symbols-outlined text-yellow-500 text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
   <span id="ratingValue" class="font-body-sm text-body-sm font-bold text-on-surface">--</span>
   <span id="ratingCount" class="font-body-sm text-body-sm text-on-surface-variant">(0 đánh giá)</span>
+</div>
+<!-- TC-T14-006 FIX: Hiển thị số đơn hoàn thành -->
+<div id="profileCompleted" class="flex items-center justify-center gap-1 mt-1">
+  <span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+  <span id="completedCount" class="font-body-sm text-body-sm font-bold text-on-surface">0</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">đơn hoàn thành</span>
 </div>
 </div>
 </section>
@@ -349,9 +355,23 @@
             var totalReviews = profileData.total_reviews || profileData.review_count || 0;
             if (ratingVal) ratingVal.textContent = avgRating > 0 ? parseFloat(avgRating).toFixed(1) : 'Chưa có';
             if (ratingCount) ratingCount.textContent = '(' + totalReviews + ' đánh giá)';
+            // TC-T14-006 FIX: Hiển thị số đơn hoàn thành
+            var completedEl = document.getElementById('completedCount');
+            if (completedEl) {
+              var completedOrders = profileData.completed_orders || profileData.total_completed || 0;
+              completedEl.textContent = completedOrders;
+            }
             // Cập nhật lại name/phone từ server (chính xác hơn localStorage)
             if (profileData.full_name && nameEl) nameEl.textContent = profileData.full_name;
-            if (profileData.phone && phoneEl) phoneEl.textContent = profileData.phone;
+            // TC-T14-024 FIX: Format SĐT đúng dạng 0xxx xxx xxx
+            if (profileData.phone && phoneEl) {
+              var rawPhone = profileData.phone.replace(/\D/g, '');
+              if (rawPhone.length === 10) {
+                phoneEl.textContent = rawPhone.slice(0,4) + ' ' + rawPhone.slice(4,7) + ' ' + rawPhone.slice(7);
+              } else {
+                phoneEl.textContent = profileData.phone;
+              }
+            }
             var editNameEl2 = document.getElementById('editFullName');
             if (editNameEl2 && profileData.full_name) editNameEl2.value = profileData.full_name;
             // BUG FIX: Hiển thị avatar từ server

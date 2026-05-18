@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -315,8 +315,20 @@ Phương thức thanh toán
     pricePerHour: 100000,
     date: '',
     time: '18:00',
-    paymentMethod: 'WALLET'
+    paymentMethod: 'WALLET',
+    hasFamilyPackage: false
   };
+
+  // ===== Kiểm tra gói gia đình =====
+  (async function checkFamilyPackage() {
+    try {
+      var activePkgs = await apiFetch('/api/packages/my-active');
+      if (activePkgs && activePkgs.length > 0) {
+        state.hasFamilyPackage = true;
+        updateSummary();
+      }
+    } catch (e) { console.warn('[Gói] Không check được gói:', e.message); }
+  })();
 
   var ageOptions = [
     '0-1 tuổi', '1 tuổi', '2 tuổi', '3 tuổi', '4 tuổi', 
@@ -474,12 +486,43 @@ Phương thức thanh toán
   // ===== Update Summary =====
   function updateSummary() {
     var total = state.hours * state.pricePerHour;
+    var originalTotal = total;
+    var discount = 0;
+
+    if (state.hasFamilyPackage) {
+      discount = Math.round(originalTotal * 0.15);
+      total = originalTotal - discount;
+    }
+
     var agesStr = state.childAges.map(function(a) { return ageOptions[a] || a + ' tuổi'; }).join(', ');
     
     document.getElementById('summary-children').textContent = state.childCount + ' trẻ (' + agesStr + ')';
     var dateFormatted = state.date ? new Date(state.date).toLocaleDateString('vi-VN') : '—';
     document.getElementById('summary-time').textContent = dateFormatted + ' - ' + state.time;
     document.getElementById('summary-duration').textContent = state.hours + ' giờ';
+
+    var summaryDurationEl = document.getElementById('summary-duration').parentElement;
+    var existingDiscount = document.getElementById('summary-discount-fee');
+    if (discount > 0) {
+      if (!existingDiscount) {
+        var discDiv = document.createElement('div');
+        discDiv.id = 'summary-discount-fee';
+        discDiv.className = 'flex justify-between text-body-sm text-green-600 font-bold mt-sm pt-sm border-t border-outline-variant/20';
+        discDiv.innerHTML = '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">verified</span> Gói Gia Đình (-15%)</span><span>-' + formatVND(discount) + '</span>';
+        summaryDurationEl.after(discDiv);
+        
+        // Remove margin-top on the actual Total div to keep spacing nice
+        var totalDiv = document.getElementById('summary-total').parentElement;
+        totalDiv.className = 'flex justify-between pt-sm mt-sm';
+      } else {
+        existingDiscount.innerHTML = '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">verified</span> Gói Gia Đình (-15%)</span><span>-' + formatVND(discount) + '</span>';
+      }
+    } else if (existingDiscount) {
+      existingDiscount.remove();
+      var totalDiv = document.getElementById('summary-total').parentElement;
+      totalDiv.className = 'flex justify-between pt-sm border-t border-outline-variant/20 mt-sm';
+    }
+
     document.getElementById('summary-total').textContent = formatVND(total);
     document.getElementById('submit-btn').textContent = 'Đặt dịch vụ — ' + formatVND(total);
   }

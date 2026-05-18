@@ -5,7 +5,7 @@
 //   - Static khác (CSS/JS/fonts/icons): cache-first, refresh background
 //   - API calls: network-only (real-time data, không cache)
 
-const VERSION = 'chioi-v1.1.0'; // BUMP v1.1.0: prefetch + view-transitions + stale-while-revalidate
+const VERSION = 'chioi-v2.0.0'; // BUMP v2.0.0: HTML = network-first (không serve bản cũ nữa)
 const CACHE_STATIC = `${VERSION}-static`;
 const CACHE_PAGES  = `${VERSION}-pages`;
 
@@ -14,12 +14,6 @@ const NETWORK_FIRST_PATHS = ['/shared/api.js', '/pwa-register.js', '/manifest.js
 
 // Pre-cache shell — core pages + shared assets để navigate siêu nhanh
 const PRECACHE = [
-  '/',
-  '/khachhang/dangnhap.html',
-  '/khachhang/trangchu.html',
-  '/khachhang/lichsuhoatdong.html',
-  '/khachhang/thongbao.html',
-  '/khachhang/taikhoan.html',
   '/shared/transitions.css',
   '/shared/prefetch.js',
   '/icons/icon-192.png',
@@ -75,21 +69,18 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML pages: stale-while-revalidate (tải ngay từ cache, update nền)
+  // HTML pages: NETWORK-FIRST (luôn lấy bản mới, chỉ dùng cache khi offline)
   if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
     event.respondWith(
-      caches.match(req).then(cached => {
-        // Luôn fetch bản mới ở background
-        const fetchPromise = fetch(req).then(resp => {
+      fetch(req)
+        .then(resp => {
           if (resp && resp.status === 200) {
             const copy = resp.clone();
             caches.open(CACHE_PAGES).then(cache => cache.put(req, copy)).catch(() => {});
           }
           return resp;
-        }).catch(() => cached);
-        // Trả cache ngay nếu có, nếu không chờ fetch
-        return cached || fetchPromise;
-      })
+        })
+        .catch(() => caches.match(req)) // Fallback cache khi offline
     );
     return;
   }
@@ -109,6 +100,46 @@ self.addEventListener('fetch', (event) => {
       })
     );
   }
+});
+
+// TC-T09-025 + TC-T13-023 FIX: Web Push Notification — nhận thông báo khi app ở background
+self.addEventListener('push', (event) => {
+  let data = { title: 'Chị Ơi!', body: 'Bạn có thông báo mới', icon: '/icons/icon-192.png', url: '/' };
+  try {
+    if (event.data) {
+      const json = event.data.json();
+      data = { ...data, ...json };
+    }
+  } catch (e) {
+    if (event.data) data.body = event.data.text();
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon || '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      vibrate: [200, 100, 200],
+      data: { url: data.url || '/' },
+      actions: [{ action: 'open', title: 'Mở ứng dụng' }],
+    })
+  );
+});
+
+// Click notification → mở đúng trang
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      // Nếu đang có tab mở → focus vào đó
+      for (const client of windowClients) {
+        if (client.url.includes(url) && 'focus' in client) return client.focus();
+      }
+      // Mở tab mới
+      return clients.openWindow(url);
+    })
+  );
 });
 
 // Listen for skipWaiting message từ page (nếu có update prompt)
