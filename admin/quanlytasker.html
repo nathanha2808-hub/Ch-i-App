@@ -118,7 +118,7 @@
     </script>
   <link rel="stylesheet" href="../shared/transitions.css"/>
 </head>
-<body class="bg-background text-on-surface">
+<body class="bg-background text-on-surface min-w-[1280px] overflow-x-auto">
 <!-- Sidebar Navigation -->
 <aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-dim shadow-md flex flex-col py-stack_lg z-50">
 <div class="px-6 mb-8">
@@ -577,12 +577,14 @@ document.querySelectorAll('button').forEach(function(btn) {
     var idFrontUrl = '';
     var cccdText = '—';
     if (tasker.bio) {
-      if (tasker.bio.startsWith('{"cccd"')) {
+      if (tasker.bio.startsWith('{')) {
         try {
           var bioData = JSON.parse(tasker.bio);
           cccdText = bioData.cccd || '—';
           idFrontUrl = bioData.idFrontUrl || '';
-        } catch(e) {}
+        } catch(e) {
+          console.error('Error parsing bio:', e);
+        }
       } else if (tasker.bio.startsWith('CCCD:')) {
         cccdText = tasker.bio.replace('CCCD:', '').trim();
       }
@@ -907,9 +909,9 @@ document.querySelectorAll('button').forEach(function(btn) {
           .filter(function(ts) { return ts.services && ts.services.name; })
           .map(function(ts) { return ts.services.name; });
       }
-      return {
         user_id: u.user_id,
         tasker_id: u.taskers.tasker_id,
+        bio: u.taskers.bio,
         full_name: u.full_name,
         phone: u.phone,
         created_at: u.created_at,
