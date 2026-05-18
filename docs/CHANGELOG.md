@@ -4,6 +4,18 @@
 
 ---
 
+## [1.5.3] — 2026-05-18
+
+### ✨ New Features — Admin Tasker KYC Detail Modal
+
+#### Added
+- **Backend:** `auth.service.ts` và `register.dto.ts` — Thêm `id_front_base64` vào API đăng ký `/api/auth/register` để lưu ảnh giấy tờ tuỳ thân dưới dạng JSON trong cột `bio` của bảng `taskers`, giúp bypass giới hạn lưu file.
+- **Admin Panel:** `admin/quanlytasker.html` — Thêm nút "Chi tiết" ở danh sách Tasker và danh sách Chờ Duyệt. Triển khai Tasker Detail Modal để hiển thị thông tin chi tiết và hiển thị ảnh CCCD Mặt trước (từ `bio`) để Admin xác minh tính hợp lệ.
+- **Frontend Customer:** `khachhang/trangchu.html` — Ẩn mã số CCCD của Tasker khỏi thông tin `bio` trên trang chủ nhằm đảm bảo quyền riêng tư.
+- **Frontend Tasker:** `giupviec/dangkytasker.html` — Truyền chuỗi `cccdBase64` vào trường `id_front_base64` khi gọi API `/api/auth/register`.
+
+---
+
 ## [1.5.2] — 2026-05-18
 
 ### 🐛 Bug fixes — Tasker App (CCCD Registration Validation)

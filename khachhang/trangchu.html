@@ -704,6 +704,9 @@ if ('serviceWorker' in navigator && 'caches' in window) {
             var rating = (t.taskers && t.taskers.average_rating) ? Number(t.taskers.average_rating).toFixed(1) : '5.0';
             var totalJobs = (t.taskers && t.taskers.total_jobs) ? t.taskers.total_jobs : 0;
             var bio = (t.taskers && t.taskers.bio) ? t.taskers.bio : 'Chưa có mô tả';
+            if (bio.indexOf('CCCD:') === 0 || bio.indexOf('{"cccd"') === 0) {
+              bio = 'Chưa có mô tả';
+            }
             var svcName = getTaskerServices(t);
             var distance = formatDistance(t);
             var isOnline = t.taskers && t.taskers.is_online;

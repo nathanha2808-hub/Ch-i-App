@@ -79,11 +79,20 @@ export class AuthService {
         data: { customer_id: user.user_id },
       });
     } else if (data.role === 'TASKER') {
+      let bioData = data.id_number ? `CCCD: ${data.id_number}` : null;
+      if (data.id_front_base64 || data.id_back_base64) {
+        bioData = JSON.stringify({
+          cccd: data.id_number,
+          idFrontUrl: data.id_front_base64,
+          idBackUrl: data.id_back_base64
+        });
+      }
+
       await this.prisma.taskers.create({
         data: { 
           tasker_id: user.user_id, 
           kyc_status: 'PENDING_APPROVAL',
-          bio: data.id_number ? `CCCD: ${data.id_number}` : null
+          bio: bioData
         },
       });
 
