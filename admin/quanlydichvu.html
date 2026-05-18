@@ -325,8 +325,17 @@ main{animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:transl
 
   // Lỗi 3 FIX: Fee config logic
   var feeInput = document.getElementById('fee-percent');
-  var savedFee = localStorage.getItem('chioi_platform_fee_pct') || '20';
-  feeInput.value = savedFee;
+  
+  try {
+    var feeSetting = await apiFetch('/api/admin/system-settings/platform_fee_pct');
+    if (feeSetting && feeSetting.value) {
+      feeInput.value = feeSetting.value;
+    } else {
+      feeInput.value = '20';
+    }
+  } catch (e) {
+    feeInput.value = '20';
+  }
 
   function updateFeeDisplay() {
     var pct = parseInt(feeInput.value) || 20;
@@ -340,12 +349,28 @@ main{animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:transl
   updateFeeDisplay();
   feeInput.addEventListener('input', updateFeeDisplay);
 
-  document.getElementById('btn-save-fee').addEventListener('click', function() {
+  document.getElementById('btn-save-fee').addEventListener('click', async function() {
     var pct = parseInt(feeInput.value);
     if (isNaN(pct) || pct < 0 || pct > 50) { showToast('⚠️ Phí phải từ 0% - 50%'); return; }
-    localStorage.setItem('chioi_platform_fee_pct', pct);
-    showToast('✅ Đã lưu phí nền tảng: ' + pct + '%');
-    updateFeeDisplay();
+    
+    var btn = this;
+    var originalText = btn.innerHTML;
+    btn.innerHTML = 'Đang lưu...';
+    btn.disabled = true;
+
+    try {
+      await apiFetch('/api/admin/system-settings', {
+        method: 'POST',
+        body: { key: 'platform_fee_pct', value: pct.toString(), description: 'Phí nền tảng (phần trăm)' }
+      });
+      showToast('✅ Đã lưu phí nền tảng: ' + pct + '% (áp dụng cho đơn mới)');
+      updateFeeDisplay();
+    } catch (e) {
+      showToast('⚠️ Lỗi: ' + e.message);
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
   });
 
   // Lỗi 3 FIX: Load financial stats

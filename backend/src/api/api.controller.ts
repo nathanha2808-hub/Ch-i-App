@@ -435,4 +435,19 @@ export class ApiController {
   async adminReplyTicket(@Request() req, @Param('id', ParseIntPipe) id: number, @Body() body: any) {
     return this.apiService.sendTicketMessage(id, req.user.userId, body.content, true);
   }
+
+  // Lỗi 3 FIX: Cấu hình phí nền tảng động
+  @Get('admin/system-settings/:key')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Lấy cấu hình hệ thống (ví dụ: platform_fee_pct)' })
+  async getSystemSetting(@Param('key') key: string) {
+    return this.apiService.getSystemSetting(key);
+  }
+
+  @Post('admin/system-settings')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Cập nhật cấu hình hệ thống' })
+  async setSystemSetting(@Body() body: any) {
+    return this.apiService.setSystemSetting(body.key, String(body.value), body.description);
+  }
 }

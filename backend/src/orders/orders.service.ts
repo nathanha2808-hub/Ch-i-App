@@ -56,13 +56,28 @@ export class OrdersService {
       ? ((data.notes ? data.notes + '\n' : '') + `[Đã áp dụng giảm ${discountAmount.toLocaleString('vi-VN')}đ từ Gói Gia Đình]`)
       : (data.notes ?? null);
 
+    // Lỗi 3 FIX: Fetch platform fee từ DB thay vì fix cứng 20%
+    let platformFeePct = 0.2; // mặc định 20%
+    try {
+      const setting = await this.prisma.system_settings.findUnique({ where: { setting_key: 'platform_fee_pct' } });
+      if (setting && setting.setting_value) {
+        const parsed = Number(setting.setting_value);
+        if (!isNaN(parsed) && parsed >= 0 && parsed <= 50) {
+          platformFeePct = parsed / 100;
+        }
+      }
+    } catch (e) {
+      console.warn('[Order] Lỗi khi lấy phí nền tảng:', e.message);
+    }
+    const taskerEarningsPct = 1 - platformFeePct;
+
     const [order] = await this.prisma.$queryRaw<any[]>`
       INSERT INTO orders (
         order_code, customer_id, service_id, status, scheduled_time, address, total_price,
         tasker_earnings, platform_fee, payment_method, location, notes, created_at, updated_at
       ) VALUES (
         ${orderCode}, ${customerId}, ${data.service_id}, 'PENDING', ${new Date(data.scheduled_time)},
-        ${data.address}, ${finalPrice}, ${finalPrice * 0.8}, ${finalPrice * 0.2},
+        ${data.address}, ${finalPrice}, ${finalPrice * taskerEarningsPct}, ${finalPrice * platformFeePct},
         ${paymentMethod}, ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326), ${noteWithPkg},
         NOW(), NOW()
       ) RETURNING order_id, order_code;

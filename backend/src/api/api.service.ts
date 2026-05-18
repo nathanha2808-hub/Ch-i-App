@@ -1323,4 +1323,21 @@ export class ApiService {
 
     return { success: true, message: 'Đã gửi tin nhắn' };
   }
+
+  // Lỗi 3 FIX: Cấu hình phí nền tảng động
+  async getSystemSetting(key: string) {
+    const setting = await this.prisma.system_settings.findUnique({
+      where: { setting_key: key },
+    });
+    return { key, value: setting ? setting.setting_value : null, description: setting?.description };
+  }
+
+  async setSystemSetting(key: string, value: string, description?: string) {
+    const updated = await this.prisma.system_settings.upsert({
+      where: { setting_key: key },
+      update: { setting_value: value, description, updated_at: new Date() },
+      create: { setting_key: key, setting_value: value, description },
+    });
+    return { success: true, data: updated };
+  }
 }
