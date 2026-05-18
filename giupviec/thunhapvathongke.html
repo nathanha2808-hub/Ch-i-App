@@ -154,10 +154,16 @@ tailwind.config = {
         <span class="material-symbols-outlined text-primary text-[28px]">account_balance_wallet</span>
         <span id="wallet-balance" class="font-display-lg text-display-lg text-on-surface">0 đ</span>
       </div>
-      <!-- TC-T12-024,025: Nút rút tiền -->
-      <button id="btn-withdraw" class="mt-sm w-full py-3.5 bg-gradient-to-r from-primary to-primary-container text-white font-title-sm text-[15px] rounded-full shadow-lg active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100">
-        YÊU CẦU RÚT TIỀN
-      </button>
+      <!-- TC-T12-024,025: Nút rút tiền + Lỗi 5 FIX: Nút nạp tiền -->
+      <div class="mt-sm flex gap-2">
+        <button id="btn-deposit" class="flex-1 py-3.5 bg-green-600 text-white font-title-sm text-[15px] rounded-full shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          NẠP TIỀN
+        </button>
+        <button id="btn-withdraw" class="flex-1 py-3.5 bg-gradient-to-r from-primary to-primary-container text-white font-title-sm text-[15px] rounded-full shadow-lg active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100">
+          RÚT TIỀN
+        </button>
+      </div>
       <p class="text-[11px] text-on-surface-variant leading-tight mt-xs">* T+1 · Min 100k · Khấu trừ TNCN 10% nếu &gt;2tr</p>
     </div>
   </div>
@@ -514,6 +520,9 @@ tailwind.config = {
     }
     noMsg.classList.add('hidden');
 
+    // Lỗi 5 FIX: Sort mới nhất lên đầu
+    history.sort(function(a, b) { return new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0); });
+
     history.forEach(function(item) {
       var isWallet = (item.payment_method || 'WALLET') !== 'CASH';
       var div = document.createElement('div');
@@ -562,6 +571,11 @@ tailwind.config = {
   // TC-T13-025: Chỉ cho nhập số vào field số tiền
   wdAmount.addEventListener('input', function() {
     this.value = this.value.replace(/[^0-9]/g, '');
+  });
+
+  // Lỗi 5 FIX: Nút nạp tiền
+  document.getElementById('btn-deposit').addEventListener('click', function() {
+    window.location.href = '../khachhang/naptienqr.html';
   });
 
   // Mở modal

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="light" lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -367,45 +367,63 @@
                 body: { image: base64Data }
             }).then(function(result) {
                 ocrLoading.classList.add('hidden');
-                if (result && (result.full_name || result.cccd_number)) {
+                if (result && result.is_valid_cccd && (result.full_name || result.cccd_number)) {
                     ocrName = result.full_name || '';
                     ocrCCCD = result.cccd_number || '';
                     document.getElementById('nameFromOCR').value = ocrName;
                     document.getElementById('cccdFromOCR').value = ocrCCCD;
                     ocrResults.classList.remove('hidden');
                     showError('');
+
+                    // Lỗi 6 FIX: Check unique CCCD ngay sau OCR
+                    if (ocrCCCD) {
+                        checkDuplicateCCCD(ocrCCCD);
+                    }
                 } else {
-                    // Fallback: let user enter manually
-                    showManualInput();
+                    // Lỗi 6 FIX: KHÔNG cho nhập thủ công — bắt buộc ảnh CCCD hợp lệ
+                    showOCRFailed();
                 }
             }).catch(function(err) {
-                console.warn('[OCR] API error, fallback to manual:', err.message);
+                console.warn('[OCR] API error:', err.message);
                 ocrLoading.classList.add('hidden');
-                // Fallback: show manual input fields
-                showManualInput();
+                // Lỗi 6 FIX: KHÔNG fallback manual — yêu cầu chụp lại
+                showOCRFailed();
             });
         }
 
-        function showManualInput() {
+        // Lỗi 6 FIX: OCR thất bại → reset upload, yêu cầu chụp lại
+        function showOCRFailed() {
             var ocrResults = document.getElementById('ocr-results');
-            ocrResults.classList.remove('hidden');
-            // Make fields editable
-            document.getElementById('nameFromOCR').removeAttribute('readonly');
-            document.getElementById('nameFromOCR').classList.remove('bg-primary-fixed/20', 'border-primary/20');
-            document.getElementById('nameFromOCR').classList.add('bg-surface-container-low', 'border-none');
-            document.getElementById('nameFromOCR').placeholder = 'Nhập họ tên thủ công';
+            ocrResults.classList.add('hidden');
+            // Reset ảnh preview
+            document.getElementById('upload-placeholder').classList.remove('hidden');
+            document.getElementById('upload-preview').classList.add('hidden');
+            cccdBase64 = '';
+            ocrName = '';
+            ocrCCCD = '';
+            document.getElementById('cccdFileInput').value = '';
+            showError('❌ Ảnh không phải CCCD hoặc không đọc được. Vui lòng chụp lại ảnh CCCD rõ ràng hơn (mặt trước, không bị lóa, không bị che).');
+        }
 
-            document.getElementById('cccdFromOCR').removeAttribute('readonly');
-            document.getElementById('cccdFromOCR').classList.remove('bg-primary-fixed/20', 'border-primary/20');
-            document.getElementById('cccdFromOCR').classList.add('bg-surface-container-low', 'border-none');
-            document.getElementById('cccdFromOCR').placeholder = 'Nhập số CCCD thủ công';
-
-            // Remove verified icons
-            ocrResults.querySelectorAll('.material-symbols-outlined[style*="FILL"]').forEach(function(el) {
-                if (el.textContent === 'verified') el.textContent = 'edit';
-            });
-
-            showError('Không nhận diện được CCCD tự động. Vui lòng nhập thủ công.');
+        // Lỗi 6 FIX: Check trùng CCCD ngay sau OCR
+        async function checkDuplicateCCCD(cccdNumber) {
+            try {
+                var result = await apiFetch('/api/auth/check-cccd?id_number=' + encodeURIComponent(cccdNumber));
+                if (result && result.exists) {
+                    showError('❌ Số CCCD ' + cccdNumber + ' đã được đăng ký tài khoản. Mỗi CCCD chỉ được đăng ký 1 tài khoản.');
+                    // Reset OCR results
+                    document.getElementById('ocr-results').classList.add('hidden');
+                    document.getElementById('upload-placeholder').classList.remove('hidden');
+                    document.getElementById('upload-preview').classList.add('hidden');
+                    cccdBase64 = '';
+                    ocrName = '';
+                    ocrCCCD = '';
+                    document.getElementById('cccdFileInput').value = '';
+                }
+            } catch(e) {
+                // API chưa có hoặc lỗi → bỏ qua, backend sẽ check lại khi register
+                console.warn('[CCCD Check] Skipped:', e.message);
+            }
         }
 
         function showError(msg) {

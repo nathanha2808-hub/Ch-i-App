@@ -150,6 +150,15 @@
 <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full"></div>
 <div class="absolute right-12 -top-4 w-20 h-20 bg-white/5 rounded-full"></div>
 </section>
+<!-- Lỗi 1 FIX: Gói đang sử dụng -->
+<section id="active-pkg-section" class="hidden">
+  <h2 class="font-title-sm text-on-surface px-1 flex items-center gap-2">
+    <span class="material-symbols-outlined text-green-600 text-[20px]" style="font-variation-settings:'FILL' 1">verified</span>
+    Gói đang sử dụng
+  </h2>
+  <div id="active-pkg-list" class="space-y-3 mt-2"></div>
+</section>
+
 <!-- Package Options -->
 <section class="space-y-sm">
 <h2 class="font-title-sm text-on-surface px-1">Chọn gói</h2>
@@ -374,6 +383,47 @@
     var m = document.getElementById('pkg-modal');
     if (m) m.remove();
   }
+
+  // Lỗi 1 FIX: Load gói đang sử dụng
+  async function loadActivePackages() {
+    try {
+      var activePkgs = await apiFetch('/api/packages/my-active');
+      if (activePkgs && activePkgs.length > 0) {
+        document.getElementById('active-pkg-section').classList.remove('hidden');
+        var listEl = document.getElementById('active-pkg-list');
+        listEl.innerHTML = activePkgs.map(function(p) {
+          var endDate = new Date(p.end_date);
+          var pctUsed = Math.max(0, 100 - Math.round(p.remaining_days / 30 * 100));
+          return '<div class="bg-white border-2 border-green-200 p-4 rounded-2xl soft-shadow">' +
+            '<div class="flex justify-between items-start">' +
+              '<div>' +
+                '<h3 class="font-bold text-green-700 flex items-center gap-1.5">' +
+                  '<span class="material-symbols-outlined text-[18px]" style="font-variation-settings:\'FILL\' 1">verified</span>' + p.package_name + '</h3>' +
+                '<p class="text-body-sm text-on-surface-variant mt-0.5">' + (p.package_desc || '') + '</p>' +
+              '</div>' +
+              '<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2.5 py-1 rounded-full">ACTIVE</span>' +
+            '</div>' +
+            '<div class="mt-3 bg-green-50 rounded-xl p-3">' +
+              '<div class="flex justify-between text-[12px] mb-1.5">' +
+                '<span class="text-on-surface-variant">Còn lại</span>' +
+                '<span class="font-bold text-green-700">' + p.remaining_days + ' ngày</span>' +
+              '</div>' +
+              '<div class="h-2 bg-green-100 rounded-full overflow-hidden">' +
+                '<div class="h-full bg-green-500 rounded-full transition-all" style="width:' + (100 - pctUsed) + '%"></div>' +
+              '</div>' +
+              '<p class="text-[10px] text-on-surface-variant mt-1.5">Hết hạn: ' + endDate.toLocaleDateString('vi-VN') + '</p>' +
+            '</div>' +
+            '<div class="mt-3 p-3 bg-primary/5 rounded-xl border border-primary/10">' +
+              '<p class="text-[12px] font-bold text-primary flex items-center gap-1">' +
+                '<span class="material-symbols-outlined text-[16px]">info</span> Cách sử dụng gói</p>' +
+              '<p class="text-[11px] text-on-surface-variant mt-1">Khi đặt dịch vụ dọn nhà, trông trẻ hoặc mua hộ, hệ thống sẽ <b>tự động áp dụng</b> ưu đãi gói gia đình (giảm 15% phí dịch vụ). Bạn chỉ cần đặt đơn bình thường!</p>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+    } catch(e) { console.warn('[Gói] Không load được gói active:', e.message); }
+  }
+  await loadActivePackages();
 
   renderPackages();
   updateTotal();

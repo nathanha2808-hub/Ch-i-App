@@ -83,6 +83,80 @@ main{animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:transl
 </div>
 </div>
 
+<!-- Lỗi 3 FIX: Cấu hình phí nền tảng -->
+<div class="bg-white rounded-xl p-5 border border-outline-variant/20 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">tune</span>
+      </div>
+      <div>
+        <h3 class="font-bold text-on-surface">Cấu hình phí nền tảng</h3>
+        <p class="text-[11px] text-on-surface-variant">% phí nền tảng tính trên tổng giá đơn hàng</p>
+      </div>
+    </div>
+    <button id="btn-save-fee" class="admin-gradient text-white px-5 py-2 rounded-xl font-bold text-body-sm hover:shadow-lg transition-all active:scale-95 flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-[18px]">save</span> Lưu
+    </button>
+  </div>
+  <div class="grid grid-cols-3 gap-4">
+    <div>
+      <label class="text-[11px] font-bold text-on-surface-variant uppercase block mb-1.5">Phí nền tảng (%)</label>
+      <div class="flex items-center gap-2">
+        <input id="fee-percent" type="number" min="0" max="50" step="1" value="20" class="w-full px-4 py-3 border border-outline-variant rounded-xl text-[18px] font-bold text-primary text-center focus:ring-2 focus:ring-primary"/>
+        <span class="text-on-surface-variant font-bold text-[18px]">%</span>
+      </div>
+      <p class="text-[10px] text-on-surface-variant mt-1">Hiện tại: Tasker nhận <span id="tasker-share">80</span>% · Nền tảng <span id="platform-share">20</span>%</p>
+    </div>
+    <div class="bg-green-50 rounded-xl p-4 border border-green-100">
+      <p class="text-[10px] font-bold text-green-600 uppercase mb-1">Tasker nhận</p>
+      <p class="text-[20px] font-bold text-green-700"><span id="tasker-pct">80</span>%</p>
+      <p class="text-[11px] text-green-600">của tổng đơn hàng</p>
+    </div>
+    <div class="bg-orange-50 rounded-xl p-4 border border-orange-100">
+      <p class="text-[10px] font-bold text-primary uppercase mb-1">Nền tảng nhận</p>
+      <p class="text-[20px] font-bold text-primary"><span id="fee-pct">20</span>%</p>
+      <p class="text-[11px] text-primary/70">của tổng đơn hàng</p>
+    </div>
+  </div>
+</div>
+
+<!-- Lỗi 3 FIX: Thống kê tài chính tổng hợp -->
+<div class="grid grid-cols-4 gap-4 mb-6">
+  <div class="stat-card bg-white rounded-xl p-5 border border-outline-variant/20">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="material-symbols-outlined text-blue-500 text-[20px]" style="font-variation-settings:'FILL' 1">account_balance</span>
+      <p class="text-[10px] font-bold text-on-surface-variant uppercase">Tổng KH đã trả</p>
+    </div>
+    <p id="stat-total-paid" class="text-[20px] font-bold text-blue-600">—</p>
+    <p class="text-[10px] text-on-surface-variant mt-1">Đơn hoàn thành</p>
+  </div>
+  <div class="stat-card bg-white rounded-xl p-5 border border-outline-variant/20">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="material-symbols-outlined text-green-600 text-[20px]" style="font-variation-settings:'FILL' 1">engineering</span>
+      <p class="text-[10px] font-bold text-on-surface-variant uppercase">Tổng Tasker nhận</p>
+    </div>
+    <p id="stat-tasker-total" class="text-[20px] font-bold text-green-600">—</p>
+    <p class="text-[10px] text-on-surface-variant mt-1">Thu nhập Tasker</p>
+  </div>
+  <div class="stat-card bg-white rounded-xl p-5 border border-outline-variant/20">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">toll</span>
+      <p class="text-[10px] font-bold text-on-surface-variant uppercase">Phí nền tảng</p>
+    </div>
+    <p id="stat-platform-fee" class="text-[20px] font-bold text-primary">—</p>
+    <p class="text-[10px] text-on-surface-variant mt-1">Doanh thu nền tảng</p>
+  </div>
+  <div class="stat-card bg-white rounded-xl p-5 border border-outline-variant/20">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="material-symbols-outlined text-purple-600 text-[20px]" style="font-variation-settings:'FILL' 1">receipt_long</span>
+      <p class="text-[10px] font-bold text-on-surface-variant uppercase">Tổng đơn HT</p>
+    </div>
+    <p id="stat-completed-orders" class="text-[20px] font-bold text-purple-600">—</p>
+    <p class="text-[10px] text-on-surface-variant mt-1">Đơn hoàn thành</p>
+  </div>
+</div>
+
 <!-- Services Table -->
 <div class="bg-white rounded-xl border border-outline-variant/20 overflow-hidden">
 <table class="w-full text-left">
@@ -248,6 +322,45 @@ main{animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:transl
   }
 
   loadServices();
+
+  // Lỗi 3 FIX: Fee config logic
+  var feeInput = document.getElementById('fee-percent');
+  var savedFee = localStorage.getItem('chioi_platform_fee_pct') || '20';
+  feeInput.value = savedFee;
+
+  function updateFeeDisplay() {
+    var pct = parseInt(feeInput.value) || 20;
+    if (pct < 0) pct = 0;
+    if (pct > 50) pct = 50;
+    document.getElementById('tasker-share').textContent = 100 - pct;
+    document.getElementById('platform-share').textContent = pct;
+    document.getElementById('tasker-pct').textContent = 100 - pct;
+    document.getElementById('fee-pct').textContent = pct;
+  }
+  updateFeeDisplay();
+  feeInput.addEventListener('input', updateFeeDisplay);
+
+  document.getElementById('btn-save-fee').addEventListener('click', function() {
+    var pct = parseInt(feeInput.value);
+    if (isNaN(pct) || pct < 0 || pct > 50) { showToast('⚠️ Phí phải từ 0% - 50%'); return; }
+    localStorage.setItem('chioi_platform_fee_pct', pct);
+    showToast('✅ Đã lưu phí nền tảng: ' + pct + '%');
+    updateFeeDisplay();
+  });
+
+  // Lỗi 3 FIX: Load financial stats
+  try {
+    var reportData = await apiFetch('/api/admin/report-stats?period=30d');
+    var s = reportData.summary;
+    var totalPaid = Number(s.totalRevenue || 0);
+    var platformFee = Number(s.platformRevenue || 0);
+    var taskerTotal = totalPaid - platformFee;
+
+    document.getElementById('stat-total-paid').textContent = totalPaid >= 1e6 ? (totalPaid/1e6).toFixed(1) + 'M' : totalPaid.toLocaleString('vi-VN') + 'đ';
+    document.getElementById('stat-tasker-total').textContent = taskerTotal >= 1e6 ? (taskerTotal/1e6).toFixed(1) + 'M' : taskerTotal.toLocaleString('vi-VN') + 'đ';
+    document.getElementById('stat-platform-fee').textContent = platformFee >= 1e6 ? (platformFee/1e6).toFixed(1) + 'M' : platformFee.toLocaleString('vi-VN') + 'đ';
+    document.getElementById('stat-completed-orders').textContent = s.completedOrders || 0;
+  } catch(e) { console.warn('Cannot load financial stats:', e); }
 })();
 </script>
 </body></html>

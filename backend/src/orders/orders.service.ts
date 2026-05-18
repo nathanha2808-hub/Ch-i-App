@@ -15,27 +15,55 @@ export class OrdersService {
     const orderCode = 'ORD' + Date.now().toString().slice(-6);
     const paymentMethod = data.payment_method || 'WALLET';
 
+    // KIỂM TRA GÓI GIA ĐÌNH - ÁP DỤNG GIẢM GIÁ TỰ ĐỘNG
+    let originalPrice = Number(data.total_price);
+    let finalPrice = originalPrice;
+    let discountAmount = 0;
+    
+    try {
+      const activePackage = await this.prisma.customer_packages.findFirst({
+        where: {
+          customer_id: customerId,
+          status: 'ACTIVE',
+          end_date: { gt: new Date() }
+        }
+      });
+      if (activePackage) {
+        // Giảm 15% phí dịch vụ dọn dẹp
+        discountAmount = Math.round(originalPrice * 0.15);
+        finalPrice = originalPrice - discountAmount;
+      }
+    } catch (e) {
+      console.warn('[Order] Lỗi khi kiểm tra gói gia đình:', e.message);
+    }
+
     // Bug #34 FIX: Nếu thanh toán ví → PHẢI kiểm tra số dư, không bỏ qua lỗi
     if (paymentMethod === 'WALLET') {
       const wallet = await this.prisma.wallets.findUnique({ where: { user_id: customerId } });
       const balance = wallet ? Number(wallet.balance) : 0;
-      if (balance < Number(data.total_price)) {
+      if (balance < finalPrice) {
         throw new BadRequestException(
-          `Số dư ví không đủ. Cần ${Number(data.total_price).toLocaleString('vi-VN')}đ nhưng chỉ có ${balance.toLocaleString('vi-VN')}đ. Vui lòng nạp thêm tiền hoặc chọn thanh toán tiền mặt.`
+          `Số dư ví không đủ. Cần ${finalPrice.toLocaleString('vi-VN')}đ nhưng chỉ có ${balance.toLocaleString('vi-VN')}đ. Vui lòng nạp thêm tiền hoặc chọn thanh toán tiền mặt.`
         );
       }
     }
 
     // Insert order with PostGIS geometry using raw SQL
     // Bug 12.1 FIX: RETURNING thêm lat/lng để FE Tasker vẽ route map
+    // Lưu ý: data.total_price truyền vào là original, lưu DB là finalPrice
+    // Ta sử dụng notes để lưu vết áp dụng gói
+    const noteWithPkg = discountAmount > 0 
+      ? ((data.notes ? data.notes + '\n' : '') + `[Đã áp dụng giảm ${discountAmount.toLocaleString('vi-VN')}đ từ Gói Gia Đình]`)
+      : (data.notes ?? null);
+
     const [order] = await this.prisma.$queryRaw<any[]>`
       INSERT INTO orders (
         order_code, customer_id, service_id, status, scheduled_time, address, total_price,
         tasker_earnings, platform_fee, payment_method, location, notes, created_at, updated_at
       ) VALUES (
         ${orderCode}, ${customerId}, ${data.service_id}, 'PENDING', ${new Date(data.scheduled_time)},
-        ${data.address}, ${data.total_price}, ${data.total_price * 0.8}, ${data.total_price * 0.2},
-        ${paymentMethod}, ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326), ${data.notes ?? null},
+        ${data.address}, ${finalPrice}, ${finalPrice * 0.8}, ${finalPrice * 0.2},
+        ${paymentMethod}, ST_SetSRID(ST_MakePoint(${data.longitude}, ${data.latitude}), 4326), ${noteWithPkg},
         NOW(), NOW()
       ) RETURNING order_id, order_code;
     `;
@@ -45,7 +73,7 @@ export class OrdersService {
       try {
         await this.walletsService.addTransaction(
           customerId,
-          -Number(data.total_price),
+          -finalPrice,
           'PAYMENT',
           order.order_id,
           'Thanh toán dịch vụ đơn hàng #' + order.order_id
@@ -60,7 +88,9 @@ export class OrdersService {
       address: data.address,
       latitude: Number(data.latitude),
       longitude: Number(data.longitude),
-      total_price: data.total_price,
+      total_price: finalPrice,
+      original_price: originalPrice,
+      discount_amount: discountAmount,
       payment_method: paymentMethod,
     };
   }

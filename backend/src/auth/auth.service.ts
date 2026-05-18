@@ -43,6 +43,16 @@ export class AuthService {
       throw new BadRequestException('Phone number already exists');
     }
 
+    // Lỗi 6 FIX: Check unique CCCD trước khi tạo user
+    if (data.id_number) {
+      const existingCCCD = await this.prisma.taskers.findFirst({
+        where: { bio: { contains: data.id_number } }
+      });
+      if (existingCCCD) {
+        throw new BadRequestException('Số CCCD này đã được đăng ký tài khoản. Mỗi CCCD chỉ được đăng ký 1 tài khoản.');
+      }
+    }
+
     const saltOrRounds = 10;
     const password_hash = await bcrypt.hash(data.password, saltOrRounds);
 
@@ -287,5 +297,13 @@ export class AuthService {
     });
 
     return { message: 'Đổi mật khẩu thành công' };
+  }
+
+  // Lỗi 6 FIX: Check trùng CCCD
+  async checkCCCDExists(idNumber: string) {
+    const existing = await this.prisma.taskers.findFirst({
+      where: { bio: { contains: `CCCD: ${idNumber}` } }
+    });
+    return { exists: !!existing };
   }
 }
