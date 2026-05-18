@@ -4,6 +4,15 @@
 
 ---
 
+## [1.5.2] — 2026-05-18
+
+### 🐛 Bug fixes — Tasker App (CCCD Registration Validation)
+
+#### Fixed
+- **Frontend:** `giupviec/dangkytasker.html` — Cập nhật logic upload và nhận diện CCCD (Lỗi 6 FIX). Khi API OCR trả về kết quả giả lập (mock data) nhưng không có nội dung trích xuất (`full_name` và `cccd_number` rỗng) nhưng ảnh được coi là hợp lệ (`is_valid_cccd: true`), hệ thống sẽ mở khóa các ô nhập liệu cho phép người dùng tự điền thông tin thay vì báo lỗi bắt chụp lại. Đồng thời, hàm `showOCRFailed` được nâng cấp để chấp nhận hiển thị các thông báo lỗi tuỳ biến từ backend thay vì thông báo cứng nhắc.
+
+---
+
 ## [1.5.1] — 2026-05-17
 
 ### 🐛 Bug fixes — Tasker App (GPS Permission)
