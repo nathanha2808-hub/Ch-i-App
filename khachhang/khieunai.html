@@ -202,7 +202,7 @@
         }
         // Lỗi 2 FIX: Load đơn hàng của KH để chọn khi khiếu nại
         try {
-            var myOrders = await apiFetch('/api/orders');
+            var myOrders = await apiFetch('/api/orders/customer/history');
             var orderSelect = document.getElementById('ticket-order');
             if (Array.isArray(myOrders)) {
                 myOrders.filter(function(o) { return o.status === 'COMPLETED' || o.status === 'CANCELLED'; }).forEach(function(o) {
