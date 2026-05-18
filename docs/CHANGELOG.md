@@ -13,6 +13,8 @@
 - **Admin Panel:** `admin/quanlytasker.html` — Thêm nút "Chi tiết" ở danh sách Tasker và danh sách Chờ Duyệt. Triển khai Tasker Detail Modal để hiển thị thông tin chi tiết và hiển thị ảnh CCCD Mặt trước (từ `bio`) để Admin xác minh tính hợp lệ.
 - **Frontend Customer:** `khachhang/trangchu.html` — Ẩn mã số CCCD của Tasker khỏi thông tin `bio` trên trang chủ nhằm đảm bảo quyền riêng tư.
 - **Frontend Tasker:** `giupviec/dangkytasker.html` — Truyền chuỗi `cccdBase64` vào trường `id_front_base64` khi gọi API `/api/auth/register`.
+- **Admin Panel UI:** Bắt buộc duy trì giao diện dạng Desktop (thêm `min-w-[1280px] overflow-x-auto`) cho toàn bộ các trang Admin để chống vỡ layout trên màn hình nhỏ.
+- **Admin Panel Data:** Sửa lỗi thiếu data `bio` khi lấy danh sách Taskers từ API (`admin.controller.ts`), giúp hiển thị chính xác ảnh CCCD trong Modal chi tiết; Khôi phục toàn vẹn dữ liệu UTF-8 tiếng Việt do lỗi mã hóa trước đó.
 
 ---
 
