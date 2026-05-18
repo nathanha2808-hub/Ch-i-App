@@ -31,6 +31,16 @@ export class RegisterDto {
   @IsString()
   id_number?: string;
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  id_front_base64?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  id_back_base64?: string;
+
   @ApiProperty({ required: false, type: [String] })
   @IsOptional()
   @IsArray()

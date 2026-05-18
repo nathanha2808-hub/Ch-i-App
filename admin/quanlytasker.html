@@ -118,7 +118,7 @@
     </script>
   <link rel="stylesheet" href="../shared/transitions.css"/>
 </head>
-<body class="bg-background text-on-surface">
+<body class="bg-background text-on-surface min-w-[1280px] overflow-x-auto">
 <!-- Sidebar Navigation -->
 <aside class="fixed left-0 top-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-dim shadow-md flex flex-col py-stack_lg z-50">
 <div class="px-6 mb-8">
@@ -569,6 +569,93 @@ document.querySelectorAll('button').forEach(function(btn) {
     return dt.toLocaleDateString('vi-VN');
   }
 
+  function showTaskerDetail(tasker) {
+    var ks = getKycStatus(tasker);
+    var s = kycStatusMap[ks] || { label: ks, cls: 'bg-gray-100 text-gray-700' };
+    
+    // Parse bio to get CCCD images if exists
+    var idFrontUrl = '';
+    var cccdText = '—';
+    if (tasker.bio) {
+      if (tasker.bio.startsWith('{')) {
+        try {
+          var bioData = JSON.parse(tasker.bio);
+          cccdText = bioData.cccd || '—';
+          idFrontUrl = bioData.idFrontUrl || '';
+        } catch(e) {
+          console.error('Error parsing bio:', e);
+        }
+      } else if (tasker.bio.startsWith('CCCD:')) {
+        cccdText = tasker.bio.replace('CCCD:', '').trim();
+      }
+    }
+
+    var html = '<div id="tasker-detail-modal" class="fixed inset-0 bg-black/50 z-[999] flex items-center justify-center p-4 overflow-y-auto">' +
+      '<div class="bg-surface rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-slide-up">' +
+        // Header
+        '<div class="p-6 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-low rounded-t-2xl">' +
+          '<h2 class="text-h2-section font-bold flex items-center gap-2"><span class="material-symbols-outlined text-primary">badge</span> Chi tiết Tasker</h2>' +
+          '<button id="close-detail-modal" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-outline-variant/20 transition-colors"><span class="material-symbols-outlined">close</span></button>' +
+        '</div>' +
+        // Body
+        '<div class="p-6 overflow-y-auto flex-1">' +
+          '<div class="flex flex-col md:flex-row gap-6 mb-6">' +
+            '<div class="w-24 h-24 rounded-full bg-primary-fixed/30 flex items-center justify-center flex-shrink-0 mx-auto md:mx-0">' +
+              '<span class="material-symbols-outlined text-primary text-[48px]" style="font-variation-settings: \'FILL\' 1;">person</span>' +
+            '</div>' +
+            '<div class="flex-1 text-center md:text-left">' +
+              '<h3 class="text-[24px] font-bold text-on-surface">' + (tasker.full_name || '—') + '</h3>' +
+              '<p class="text-body-lg text-on-surface-variant">' + (tasker.phone || '—') + '</p>' +
+              '<div class="mt-2 inline-block px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tight ' + s.cls + '">' + s.label + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
+            '<div class="bg-surface-container-low p-4 rounded-xl">' +
+              '<p class="text-caption text-on-surface-variant mb-1">Dịch vụ đăng ký</p>' +
+              '<p class="text-body-lg font-semibold">' + (tasker.service_type || '—') + '</p>' +
+            '</div>' +
+            '<div class="bg-surface-container-low p-4 rounded-xl">' +
+              '<p class="text-caption text-on-surface-variant mb-1">Khu vực hoạt động</p>' +
+              '<p class="text-body-lg font-semibold">' + (tasker.area || '—') + '</p>' +
+            '</div>' +
+            '<div class="bg-surface-container-low p-4 rounded-xl">' +
+              '<p class="text-caption text-on-surface-variant mb-1">Số CCCD / CMND</p>' +
+              '<p class="text-body-lg font-semibold">' + cccdText + '</p>' +
+            '</div>' +
+            '<div class="bg-surface-container-low p-4 rounded-xl">' +
+              '<p class="text-caption text-on-surface-variant mb-1">Ngày đăng ký</p>' +
+              '<p class="text-body-lg font-semibold">' + formatDate(tasker.created_at) + '</p>' +
+            '</div>' +
+          '</div>' +
+          // Identity Documents
+          '<div class="mb-2">' +
+            '<h4 class="text-body-lg font-bold mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-primary">id_card</span> Giấy tờ xác minh (CCCD mặt trước)</h4>' +
+            (idFrontUrl ? 
+              '<div class="border border-outline-variant/30 rounded-xl overflow-hidden bg-surface-container-lowest flex justify-center">' +
+                '<img src="' + idFrontUrl + '" class="max-w-full max-h-[300px] object-contain" alt="CCCD Mặt trước" />' +
+              '</div>' 
+              : 
+              '<div class="p-8 text-center bg-surface-container-low border border-dashed border-outline-variant/50 rounded-xl">' +
+                '<span class="material-symbols-outlined text-[32px] text-on-surface-variant/50 mb-2">image_not_supported</span>' +
+                '<p class="text-body-sm text-on-surface-variant">Tasker chưa tải lên ảnh CCCD (Hoặc dùng tài khoản cũ)</p>' +
+              '</div>'
+            ) +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    
+    var modal = document.getElementById('tasker-detail-modal');
+    document.getElementById('close-detail-modal').addEventListener('click', function() {
+      modal.remove();
+    });
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.remove();
+    });
+  }
+
   function renderTable(taskers) {
     var tbody = document.getElementById('tasker-tbody');
     if (!tbody) return;
@@ -588,7 +675,11 @@ document.querySelectorAll('button').forEach(function(btn) {
       var isLocked = ks === 'REJECTED' || ks === 'SUSPENDED';
 
       var tr = document.createElement('tr');
-      tr.className = (idx % 2 ? 'bg-background/40 ' : '') + 'hover:bg-background transition-colors';
+      tr.className = (idx % 2 ? 'bg-background/40 ' : '') + 'hover:bg-background transition-colors cursor-pointer';
+      tr.addEventListener('click', function(e) {
+        if (e.target.closest('button')) return; // Ignore if clicked on buttons
+        showTaskerDetail(taskers[idx]);
+      });
       tr.innerHTML =
         '<td class="p-4 text-body-sm text-on-surface-variant text-center">' + (idx + 1) + '</td>' +
         '<td class="p-4"><div class="flex items-center gap-3">' +
@@ -602,7 +693,7 @@ document.querySelectorAll('button').forEach(function(btn) {
           '<span class="ml-1 font-bold">' + (tasker.avg_rating ? Number(tasker.avg_rating).toFixed(1) : '—') + '</span></div></div></td>' +
         '<td class="p-4"><span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ' + s.cls + '">' + s.label + '</span></td>' +
         '<td class="p-4 text-body-sm text-on-surface-variant">' + formatDate(tasker.created_at) + '</td>' +
-        '<td class="p-4"><div class="flex gap-2">' +
+        '<td class="p-4"><div class="flex gap-2 flex-wrap">' +
           (isPending ?
             '<button class="approve-btn px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-[11px] font-bold transition-colors" data-uid="' + tasker.tasker_id + '">Duyệt</button>' +
             '<button class="reject-btn px-3 py-1.5 border border-error text-error hover:bg-error/10 rounded-lg text-[11px] font-bold transition-colors" data-uid="' + tasker.tasker_id + '">Từ chối</button>' :
@@ -693,7 +784,11 @@ document.querySelectorAll('button').forEach(function(btn) {
     panel.innerHTML = '';
     pendingTaskers.slice(0, 5).forEach(function(t) {
       var div = document.createElement('div');
-      div.className = 'p-3 border border-outline-variant/20 rounded-xl hover:border-primary/30 transition-all bg-surface-container-lowest';
+      div.className = 'p-3 border border-outline-variant/20 rounded-xl hover:border-primary/30 transition-all bg-surface-container-lowest cursor-pointer';
+      div.addEventListener('click', function(e) {
+        if (e.target.closest('button')) return; // Ignore if clicked on buttons
+        showTaskerDetail(t);
+      });
       div.innerHTML =
         '<div class="flex items-center gap-3 mb-3">' +
           '<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary">person</span></div>' +
@@ -814,9 +909,9 @@ document.querySelectorAll('button').forEach(function(btn) {
           .filter(function(ts) { return ts.services && ts.services.name; })
           .map(function(ts) { return ts.services.name; });
       }
-      return {
         user_id: u.user_id,
         tasker_id: u.taskers.tasker_id,
+        bio: u.taskers.bio,
         full_name: u.full_name,
         phone: u.phone,
         created_at: u.created_at,

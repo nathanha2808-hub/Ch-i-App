@@ -367,13 +367,29 @@
                 body: { image: base64Data }
             }).then(function(result) {
                 ocrLoading.classList.add('hidden');
-                if (result && result.is_valid_cccd && (result.full_name || result.cccd_number)) {
+                if (result && result.is_valid_cccd) {
                     ocrName = result.full_name || '';
                     ocrCCCD = result.cccd_number || '';
-                    document.getElementById('nameFromOCR').value = ocrName;
-                    document.getElementById('cccdFromOCR').value = ocrCCCD;
+                    var nameInput = document.getElementById('nameFromOCR');
+                    var cccdInput = document.getElementById('cccdFromOCR');
+                    nameInput.value = ocrName;
+                    cccdInput.value = ocrCCCD;
+                    
+                    if (!ocrName || !ocrCCCD) {
+                        nameInput.removeAttribute('readonly');
+                        cccdInput.removeAttribute('readonly');
+                        nameInput.classList.remove('bg-primary-fixed/20');
+                        cccdInput.classList.remove('bg-primary-fixed/20');
+                        showError('Hệ thống chưa nhận diện được thông tin. Vui lòng nhập thủ công Họ tên và Số CCCD.');
+                    } else {
+                        nameInput.setAttribute('readonly', 'readonly');
+                        cccdInput.setAttribute('readonly', 'readonly');
+                        nameInput.classList.add('bg-primary-fixed/20');
+                        cccdInput.classList.add('bg-primary-fixed/20');
+                        showError('');
+                    }
+
                     ocrResults.classList.remove('hidden');
-                    showError('');
 
                     // Lỗi 6 FIX: Check unique CCCD ngay sau OCR
                     if (ocrCCCD) {
@@ -381,18 +397,18 @@
                     }
                 } else {
                     // Lỗi 6 FIX: KHÔNG cho nhập thủ công — bắt buộc ảnh CCCD hợp lệ
-                    showOCRFailed();
+                    showOCRFailed(result ? result.error : null);
                 }
             }).catch(function(err) {
                 console.warn('[OCR] API error:', err.message);
                 ocrLoading.classList.add('hidden');
                 // Lỗi 6 FIX: KHÔNG fallback manual — yêu cầu chụp lại
-                showOCRFailed();
+                showOCRFailed('Lỗi kết nối máy chủ khi nhận diện CCCD. Vui lòng thử lại.');
             });
         }
 
         // Lỗi 6 FIX: OCR thất bại → reset upload, yêu cầu chụp lại
-        function showOCRFailed() {
+        function showOCRFailed(customMsg) {
             var ocrResults = document.getElementById('ocr-results');
             ocrResults.classList.add('hidden');
             // Reset ảnh preview
@@ -402,7 +418,7 @@
             ocrName = '';
             ocrCCCD = '';
             document.getElementById('cccdFileInput').value = '';
-            showError('❌ Ảnh không phải CCCD hoặc không đọc được. Vui lòng chụp lại ảnh CCCD rõ ràng hơn (mặt trước, không bị lóa, không bị che).');
+            showError(customMsg || '❌ Ảnh không phải CCCD hoặc không đọc được. Vui lòng chụp lại ảnh CCCD rõ ràng hơn (mặt trước, không bị lóa, không bị che).');
         }
 
         // Lỗi 6 FIX: Check trùng CCCD ngay sau OCR
@@ -532,6 +548,7 @@
                         password: pass,
                         full_name: name,
                         id_number: cccd,
+                        id_front_base64: cccdBase64,
                         role: 'TASKER',
                         services: selectedServices
                     }
