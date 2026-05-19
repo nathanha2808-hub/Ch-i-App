@@ -630,7 +630,7 @@ document.querySelectorAll('table tbody tr').forEach(function(row) {
     var filtered = allOrders.filter(function(o) {
       var customerName = (o.customers && o.customers.users && o.customers.users.full_name) || '';
       var serviceName  = (o.services && o.services.name) || '';
-      var orderCode    = '#DH-' + String(o.order_id).padStart(4, '0');
+      var orderCode    = o.order_code || ('#DH-' + String(o.order_id).padStart(4, '0'));
 
       // Text search
       var matchQ = !q || customerName.toLowerCase().includes(q) || serviceName.toLowerCase().includes(q) || orderCode.toLowerCase().includes(q);
@@ -674,7 +674,7 @@ document.querySelectorAll('table tbody tr').forEach(function(row) {
       var customerName = (order.customers && order.customers.users && order.customers.users.full_name) || 'Không xác định';
       var taskerName   = (order.taskers  && order.taskers.users  && order.taskers.users.full_name)   || '—';
       var serviceName  = (order.services && order.services.name) || '—';
-      var orderCode    = '#DH-' + String(order.order_id).padStart(4, '0');
+      var orderCode    = order.order_code || ('#DH-' + String(order.order_id).padStart(4, '0'));
 
       var tr = document.createElement('tr');
       tr.className = (idx % 2 ? 'bg-[#F8F5F3]/30 ' : '') + 'hover:bg-surface-container-low/50 transition-colors cursor-pointer';
@@ -850,7 +850,7 @@ document.querySelectorAll('table tbody tr').forEach(function(row) {
       var customerName = (order.customers && order.customers.users && order.customers.users.full_name) || '';
       var taskerName = (order.taskers && order.taskers.users && order.taskers.users.full_name) || '';
       var serviceName = (order.services && order.services.name) || '';
-      var orderCode = '#DH-' + String(order.order_id).padStart(4, '0');
+      var orderCode = order.order_code || ('#DH-' + String(order.order_id).padStart(4, '0'));
       var s = STATUS_MAP[order.status] || { label: order.status };
       return [
         orderCode,
