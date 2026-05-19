@@ -1,9 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PushService } from '../push/push.service';
 
 @Injectable()
 export class WalletsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private pushService: PushService) {}
 
   async getWallet(userId: number) {
     let wallet = await this.prisma.wallets.findUnique({
@@ -185,6 +186,17 @@ export class WalletsService {
 
       return { wallet: updatedWallet, transaction };
     });
+
+    // TC-T13-002 FIX: Gửi push notification sau khi rút tiền thành công
+    try {
+      await this.pushService.sendPushToUser(userId, {
+        title: 'Yêu cầu rút tiền đã gửi',
+        body: `Yêu cầu rút ${amount.toLocaleString('vi-VN')} đ đang chờ Admin duyệt.`,
+        url: '/giupviec/thunhapvathongke.html',
+      });
+    } catch (e) {
+      console.warn('[Wallet] Push notification failed:', e.message);
+    }
 
     return result;
   }

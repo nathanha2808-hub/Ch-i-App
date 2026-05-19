@@ -220,6 +220,12 @@
 (async function() {
   if (!ChiOiAuth.requireAuth('dangnhaptasker.html')) return;
 
+  // TC-T10-015 FIX: Strip 'Z' từ ISO string để tránh offset UTC+7
+  function fixTimezone(isoStr) {
+    if (!isoStr) return isoStr;
+    return String(isoStr).replace(/Z$/i, '').replace(/\+00:00$/, '');
+  }
+
   var ordersList = document.querySelector('.flex.flex-col.gap-md');
   if (!ordersList) return;
 
@@ -284,8 +290,8 @@
         card.innerHTML =
           '<div class="flex justify-between items-start">' +
             '<div><h3 class="text-title-sm font-title-sm text-on-surface">' + serviceName + '</h3>' +
-            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px]">schedule</span>' + formatDateTime(order.scheduled_time) + (order.duration_hours ? ' (' + order.duration_hours + ' giá»)' : '') + '</p>' +
-            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5"><span class="material-symbols-outlined text-[14px]">location_on</span>' + (order.address || 'ChÆ°a cáº­p nháº­t') + '</p></div>' +
+            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px]">schedule</span>' + formatDateTime(fixTimezone(order.scheduled_time)) + (order.duration_hours ? ' (' + order.duration_hours + ' giờ)' : '') + '</p>' +
+            '<p class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5"><span class="material-symbols-outlined text-[14px]">location_on</span>' + (order.address || 'Chưa cập nhật') + '</p></div>' +
             '<span class="' + s.bg + ' ' + s.text + ' px-3 py-1 rounded-full text-label-caps font-bold">' + s.label + '</span></div>' +
           '<div class="flex items-center justify-between border-t border-dashed border-outline-variant pt-3">' +
             '<span class="text-headline-md font-headline-md text-primary">' + formatVND(order.total_price) + '</span>' +
@@ -400,7 +406,7 @@
   function showTaskerOrderDetail(order, statusInfo, serviceName, customerName) {
     var address = order.address || 'Chưa cập nhật';
     var note = order.note || 'Không có ghi chú';
-    var scheduledTime = order.scheduled_time ? formatDateTime(order.scheduled_time) : 'Chưa xác định';
+    var scheduledTime = order.scheduled_time ? formatDateTime(fixTimezone(order.scheduled_time)) : 'Chưa xác định';
     var rating = order.review ? order.review.rating : 0;
     var comment = order.review ? order.review.comment : '';
     var starStr = '';

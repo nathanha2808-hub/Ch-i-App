@@ -21,10 +21,35 @@ export class ApiService {
     const customer = await this.prisma.customers.findUnique({ where: { customer_id: userId } });
     const tasker = await this.prisma.taskers.findUnique({ where: { tasker_id: userId } });
 
+    // TC-T14-005 FIX: Trả rating + review count cho Tasker profile
+    let average_rating = 0;
+    let total_jobs = 0;
+    let total_reviews = 0;
+    let completed_orders = 0;
+
+    if (tasker) {
+      average_rating = Number(tasker.average_rating) || 0;
+      total_jobs = tasker.total_jobs || 0;
+
+      // Đếm số review thực tế từ bảng reviews
+      total_reviews = await this.prisma.reviews.count({
+        where: { tasker_id: userId },
+      });
+
+      // Đếm số đơn hoàn thành
+      completed_orders = await this.prisma.orders.count({
+        where: { tasker_id: userId, status: 'COMPLETED' },
+      });
+    }
+
     return {
       ...user,
       address: customer?.default_address || tasker?.address || null,
       bio: tasker?.bio || null,
+      average_rating,
+      total_jobs,
+      total_reviews,
+      completed_orders,
     };
   }
 
