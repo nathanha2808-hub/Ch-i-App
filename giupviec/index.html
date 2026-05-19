@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đang tải...</title>
+    <script src="../shared/api.js?v=20260519"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var token = ChiOiAuth.getToken();
+            var user = ChiOiAuth.getUser();
+            if (token && user && user.role === 'TASKER') {
+                window.location.replace('trangchutasker.html');
+            } else {
+                window.location.replace('dangnhaptasker.html');
+            }
+        });
+    </script>
+</head>
+<body style="background:#fff8f6;"></body>
+</html>
