@@ -737,7 +737,9 @@
     if (order.status === 'ACCEPTED') {
       actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'TASKER_ARRIVED\')" class="w-full py-3 mt-3 rounded-full bg-[#00b1da] text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">ĐÃ ĐẾN NƠI</button>';
     } else if (order.status === 'TASKER_ARRIVED') {
-      actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'IN_PROGRESS\')" class="w-full py-3 mt-3 rounded-full bg-[#ff7e36] text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">BẮT ĐẦU DỌN DẸP</button>';
+      var btnText = 'BẮT ĐẦU ' + serviceName.toUpperCase();
+      if (serviceName.toLowerCase() === 'dọn nhà') btnText = 'BẮT ĐẦU DỌN DẸP';
+      actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'IN_PROGRESS\')" class="w-full py-3 mt-3 rounded-full bg-[#ff7e36] text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">' + btnText + '</button>';
     } else if (order.status === 'IN_PROGRESS') {
       // FIX: Tasker bấm hoàn thành → Gửi COMPLETED trực tiếp
       actionHtml = '<button onclick="updateOrderStatus(' + order.order_id + ', \'COMPLETED\')" class="w-full py-3 mt-3 rounded-full bg-green-500 text-white font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all">HOÀN THÀNH ĐƠN</button>';
