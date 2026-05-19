@@ -310,9 +310,12 @@ Phương thức thanh toán
 <script src="../shared/api.js?v=20260514"></script>
 <script src="../shared/prefetch.js" defer></script>
 <script>
-(function() {
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
+
   // ===== State =====
   var state = {
+    serviceId: null,
     childCount: 1,
     childAges: [3],
     hours: 3,
@@ -322,6 +325,28 @@ Phương thức thanh toán
     paymentMethod: 'WALLET',
     hasFamilyPackage: false
   };
+
+  // ===== Load service_id and price =====
+  try {
+    var params = new URLSearchParams(window.location.search);
+    state.serviceId = params.get('service_id') ? parseInt(params.get('service_id')) : null;
+    var services = await apiFetch('/api/services');
+    if (services && services.length > 0) {
+      if (!state.serviceId) {
+        // Tìm service Trông trẻ
+        var ttService = services.find(function(s) { return s.name && s.name.toLowerCase().indexOf('trông') >= 0; });
+        if (ttService) {
+          state.serviceId = ttService.service_id;
+          state.pricePerHour = ttService.base_price || 100000;
+        }
+      } else {
+        var defaultService = services.find(function(s) { return s.service_id === state.serviceId; });
+        if (defaultService) {
+          state.pricePerHour = defaultService.base_price || 100000;
+        }
+      }
+    }
+  } catch (e) { console.warn('[Đặt DV] Không load được services:', e.message); }
 
   // ===== Kiểm tra gói gia đình (ĐÃ TẠM ẨN) =====
   /*
@@ -575,7 +600,7 @@ Phương thức thanh toán
     var totalPrice = state.childCount * state.hours * state.pricePerHour;
     var agesStr = state.childAges.map(function(a) { return ageOptions[a] || a + ' tuổi'; }).join(', ');
     var noteText = (document.getElementById('noteInput') || {}).value || '';
-    var note = state.childCount + ' trẻ (' + agesStr + '). ' + noteText;
+    var note = '[Trông ' + state.childCount + ' bé độ tuổi: ' + agesStr + ']\\n- Yêu cầu đặc biệt: ' + (noteText || 'Không có');
 
     // TC-KH08-002 FIX: Kiểm tra số dư ví trước khi đặt (chỉ khi thanh toán VÍ)
     if (state.paymentMethod === 'WALLET') {
@@ -591,22 +616,8 @@ Phương thức thanh toán
       }
     }
 
-    // Tìm service_id cho Trông trẻ
-    var serviceId = null;
-    try {
-      var services = await apiFetch('/api/services');
-      if (services && services.length > 0) {
-        for (var i = 0; i < services.length; i++) {
-          if (services[i].name && services[i].name.toLowerCase().indexOf('trông') >= 0) {
-            serviceId = services[i].service_id;
-            break;
-          }
-        }
-        if (!serviceId) serviceId = services.length > 1 ? services[1].service_id : services[0].service_id;
-      }
-    } catch(e) { console.warn('Không load được services'); }
-
-    if (!serviceId) { showToastMsg('Không tìm thấy dịch vụ Trông trẻ'); return; }
+    // Sử dụng serviceId đã load từ lúc vào trang
+    var serviceIdToBook = state.serviceId || 2;
 
     // Khóa nút
     isSubmitting = true;
@@ -620,7 +631,7 @@ Phương thức thanh toán
       var result = await apiFetch('/api/orders/book', {
         method: 'POST',
         body: {
-          service_id: serviceId,
+          service_id: serviceIdToBook,
           scheduled_time: scheduledTime,
           address: userAddress,
           total_price: totalPrice,
