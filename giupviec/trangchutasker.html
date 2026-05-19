@@ -324,49 +324,70 @@
       startGpsTracking();
     }
 
-    toggleInput.addEventListener('change', async function() {
-      // Bật/tắt trạng thái nhận việc — KHÔNG block toggle bằng GPS
-      // GPS sẽ tự bật khi toggle ON thông qua startGpsTracking()
-
-      try {
-        await apiFetch('/api/taskers/status', {
-          method: 'PATCH',
-          body: { is_online: toggleInput.checked }
-        });
-        localStorage.setItem(storageKey, String(toggleInput.checked));
-        showToast(toggleInput.checked ? '🟢 Đã bật nhận việc' : '🔴 Đã tắt nhận việc');
-        // TC_T04_012 FIX: Sync trạng thái sang các thiết bị khác qua Socket
-        if (window.ChiOiSocket) {
-          window.ChiOiSocket.emit('update_status', { is_online: toggleInput.checked });
-        }
-        // Bug 1 Report19: Bật/tắt GPS realtime tracking theo trạng thái
-        if (toggleInput.checked) {
-          startGpsTracking();
-          updateLocationAndSendGps();
+    toggleInput.addEventListener('change', function(e) {
+      if (toggleInput.checked) {
+        // Enforce GPS check before allowing ONLINE
+        if (navigator.geolocation) {
+          showToast('Đang lấy vị trí GPS...');
+          navigator.geolocation.getCurrentPosition(async function(pos) {
+            // Success: Turn on Online
+            try {
+              await apiFetch('/api/taskers/status', {
+                method: 'PATCH',
+                body: { is_online: true }
+              });
+              localStorage.setItem(storageKey, 'true');
+              showToast('🟢 Đã bật nhận việc');
+              if (window.ChiOiSocket) {
+                window.ChiOiSocket.emit('update_status', { is_online: true });
+              }
+              startGpsTracking();
+              updateLocationAndSendGps();
+              
+              var idleText = document.querySelector('#idle-state .font-bold');
+              var idleSubText = document.querySelector('#idle-state .text-xs');
+              if (idleText) idleText.textContent = 'Đang tìm đơn hàng...';
+              if (idleSubText) idleSubText.textContent = 'Bạn đang ở chế độ trực tuyến';
+            } catch (err) {
+              showToast('Lỗi: ' + err.message);
+              toggleInput.checked = false; // revert
+            }
+          }, function(err) {
+            // Error/Denied
+            showToast('❌ Bạn phải cho phép truy cập Vị trí (GPS) để bật nhận việc!');
+            toggleInput.checked = false; // revert
+          }, { enableHighAccuracy: true, timeout: 10000 });
         } else {
+          showToast('❌ Thiết bị của bạn không hỗ trợ GPS!');
+          toggleInput.checked = false;
+        }
+      } else {
+        // Bật OFF
+        apiFetch('/api/taskers/status', {
+          method: 'PATCH',
+          body: { is_online: false }
+        }).then(function() {
+          localStorage.setItem(storageKey, 'false');
+          showToast('🔴 Đã tắt nhận việc');
+          if (window.ChiOiSocket) {
+            window.ChiOiSocket.emit('update_status', { is_online: false });
+          }
           stopGpsTracking();
-        }
-        // Bug 4 FIX (report14): Khi tắt → ẩn modal đơn mới (nhưng giữ đơn đang xử lý)
-        if (!toggleInput.checked && !isHandlingOrder) {
-          clearInterval(countdownTimer);
-          hideModal();
-          showIdleState();
-          // Cập nhật text idle
-          var idleText = document.querySelector('#idle-state .font-bold');
-          var idleSubText = document.querySelector('#idle-state .text-xs');
-          if (idleText) idleText.textContent = 'Đang tắt nhận việc';
-          if (idleSubText) idleSubText.textContent = 'Bật lại để nhận đơn hàng mới';
-          currentOrder = null;
-        } else if (toggleInput.checked) {
-          // Khi bật lại → cập nhật text idle và load đơn mới
-          var idleText = document.querySelector('#idle-state .font-bold');
-          var idleSubText = document.querySelector('#idle-state .text-xs');
-          if (idleText) idleText.textContent = 'Đang tìm đơn hàng...';
-          if (idleSubText) idleSubText.textContent = 'Bạn đang ở chế độ trực tuyến';
-        }
-      } catch (err) {
-        showToast('Lỗi: ' + err.message);
-        toggleInput.checked = !toggleInput.checked; // revert
+          
+          if (!isHandlingOrder) {
+            clearInterval(countdownTimer);
+            hideModal();
+            showIdleState();
+            var idleText = document.querySelector('#idle-state .font-bold');
+            var idleSubText = document.querySelector('#idle-state .text-xs');
+            if (idleText) idleText.textContent = 'Đang tắt nhận việc';
+            if (idleSubText) idleSubText.textContent = 'Bật lại để nhận đơn hàng mới';
+            currentOrder = null;
+          }
+        }).catch(function(err) {
+          showToast('Lỗi: ' + err.message);
+          toggleInput.checked = true; // revert
+        });
       }
     });
 
@@ -449,11 +470,11 @@
         taskerMarker.setLatLng([lat, lng]);
         emitGps(lat, lng);
       }, function() {
-        console.warn('[Map] Không lấy được vị trí, dùng vị trí mặc định.');
-        emitGps(defaultLat, defaultLng);
+        console.warn('[Map] Không lấy được vị trí thực, từ chối gửi GPS ảo.');
+        showToast('❌ Mất kết nối GPS, vui lòng kiểm tra lại quyền Vị trí!');
       }, { enableHighAccuracy: true, timeout: 10000 });
     } else {
-      emitGps(defaultLat, defaultLng);
+      showToast('❌ Thiết bị không hỗ trợ GPS!');
     }
   }
 
