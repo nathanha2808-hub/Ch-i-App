@@ -475,21 +475,29 @@
       '</div>',
     ].join('');
 
+    // TC-AD08-08 FIX: Submit lock + cải thiện UX hoàn tiền
     var refundBtn = document.getElementById('btn-refund');
     if (refundBtn) {
       refundBtn.addEventListener('click', async function() {
+        if (refundBtn.disabled) return;
         var tid = this.getAttribute('data-ticket-id');
         var oid = this.getAttribute('data-order-id');
-        if (!confirm('Xác nhận HOÀN TIỀN cho đơn hàng #' + oid + '?\nTiền sẽ được cộng vào ví KH và trừ từ ví Tasker.')) return;
+        if (!confirm('Xác nhận HOÀN TIỀN cho đơn hàng #' + oid + '?\nTiền sẽ được cộng vào ví KH và trừ từ ví Tasker.\n\nLưu ý: Chỉ hoàn được đơn đã hoàn thành (COMPLETED).')) return;
+        refundBtn.disabled = true;
+        refundBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span> Đang xử lý...';
         showLoading();
         try {
           await apiFetch('/api/admin/tickets/' + tid + '/refund', { method: 'POST', body: { order_id: parseInt(oid) } });
           hideLoading();
-          showToastMsg('Hoàn tiền thành công!');
+          showToastMsg('✅ Hoàn tiền thành công!');
           setTimeout(function() { location.reload(); }, 1500);
         } catch(e) {
           hideLoading();
-          showToastMsg('Lỗi hoàn tiền: ' + e.message);
+          refundBtn.disabled = false;
+          refundBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">undo</span> Xác nhận hoàn tiền';
+          var msg = e.message || 'Lỗi không xác định';
+          if (msg.includes('hoàn thành')) msg += '\n→ Chỉ hỗ trợ hoàn tiền cho đơn đã COMPLETED.';
+          showToastMsg('❌ ' + msg);
         }
       });
     }

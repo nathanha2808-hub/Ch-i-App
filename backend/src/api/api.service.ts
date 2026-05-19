@@ -470,6 +470,11 @@ export class ApiService {
 
   async approveWithdrawal(adminId: number, transactionId: number, status: string) {
     // status should be 'COMPLETED' or 'FAILED'
+    // TC-AD06-25 FIX: Check đã xử lý chưa → chặn double-click
+    const existing = await this.prisma.transactions.findUnique({ where: { transaction_id: transactionId } });
+    if (!existing) throw new BadRequestException('Không tìm thấy giao dịch');
+    if (existing.status !== 'PENDING') throw new BadRequestException('Giao dịch đã được xử lý trước đó');
+
     const transaction = await this.prisma.transactions.update({
       where: { transaction_id: transactionId },
       data: { status },
@@ -606,11 +611,48 @@ export class ApiService {
     });
   }
 
+  // TC_AD03_008 FIX: Hủy đơn + hoàn tiền vào ví nếu thanh toán bằng WALLET
   async adminCancelOrder(adminId: number, orderId: number) {
-    const order = await this.prisma.orders.update({
+    const order = await this.prisma.orders.findUnique({ where: { order_id: orderId } });
+    if (!order) throw new BadRequestException('Không tìm thấy đơn hàng');
+    if (order.status === 'CANCELLED') throw new BadRequestException('Đơn hàng đã bị hủy trước đó');
+
+    // Update status
+    const updatedOrder = await this.prisma.orders.update({
       where: { order_id: orderId },
       data: { status: 'CANCELLED', updated_at: new Date() }
     });
+
+    // Hoàn tiền nếu thanh toán bằng WALLET
+    if (order.payment_method === 'WALLET' && Number(order.total_price) > 0) {
+      const customerWallet = await this.prisma.wallets.findUnique({ where: { user_id: order.customer_id } });
+      if (customerWallet) {
+        const refundAmount = Number(order.total_price);
+        await this.prisma.wallets.update({
+          where: { wallet_id: customerWallet.wallet_id },
+          data: { balance: { increment: refundAmount }, updated_at: new Date() },
+        });
+        await this.prisma.transactions.create({
+          data: {
+            transaction_code: `ARFD${Date.now()}`,
+            wallet_id: customerWallet.wallet_id,
+            amount: refundAmount,
+            type: 'REFUND',
+            status: 'COMPLETED',
+            order_id: orderId,
+            description: `Admin hoàn tiền hủy đơn #${order.order_code || orderId}`,
+          },
+        });
+        // Notification
+        await this.prisma.notifications.create({
+          data: {
+            user_id: order.customer_id,
+            title: 'Đơn hàng đã bị hủy — Hoàn tiền',
+            content: `Đơn #${order.order_code || orderId} đã bị Admin hủy. ${refundAmount.toLocaleString('vi-VN')}đ đã hoàn vào ví.`,
+          },
+        });
+      }
+    }
 
     await this.prisma.admin_audit_logs.create({
       data: {
@@ -618,14 +660,21 @@ export class ApiService {
         action: 'FORCE_CANCEL_ORDER',
         target_table: 'orders',
         target_id: orderId,
-        new_data: { status: 'CANCELLED' }
+        new_data: { status: 'CANCELLED', refunded: order.payment_method === 'WALLET' }
       }
     });
 
-    return order;
+    return updatedOrder;
   }
 
+  // TC_AD03_011 FIX: Validate Tasker status trước khi gán
   async adminAssignTasker(adminId: number, orderId: number, taskerId: number) {
+    // Check Tasker status
+    const taskerUser = await this.prisma.users.findUnique({ where: { user_id: taskerId } });
+    if (!taskerUser) throw new BadRequestException('Không tìm thấy Tasker');
+    if (taskerUser.status === 'BANNED') throw new BadRequestException('Tasker đã bị khóa, không thể gán đơn');
+    if (taskerUser.status !== 'ACTIVE') throw new BadRequestException('Tasker không ở trạng thái hoạt động');
+
     const order = await this.prisma.orders.update({
       where: { order_id: orderId },
       data: { 
