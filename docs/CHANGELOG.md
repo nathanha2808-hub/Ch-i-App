@@ -6,11 +6,15 @@
 
 ## [1.5.5] - 2026-05-19
 
-### ✨ New Features — Tasker Auto-Accept Orders
+### ✨ New Features — Tasker Auto-Accept Orders & Polling Optimization
 
 #### Added
 - **Frontend Tasker:** `giupviec/trangchutasker.html` — Bổ sung nút chuyển đổi (Toggle) "Tự động nhận đơn" ở phần trạng thái tìm đơn (Idle State).
 - **Frontend Tasker:** `giupviec/trangchutasker.html` — Triển khai logic chạy ngầm `autoAcceptOrder()`: Tự động gọi API nhận đơn thay vì hiển thị Modal khi có đơn mới tới từ Socket hoặc thông qua Polling, giúp Tasker nhận đơn nhanh nhất mà không cần thao tác bấm. Trạng thái cấu hình được lưu cục bộ trong `localStorage`.
+
+#### Fixed
+- **Frontend Tasker:** `giupviec/trangchutasker.html` — Sửa lỗi nghiêm trọng (Race Condition & Polling Block): Xoá bỏ logic kiểm tra sai lệch khiến Tasker vĩnh viễn không nhận được đơn mới nếu đã từng hoàn thành một đơn trước đó (do vòng lặp quét đơn bị chặn bởi trạng thái `COMPLETED`).
+- **Frontend Tasker:** `giupviec/trangchutasker.html` — Tối ưu hoá luồng tải dữ liệu (sử dụng cờ `isFirstLoad` để hạn chế gọi API lịch sử dư thừa) và đẩy nhanh chu kỳ quét đơn (Polling Interval) từ 15 giây xuống 3 giây, giúp việc bắt đơn (có/không bật Auto-Accept) trở nên cực kỳ nhạy bén theo thời gian thực.
 
 ---
 

@@ -606,32 +606,41 @@
 
   // ===== 10. Bug 8 FIX: Kiểm tra đơn đang thực hiện trước khi hiện đơn mới =====
   var isHandlingOrder = false; // Flag: đang xử lý đơn
+  var isFirstLoad = true;      // Flag: Kiểm tra lịch sử lần đầu tiên
 
   // Hàm check đơn hàng — reusable cho cả init lần đầu và polling
   async function checkAvailableOrders() {
     // Nếu đang xử lý đơn → không hiện đơn mới
     if (isHandlingOrder) return;
 
-    try {
-      // Check đơn hàng đang thực hiện (ACCEPTED / IN_PROGRESS / TASKER_ARRIVED)
-      var history = await apiFetch('/api/taskers/history');
-      if (history && history.length > 0) {
-        var activeOrder = history.find(function(o) {
-          return ['ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'].indexOf(o.status) > -1;
-        });
-        if (activeOrder) {
-          isHandlingOrder = true;
-          showActiveOrderCard(activeOrder);
-          return;
+    // Chỉ gọi lịch sử 1 lần lúc mới tải trang hoặc khi thật sự cần
+    if (isFirstLoad) {
+      try {
+        // Check đơn hàng đang thực hiện (ACCEPTED / IN_PROGRESS / TASKER_ARRIVED)
+        var history = await apiFetch('/api/taskers/history');
+        if (history && history.length > 0) {
+          var activeOrder = history.find(function(o) {
+            return ['ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'].indexOf(o.status) > -1;
+          });
+          if (activeOrder) {
+            isHandlingOrder = true;
+            showActiveOrderCard(activeOrder);
+            isFirstLoad = false;
+            return;
+          }
+          // FIX: Bỏ chặn đơn có status 'COMPLETED' vì Tasker đã rảnh
+          var pendingOrder = history.find(function(o) {
+            return o.status === 'PENDING_COMPLETION';
+          });
+          if (pendingOrder) {
+            isFirstLoad = false;
+            return;
+          }
         }
-        // FIX: Nếu có đơn PENDING_COMPLETION → Tasker đã hoàn thành, bỏ qua
-        var pendingOrder = history.find(function(o) {
-          return o.status === 'PENDING_COMPLETION' || o.status === 'COMPLETED';
-        });
-        if (pendingOrder) return;
+      } catch (e) {
+        console.warn('[Tasker] Không check được đơn đang xử lý:', e.message);
       }
-    } catch (e) {
-      console.warn('[Tasker] Không check được đơn đang xử lý:', e.message);
+      isFirstLoad = false;
     }
 
     // Nếu đang offline → không load đơn mới
@@ -665,13 +674,13 @@
   // Chạy lần đầu khi mở trang
   checkAvailableOrders();
 
-  // ===== REALTIME POLLING: Check đơn mới mỗi 15 giây khi đang online =====
+  // ===== REALTIME POLLING: Check đơn mới mỗi 3 giây khi đang online =====
   setInterval(function() {
     var toggleCheck = document.querySelector('header input[type="checkbox"]');
     if (toggleCheck && toggleCheck.checked && !isHandlingOrder && !currentOrder) {
       checkAvailableOrders();
     }
-  }, 15000);
+  }, 3000);
 
   // Hiển thị card đơn đang thực hiện (khóa nhận đơn mới)
   function showActiveOrderCard(order) {
