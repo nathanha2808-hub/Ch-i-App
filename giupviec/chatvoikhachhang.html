@@ -293,6 +293,18 @@
     document.getElementById('btn-reject-call').addEventListener('click', function() {
       if (chiOiCall.remoteUserId) chiOiCall.rejectCall(chiOiCall.remoteUserId);
     });
+
+    // Auto-accept call từ global notification redirect
+    var autoAccept = params.get('autoAcceptCall');
+    var autoCallerId = params.get('callerId');
+    if (autoAccept === 'true' && autoCallerId) {
+      setTimeout(function() {
+        chiOiCall.remoteUserId = parseInt(autoCallerId);
+        chiOiCall.currentOrderId = parseInt(orderId);
+        chiOiCall.acceptCall(parseInt(autoCallerId));
+        showToastMsg('📞 Đang kết nối cuộc gọi...');
+      }, 1500);
+    }
   }
 
   // ===== 5. Gửi tin nhắn =====
@@ -410,4 +422,5 @@
   }
 })();
 </script>
+<script src="../shared/global-notifications.js" defer></script>
 </body></html>
