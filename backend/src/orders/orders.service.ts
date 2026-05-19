@@ -389,16 +389,13 @@ export class OrdersService {
       throw new BadRequestException('Order not eligible for review');
     }
 
-    const existingReview = await this.prisma.reviews.findFirst({
+    const review = await this.prisma.reviews.upsert({
       where: { order_id: orderId },
-    });
-
-    if (existingReview) {
-      throw new BadRequestException('Order has already been reviewed');
-    }
-
-    const review = await this.prisma.reviews.create({
-      data: {
+      update: {
+        rating,
+        comment,
+      },
+      create: {
         order_id: orderId,
         customer_id: customerId,
         tasker_id: order.tasker_id,

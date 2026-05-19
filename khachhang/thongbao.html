@@ -150,12 +150,17 @@
             'CANCELLED': 'đã bị hủy'
           };
           var statusText = statusLabels[o.status] || o.status;
-          var isActive = o.status === 'IN_PROGRESS' || o.status === 'SEARCHING' || o.status === 'ACCEPTED';
+          var isActive = o.status === 'IN_PROGRESS' || o.status === 'SEARCHING' || o.status === 'ACCEPTED' || o.status === 'COMPLETED';
+          var linkUrl = o.status === 'COMPLETED' ? 'danhgiatasker.html?orderId=' + o.order_id : 'theodoidon.html?orderId=' + o.order_id;
+          var bodyText = o.status === 'COMPLETED' 
+              ? 'Đơn hàng ' + (o.order_code || ('#' + o.order_id)) + ' đã hoàn thành. Nhấn để đánh giá Tasker nhé!'
+              : 'Đơn hàng ' + (o.order_code || ('#' + o.order_id)) + ' ' + statusText + '.';
+              
           notifs.push({
             type: 'order', icon: 'local_shipping', iconBg: 'bg-primary-container', iconText: 'text-on-primary',
-            title: svcName, body: 'Đơn hàng ' + (o.order_code || ('#' + o.order_id)) + ' ' + statusText + '.',
+            title: svcName, body: bodyText,
             time: o.updated_at || o.created_at, unread: (isActive && readNotifs.indexOf('order_' + o.order_id) < 0), id: 'order_' + o.order_id,
-            link: 'theodoidon.html?orderId=' + o.order_id
+            link: linkUrl
           });
         });
       }
