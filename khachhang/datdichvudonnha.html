@@ -157,7 +157,8 @@
 <span class="material-symbols-outlined">chat_bubble</span>
 </button>
 </header>
-<main class="px-container-padding py-md space-y-lg max-w-md mx-auto relative z-10">
+<main class="px-container-padding py-md space-y-lg max-w-md md:max-w-5xl md:grid md:grid-cols-12 md:gap-8 md:space-y-0 mx-auto relative z-10">
+    <div class="md:col-span-7 space-y-lg">
     <!-- Loại dọn dẹp -->
     <section class="space-y-sm">
         <h2 class="text-title-sm font-bold text-on-surface/80 px-1">Loại dọn dẹp</h2>
@@ -233,6 +234,9 @@
 <button onclick="window.location.href='lichsuhoatdong.html'" class="flex-1 py-2 rounded-full border border-yellow-600 text-yellow-700 text-label-caps font-label-caps active:scale-95 transition-all">Xem đơn cũ</button>
 </div>
 </div>
+</div>
+    
+    <div class="md:col-span-5 space-y-lg sticky top-20 h-fit">
 <!-- Lỗi 4 FIX: Tổng kết đơn hàng hiển thị đúng thông tin từ state -->
 <section class="bg-white p-container-padding rounded-2xl soft-shadow border border-[#FFF1EB] space-y-md">
 <div class="flex items-center justify-between border-b border-surface-variant pb-2">
@@ -285,9 +289,10 @@ Phương thức thanh toán
 <button id="main-submit-btn" class="orange-gradient w-full py-4 rounded-2xl text-white font-bold text-body-lg shadow-lg shadow-orange-500/30 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
     <span>Đặt dịch vụ — 450.000 đ</span>
 </button>
+    </div>
 </main>
 <!-- Navigation Shell -->
-<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md md:max-w-4xl z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
 <!-- Trang chủ -->
 <a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="trangchu.html">
 <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
