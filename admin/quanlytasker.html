@@ -447,7 +447,7 @@ document.querySelectorAll('button').forEach(function(btn) {
         var badge = row.querySelector('[data-status]');
         if (badge) {
           badge.textContent = 'Đã duyệt';
-          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-green-100 text-green-700';
+          badge.className = badge.className.replace(/bg-[a-z]+-[0-9]+\s*text-[a-z]+-[0-9]+/g, '') + ' bg-green-100 text-green-700';
         }
         btn.disabled = true;
         btn.textContent = 'Đã duyệt';
@@ -466,7 +466,7 @@ document.querySelectorAll('button').forEach(function(btn) {
         var badge = row.querySelector('[data-status]');
         if (badge) {
           badge.textContent = 'Đã từ chối';
-          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-red-100 text-red-700';
+          badge.className = badge.className.replace(/bg-[a-z]+-[0-9]+\s*text-[a-z]+-[0-9]+/g, '') + ' bg-red-100 text-red-700';
         }
         btn.disabled = true;
         btn.textContent = 'Đã từ chối';
