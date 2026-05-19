@@ -602,6 +602,11 @@
       showIdleState();
       currentOrder = null;
     });
+
+    socket.on('force_logout', function(data) {
+      alert(data.reason || 'Tài khoản của bạn đã bị khóa. Phiên làm việc đã kết thúc.');
+      ChiOiAuth.logout();
+    });
   }
 
   // ===== 10. Bug 8 FIX: Kiểm tra đơn đang thực hiện trước khi hiện đơn mới =====

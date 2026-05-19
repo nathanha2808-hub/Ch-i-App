@@ -1,4 +1,4 @@
-import { Controller, Post, Patch, Get, Body, Param, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Patch, Get, Body, Param, UseGuards, Request, ParseIntPipe, ForbiddenException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -42,6 +42,9 @@ export class OrdersController {
   @Roles('TASKER')
   @ApiOperation({ summary: 'Nhận đơn (Cần Token Tasker)' })
   async acceptOrder(@Request() req, @Param('id', ParseIntPipe) id: number) {
+    if (req.user.isBannedGracePeriod) {
+      throw new ForbiddenException('Tài khoản của bạn đang bị khóa. Bạn chỉ có thể hoàn thành đơn hàng hiện tại.');
+    }
     const updatedOrder = await this.ordersService.acceptOrder(id, req.user.userId);
     
     // Notify customer that tasker accepted
@@ -59,6 +62,13 @@ export class OrdersController {
     
     // Notify customer of status change
     this.ordersGateway.notifyCustomerOrderStatus(order.customer_id, { orderId: id, status: order.status });
+    
+    if (order.status === 'COMPLETED' || order.status === 'CANCELLED') {
+      const isBanned = await this.ordersService.isTaskerBanned(req.user.userId);
+      if (isBanned) {
+        this.ordersGateway.notifyUserAllDevices(req.user.userId, 'force_logout', { reason: 'Tài khoản của bạn đã bị khóa. Phiên làm việc đã kết thúc.' });
+      }
+    }
     
     return order;
   }
@@ -90,6 +100,11 @@ export class OrdersController {
         message: '🎉 Khách hàng đã xác nhận hoàn thành đơn!',
         orderId: id,
       });
+
+      const isBanned = await this.ordersService.isTaskerBanned(order.tasker_id);
+      if (isBanned) {
+        this.ordersGateway.notifyUserAllDevices(order.tasker_id, 'force_logout', { reason: 'Tài khoản của bạn đã bị khóa. Phiên làm việc đã kết thúc.' });
+      }
     }
     
     return { message: 'Xác nhận hoàn thành thành công', order };

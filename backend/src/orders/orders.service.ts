@@ -463,7 +463,15 @@ export class OrdersService {
   async getChatHistory(orderId: number) {
     return this.prisma.messages.findMany({
       where: { order_id: orderId },
-      orderBy: { created_at: 'asc' }
+      orderBy: { created_at: 'asc' },
     });
+  }
+
+  async isTaskerBanned(taskerId: number): Promise<boolean> {
+    const tasker = await this.prisma.users.findUnique({ 
+      where: { user_id: taskerId }, 
+      select: { status: true } 
+    });
+    return tasker?.status === 'LOCKED' || tasker?.status === 'BANNED' || tasker?.status === 'INACTIVE';
   }
 }
