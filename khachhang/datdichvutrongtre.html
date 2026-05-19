@@ -485,7 +485,7 @@ Phương thức thanh toán
 
   // ===== Update Summary =====
   function updateSummary() {
-    var total = state.hours * state.pricePerHour;
+    var total = state.hours * state.pricePerHour * state.childCount;
     var originalTotal = total;
     var discount = 0;
 
@@ -563,7 +563,7 @@ Phương thức thanh toán
     if (addressErrEl) addressErrEl.style.display = 'none';
 
     var scheduledTime = state.date + 'T' + state.time + ':00';
-    var totalPrice = state.hours * state.pricePerHour;
+    var totalPrice = state.childCount * state.hours * state.pricePerHour;
     var agesStr = state.childAges.map(function(a) { return ageOptions[a] || a + ' tuổi'; }).join(', ');
     var noteText = (document.getElementById('noteInput') || {}).value || '';
     var note = state.childCount + ' trẻ (' + agesStr + '). ' + noteText;
