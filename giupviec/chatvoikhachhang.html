@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
 <meta name="view-transition" content="same-origin"/>
@@ -81,7 +81,7 @@
 <div class="absolute top-0 left-0 w-full h-[300px] z-0" style="background: linear-gradient(180deg, rgba(255,126,54,0.9) 0%, rgba(255,126,54,0) 100%); pointer-events: none;"></div>
 
 <!-- Header -->
-<header class="w-full max-w-md h-16 flex items-center px-md relative  z-50 bg-transparent relative z-40">
+<header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md h-16 flex items-center px-md z-50 bg-transparent">
     <button class="p-base active:scale-95 transition-all" onclick="history.back()">
         <span class="material-symbols-outlined text-white text-[24px]">arrow_back</span>
     </button>
@@ -103,7 +103,7 @@
 </header>
 
 <!-- Order Info Card -->
-<div id="order-card" class="sticky top-16 z-40 bg-white/90 backdrop-blur-sm px-md py-2 shadow-sm flex items-center gap-3 mx-md mt-[72px] rounded-xl border border-outline-variant/30 hidden">
+<div id="order-card" class="w-full max-w-md mx-auto mt-16 z-40 bg-white/90 backdrop-blur-sm px-md py-2 shadow-sm flex items-center gap-3 rounded-xl border border-outline-variant/30 hidden">
     <div class="bg-primary p-2 rounded-lg">
         <span class="material-symbols-outlined text-on-primary text-[18px]">cleaning_services</span>
     </div>
@@ -111,7 +111,7 @@
 </div>
 
 <!-- Chat Message Area -->
-<main-w-md md:max-w-4xl>
+<main id="chat-area" class="flex-1 w-full max-w-md mx-auto overflow-y-auto px-md pt-4 pb-36 no-scrollbar relative z-10">
     <div class="flex flex-col gap-lg">
         <div class="text-center">
             <span class="text-label-caps text-outline bg-surface-container-low px-3 py-1 rounded-full text-[10px]">Đang tải tin nhắn...</span>
