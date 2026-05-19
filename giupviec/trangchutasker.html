@@ -648,6 +648,12 @@
       isFirstLoad = false;
     }
 
+    // FIX: fixTimezone ở global scope để showNewOrderModal + showActiveOrderCard đều dùng được
+    function fixTimezone(isoStr) {
+      if (!isoStr) return isoStr;
+      return String(isoStr).replace(/Z$/i, '').replace(/\+00:00$/, '');
+    }
+
     // Nếu đang offline → không load đơn mới
     var toggleCheck = document.querySelector('header input[type="checkbox"]');
     if (toggleCheck && !toggleCheck.checked) return;
@@ -701,11 +707,7 @@
     var customerName = (order.customers && order.customers.users && order.customers.users.full_name) ? order.customers.users.full_name : 'Khách hàng';
     var statusLabel = { 'ACCEPTED': 'Đã nhận đơn', 'TASKER_ARRIVED': 'Đã đến nơi', 'IN_PROGRESS': 'Đang thực hiện' };
 
-    // TC-T08-005 FIX: Strip 'Z' từ ISO string để tránh offset UTC+7
-    function fixTimezone(isoStr) {
-      if (!isoStr) return isoStr;
-      return String(isoStr).replace(/Z$/i, '').replace(/\+00:00$/, '');
-    }
+    // TC-T08-005 FIX: fixTimezone đã chuyển lên global scope (dòng trên)
 
     // TC-T08-005 FIX: Tính thời gian bắt đầu làm việc
     var scheduledTime = order.scheduled_time ? formatDateTime(fixTimezone(order.scheduled_time)) : 'Chưa xác định';
