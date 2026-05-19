@@ -447,7 +447,7 @@ document.querySelectorAll('button').forEach(function(btn) {
         var badge = row.querySelector('[data-status]');
         if (badge) {
           badge.textContent = 'Đã duyệt';
-          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-green-100 text-green-700';
+          badge.className = badge.className.replace(/bg-[a-z]+-[0-9]+\s*text-[a-z]+-[0-9]+/g, '') + ' bg-green-100 text-green-700';
         }
         btn.disabled = true;
         btn.textContent = 'Đã duyệt';
@@ -466,7 +466,7 @@ document.querySelectorAll('button').forEach(function(btn) {
         var badge = row.querySelector('[data-status]');
         if (badge) {
           badge.textContent = 'Đã từ chối';
-          badge.className = badge.className.replace(/bg-w+-d+/d+s*text-w+-d+/g, '') + ' bg-red-100 text-red-700';
+          badge.className = badge.className.replace(/bg-[a-z]+-[0-9]+\s*text-[a-z]+-[0-9]+/g, '') + ' bg-red-100 text-red-700';
         }
         btn.disabled = true;
         btn.textContent = 'Đã từ chối';
@@ -545,23 +545,41 @@ document.querySelectorAll('button').forEach(function(btn) {
 (async function() {
   if (!ChiOiAuth.requireAuth('../khachhang/dangnhap.html')) return;
 
-  var kycStatusMap = {
-    'VERIFIED': { label: 'Hoạt động', cls: 'bg-green-100 text-green-700' },
-    'APPROVED': { label: 'Hoạt động', cls: 'bg-green-100 text-green-700' },
-    'ACTIVE':   { label: 'Hoạt động', cls: 'bg-green-100 text-green-700' },
-    'PENDING':  { label: 'Chờ duyệt', cls: 'bg-orange-100 text-orange-700' },
-    'PENDING_APPROVAL': { label: 'Chờ duyệt', cls: 'bg-orange-100 text-orange-700' },
-    'UNVERIFIED': { label: 'Chờ duyệt', cls: 'bg-orange-100 text-orange-700' },
-    'REJECTED': { label: 'Tạm khóa', cls: 'bg-red-100 text-red-700' },
-    'SUSPENDED':{ label: 'Tạm khóa', cls: 'bg-red-100 text-red-700' }
-  };
+  function getDetailedStatus(tasker) {
+    var kyc = tasker.kyc_status || tasker.status || 'PENDING';
+    
+    // 1. Tạm khóa
+    if (tasker.status === 'BANNED' || kyc === 'SUSPENDED' || kyc === 'REJECTED') {
+      return { label: 'Tạm khóa', cls: 'bg-red-100 text-red-700', kyc: kyc };
+    }
+    // 2. Chờ duyệt
+    if (kyc === 'PENDING' || kyc === 'PENDING_APPROVAL' || kyc === 'UNVERIFIED') {
+      return { label: 'Chờ duyệt', cls: 'bg-yellow-100 text-yellow-700', kyc: kyc };
+    }
+    
+    // Đã duyệt - kiểm tra online/offline và active order
+    if (!tasker.is_online) {
+      return { label: 'Tắt hoạt động', cls: 'bg-gray-100 text-gray-700', kyc: kyc };
+    }
+    
+    // Online - kiểm tra order
+    var os = tasker.active_order_status;
+    if (os === 'ACCEPTED') {
+      return { label: 'Đang di chuyển', cls: 'bg-blue-100 text-blue-700', kyc: kyc };
+    }
+    if (os === 'TASKER_ARRIVED') {
+      return { label: 'Đã đến nơi', cls: 'bg-purple-100 text-purple-700', kyc: kyc };
+    }
+    if (os === 'IN_PROGRESS') {
+      return { label: 'Đang làm việc', cls: 'bg-orange-100 text-orange-700', kyc: kyc };
+    }
+    
+    // Còn lại là online nhưng rảnh
+    return { label: 'Đang rảnh', cls: 'bg-green-100 text-green-700', kyc: kyc };
+  }
 
   var allTaskers = [];
   var currentFilter = 'all';
-
-  function getKycStatus(tasker) {
-    return tasker.kyc_status || tasker.status || 'PENDING';
-  }
 
   function formatDate(d) {
     if (!d) return '—';
@@ -570,8 +588,7 @@ document.querySelectorAll('button').forEach(function(btn) {
   }
 
   function showTaskerDetail(tasker) {
-    var ks = getKycStatus(tasker);
-    var s = kycStatusMap[ks] || { label: ks, cls: 'bg-gray-100 text-gray-700' };
+    var s = getDetailedStatus(tasker);
     
     // Parse bio to get CCCD images if exists
     var idFrontUrl = '';
@@ -669,10 +686,15 @@ document.querySelectorAll('button').forEach(function(btn) {
     }
 
     taskers.forEach(function(tasker, idx) {
-      var ks = getKycStatus(tasker);
-      var s = kycStatusMap[ks] || { label: ks, cls: 'bg-gray-100 text-gray-700' };
-      var isPending = ks === 'PENDING' || ks === 'PENDING_APPROVAL';
-      var isLocked = ks === 'REJECTED' || ks === 'SUSPENDED';
+      var s = getDetailedStatus(tasker);
+      var ks = s.kyc;
+      var isPending = ks === 'PENDING' || ks === 'PENDING_APPROVAL' || ks === 'UNVERIFIED';
+      var isLocked = tasker.status === 'BANNED' || ks === 'REJECTED' || ks === 'SUSPENDED';
+
+      var areaHtml = '<div class="font-medium max-w-[150px] break-words" title="' + (tasker.area || '—') + '">' + (tasker.area || '—') + '</div>';
+      if (tasker.is_online && tasker.lat && tasker.lng) {
+        areaHtml += '<a href="https://www.google.com/maps?q=' + tasker.lat + ',' + tasker.lng + '" target="_blank" class="text-[10px] text-blue-600 hover:underline flex items-center mt-1"><span class="material-symbols-outlined text-[12px] mr-1">location_on</span>Vị trí GPS</a>';
+      }
 
       var tr = document.createElement('tr');
       tr.className = (idx % 2 ? 'bg-background/40 ' : '') + 'hover:bg-background transition-colors cursor-pointer';
@@ -687,7 +709,7 @@ document.querySelectorAll('button').forEach(function(btn) {
           '<div><p class="font-semibold text-body-md text-on-surface">' + (tasker.full_name || '—') + '</p>' +
           '<p class="text-body-sm text-on-surface-variant opacity-70">' + (tasker.phone || '—') + '</p></div></div></td>' +
         '<td class="p-4 text-body-sm">' + (tasker.service_type || '—') + '</td>' +
-        '<td class="p-4 text-body-sm">' + (tasker.area || '—') + '</td>' +
+        '<td class="p-4 text-body-sm">' + areaHtml + '</td>' +
         '<td class="p-4 text-body-sm"><div class="flex flex-col"><span>' + (tasker.order_count || 0) + ' đơn</span>' +
           '<div class="flex items-center text-yellow-500"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' 1;">star</span>' +
           '<span class="ml-1 font-bold">' + (tasker.avg_rating ? Number(tasker.avg_rating).toFixed(1) : '—') + '</span></div></div></td>' +
@@ -909,6 +931,11 @@ document.querySelectorAll('button').forEach(function(btn) {
           .filter(function(ts) { return ts.services && ts.services.name; })
           .map(function(ts) { return ts.services.name; });
       }
+      var activeOrder = null;
+      if (u.taskers.orders && u.taskers.orders.length > 0) {
+        activeOrder = u.taskers.orders[0].status;
+      }
+      return {
         user_id: u.user_id,
         tasker_id: u.taskers.tasker_id,
         bio: u.taskers.bio,
@@ -919,7 +946,12 @@ document.querySelectorAll('button').forEach(function(btn) {
         service_type: serviceNames.length > 0 ? serviceNames.join(', ') : 'Chưa đăng ký',
         area: u.taskers.address || 'Chưa cập nhật',
         order_count: u.taskers.total_jobs || 0,
-        avg_rating: u.taskers.average_rating
+        avg_rating: u.taskers.average_rating,
+        is_online: !!u.taskers.is_online,
+        status: u.status,
+        lat: u.taskers.lat,
+        lng: u.taskers.lng,
+        active_order_status: activeOrder
       };
     });
 

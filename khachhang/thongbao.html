@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
@@ -78,7 +78,7 @@
 </div>
 </main>
 <!-- Bottom Navigation Bar -->
-<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md md:max-w-4xl z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-95 transition-transform" href="trangchu.html">
 <span class="material-symbols-outlined text-[28px]">home</span>
 <span class="text-label-sm font-label-sm font-medium">Trang chủ</span>
@@ -150,7 +150,7 @@
           var isActive = o.status === 'IN_PROGRESS' || o.status === 'SEARCHING' || o.status === 'ACCEPTED';
           notifs.push({
             type: 'order', icon: 'local_shipping', iconBg: 'bg-primary-container', iconText: 'text-on-primary',
-            title: svcName, body: 'Đơn hàng #' + o.order_id + ' ' + statusText + '.',
+            title: svcName, body: 'Đơn hàng ' + (o.order_code || ('#' + o.order_id)) + ' ' + statusText + '.',
             time: o.updated_at || o.created_at, unread: isActive,
             link: 'theodoidon.html?orderId=' + o.order_id
           });

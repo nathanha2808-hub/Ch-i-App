@@ -12,7 +12,27 @@ export class OrdersService {
   ) {}
 
   async bookOrder(customerId: number, data: any) {
-    const orderCode = 'ORD' + Date.now().toString().slice(-6);
+    // 1. Fetch service to determine prefix
+    const service = await this.prisma.services.findUnique({ where: { service_id: data.service_id } });
+    let prefix = 'DV';
+    if (service) {
+      const sName = service.name.toLowerCase();
+      if (sName.includes('dọn nhà')) prefix = 'DN';
+      else if (sName.includes('trông trẻ')) prefix = 'TT';
+      else if (sName.includes('mua hộ')) prefix = 'MH';
+      else if (sName.includes('nấu ăn')) prefix = 'NA';
+      else if (sName.includes('vệ sinh')) prefix = 'VS';
+      else if (sName.includes('giặt ủi')) prefix = 'GU';
+    }
+
+    // 2. Format DDMMYY
+    const d = new Date();
+    const dd = d.getDate().toString().padStart(2, '0');
+    const mm = (d.getMonth() + 1).toString().padStart(2, '0');
+    const yy = d.getFullYear().toString().slice(-2);
+    const uniquePart = Math.floor(1000 + Math.random() * 9000).toString(); // 4 random digits
+
+    const orderCode = `${prefix}${dd}${mm}${yy}-${uniquePart}`;
     const paymentMethod = data.payment_method || 'WALLET';
 
     // KIỂM TRA GÓI GIA ĐÌNH - ÁP DỤNG GIẢM GIÁ TỰ ĐỘNG
@@ -21,6 +41,7 @@ export class OrdersService {
     let discountAmount = 0;
     
     try {
+      /* [TẠM ẨN GÓI GIA ĐÌNH]
       const activePackage = await this.prisma.customer_packages.findFirst({
         where: {
           customer_id: customerId,
@@ -33,6 +54,7 @@ export class OrdersService {
         discountAmount = Math.round(originalPrice * 0.15);
         finalPrice = originalPrice - discountAmount;
       }
+      */
     } catch (e) {
       console.warn('[Order] Lỗi khi kiểm tra gói gia đình:', e.message);
     }
@@ -441,7 +463,15 @@ export class OrdersService {
   async getChatHistory(orderId: number) {
     return this.prisma.messages.findMany({
       where: { order_id: orderId },
-      orderBy: { created_at: 'asc' }
+      orderBy: { created_at: 'asc' },
     });
+  }
+
+  async isTaskerBanned(taskerId: number): Promise<boolean> {
+    const tasker = await this.prisma.users.findUnique({ 
+      where: { user_id: taskerId }, 
+      select: { status: true } 
+    });
+    return tasker?.status === 'LOCKED' || tasker?.status === 'BANNED' || tasker?.status === 'INACTIVE';
   }
 }

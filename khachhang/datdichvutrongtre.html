@@ -164,7 +164,8 @@
 <span class="material-symbols-outlined text-white">chat_bubble</span>
 </button>
 </header>
-<main class="pt-24 pb-8 px-container-padding flex flex-col gap-4 overflow-y-auto hide-scrollbar max-w-md mx-auto relative z-10">
+<main class="pt-24 pb-8 px-container-padding flex flex-col md:grid md:grid-cols-12 md:gap-8 gap-4 overflow-y-auto hide-scrollbar max-w-md md:max-w-5xl mx-auto relative z-10">
+    <div class="md:col-span-7 flex flex-col gap-4">
 <!-- Lỗi 9 FIX: Child Info Section - Hoạt động được -->
 <section class="bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container">
 <div class="flex justify-between items-center mb-md">
@@ -219,7 +220,9 @@
 </div>
 </div>
 </section>
-<!-- Lỗi 8 FIX: Bỏ phần "Giá: 3 giờ × 100.000 đ" và badge chứng chỉ -->
+    </div>
+    
+    <div class="md:col-span-5 flex flex-col gap-4 sticky top-24 h-fit">
 <!-- Summary Card -->
 <section class="bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container">
 <h3 class="font-title-sm text-on-surface mb-md">Tổng kết</h3>
@@ -281,9 +284,10 @@ Phương thức thanh toán
 <button id="submit-btn" class="orange-gradient w-full py-4 rounded-full text-white font-bold text-lg shadow-lg active:scale-95 transition-all duration-200">
     Đặt dịch vụ — 300.000 đ
 </button>
+    </div>
 </main>
 <!-- Bottom Navigation Bar -->
-<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md md:max-w-4xl z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
 <a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="trangchu.html">
 <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
 <span class="text-label-sm font-label-sm">Trang chủ</span>
@@ -319,7 +323,8 @@ Phương thức thanh toán
     hasFamilyPackage: false
   };
 
-  // ===== Kiểm tra gói gia đình =====
+  // ===== Kiểm tra gói gia đình (ĐÃ TẠM ẨN) =====
+  /*
   (async function checkFamilyPackage() {
     try {
       var activePkgs = await apiFetch('/api/packages/my-active');
@@ -329,6 +334,7 @@ Phương thức thanh toán
       }
     } catch (e) { console.warn('[Gói] Không check được gói:', e.message); }
   })();
+  */
 
   var ageOptions = [
     '0-1 tuổi', '1 tuổi', '2 tuổi', '3 tuổi', '4 tuổi', 
@@ -485,14 +491,17 @@ Phương thức thanh toán
 
   // ===== Update Summary =====
   function updateSummary() {
-    var total = state.hours * state.pricePerHour;
+    var total = state.hours * state.pricePerHour * state.childCount;
     var originalTotal = total;
     var discount = 0;
 
+    // KIỂM TRA GÓI GIA ĐÌNH ĐỂ HIỂN THỊ (ĐÃ TẠM ẨN)
+    /*
     if (state.hasFamilyPackage) {
       discount = Math.round(originalTotal * 0.15);
       total = originalTotal - discount;
     }
+    */
 
     var agesStr = state.childAges.map(function(a) { return ageOptions[a] || a + ' tuổi'; }).join(', ');
     
@@ -563,7 +572,7 @@ Phương thức thanh toán
     if (addressErrEl) addressErrEl.style.display = 'none';
 
     var scheduledTime = state.date + 'T' + state.time + ':00';
-    var totalPrice = state.hours * state.pricePerHour;
+    var totalPrice = state.childCount * state.hours * state.pricePerHour;
     var agesStr = state.childAges.map(function(a) { return ageOptions[a] || a + ' tuổi'; }).join(', ');
     var noteText = (document.getElementById('noteInput') || {}).value || '';
     var note = state.childCount + ' trẻ (' + agesStr + '). ' + noteText;
@@ -572,8 +581,9 @@ Phương thức thanh toán
     if (state.paymentMethod === 'WALLET') {
       try {
         var wallet = await apiFetch('/api/wallets/balance');
-        if (wallet && typeof wallet.balance === 'number' && wallet.balance < totalPrice) {
-          showInsufficientPopup(wallet.balance, totalPrice);
+        var finalCheckPrice = state.hasFamilyPackage ? Math.round(totalPrice * 0.85) : totalPrice;
+        if (wallet && typeof wallet.balance === 'number' && wallet.balance < finalCheckPrice) {
+          showInsufficientPopup(wallet.balance, finalCheckPrice);
           return;
         }
       } catch (walletErr) {

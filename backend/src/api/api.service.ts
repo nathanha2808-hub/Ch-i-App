@@ -93,7 +93,7 @@ export class ApiService {
   }
 
   async getServices() {
-    return this.prisma.services.findMany({ where: { is_active: true } });
+    return this.prisma.services.findMany({ where: { is_active: true }, orderBy: { service_id: 'asc' } });
   }
 
   // --- Package Subscription (Lỗi 7 FIX) ---
@@ -192,7 +192,19 @@ export class ApiService {
 
   async getActiveTaskers(lat?: number, lng?: number) {
     const activeTaskers = await this.prisma.users.findMany({
-      where: { role: 'TASKER', taskers: { is_online: true, kyc_status: 'VERIFIED' } },
+      where: { 
+        role: 'TASKER', 
+        taskers: { 
+          is_online: true, 
+          kyc_status: 'VERIFIED',
+          // Lọc tasker đang rảnh: không có order nào đang xử lý
+          orders: {
+            none: {
+              status: { in: ['ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'] }
+            }
+          }
+        } 
+      },
       include: { taskers: { include: { tasker_services: { include: { services: { select: { name: true } } } } } } },
     });
 
@@ -472,7 +484,7 @@ export class ApiService {
   }
 
   async getAdminUsers() {
-    return this.prisma.users.findMany({
+    const users = await this.prisma.users.findMany({
       select: { 
         user_id: true, 
         phone: true, 
@@ -495,11 +507,41 @@ export class ApiService {
                 status: true,
                 services: { select: { name: true } }
               }
+            },
+            orders: {
+              where: { status: { in: ['ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'] } },
+              select: { order_id: true, status: true },
+              take: 1
             }
           }
         },
         customers: { select: { default_address: true } }
       }
+    });
+
+    const taskerGpsQuery = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT tasker_id, ST_X(current_location::geometry) as lng, ST_Y(current_location::geometry) as lat FROM taskers WHERE current_location IS NOT NULL`
+    );
+    const gpsMap = {};
+    taskerGpsQuery.forEach(row => {
+      gpsMap[row.tasker_id] = { lat: row.lat, lng: row.lng };
+    });
+
+    return users.map(u => {
+      if (u.role === 'TASKER' && u.taskers) {
+        const loc = gpsMap[u.taskers.tasker_id];
+        if (loc) {
+          return {
+            ...u,
+            taskers: {
+              ...u.taskers,
+              lat: loc.lat,
+              lng: loc.lng
+            }
+          };
+        }
+      }
+      return u;
     });
   }
 
@@ -849,7 +891,7 @@ export class ApiService {
 
   // --- Tasker: Get All Services with registration status ---
   async getAllServicesForTasker(taskerId: number) {
-    const allServices = await this.prisma.services.findMany({ where: { is_active: true } });
+    const allServices = await this.prisma.services.findMany({ where: { is_active: true }, orderBy: { service_id: 'asc' } });
     const registered = await this.prisma.tasker_services.findMany({
       where: { tasker_id: taskerId },
       select: { service_id: true, status: true },

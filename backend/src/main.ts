@@ -12,8 +12,8 @@ async function bootstrap() {
   // Tăng giới hạn body size cho avatar upload (base64)
   const expressApp = app.getHttpAdapter().getInstance();
   const bodyParser = require('body-parser');
-  expressApp.use(bodyParser.json({ limit: '2mb' }));
-  expressApp.use(bodyParser.urlencoded({ limit: '2mb', extended: true }));
+  expressApp.use(bodyParser.json({ limit: '20mb' }));
+  expressApp.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
   app.enableCors(); // Enable CORS for frontend
 

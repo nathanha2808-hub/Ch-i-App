@@ -650,7 +650,7 @@
         }
 
         tr.innerHTML =
-          '<td class="px-6 py-4 font-label-bold text-primary">#DH-' + String(order.order_id).padStart(4, '0') + '</td>' +
+          '<td class="px-6 py-4 font-label-bold text-primary">' + (order.order_code || ('#DH-' + String(order.order_id).padStart(4, '0'))) + '</td>' +
           '<td class="px-6 py-4 font-body-sm text-on-surface">' + customerName + '</td>' +
           '<td class="px-6 py-4 font-body-sm text-on-surface-variant">' + serviceName + '</td>' +
           '<td class="px-6 py-4"><span class="mx-auto block w-max px-3 py-1 rounded-full font-label-md text-[11px] ' + s.cls + '">' + s.label + '</span></td>' +
@@ -691,7 +691,7 @@
       document.getElementById('intervention-list').classList.add('hidden');
       document.getElementById('intervention-details').classList.remove('hidden');
 
-      document.getElementById('ct-code').textContent = '#DH-' + String(targetOrder.order_id).padStart(4, '0');
+      document.getElementById('ct-code').textContent = targetOrder.order_code || ('#DH-' + String(targetOrder.order_id).padStart(4, '0'));
       document.getElementById('ct-date').textContent = 'Ngày tạo: ' + formatDateTime(targetOrder.created_at);
       var s = Object.assign({}, statusMap[targetOrder.status] || { label: targetOrder.status, cls: 'bg-gray-100 text-gray-700' });
       
@@ -826,7 +826,7 @@
     if (q) {
       filtered = filtered.filter(function(o) {
         var customerName = (o.customers && o.customers.users && o.customers.users.full_name) ? o.customers.users.full_name.toLowerCase() : '';
-        var code = '#DH-' + String(o.order_id).padStart(4, '0');
+        var code = o.order_code || ('#DH-' + String(o.order_id).padStart(4, '0'));
         return code.toLowerCase().includes(q) || customerName.includes(q);
       });
     }

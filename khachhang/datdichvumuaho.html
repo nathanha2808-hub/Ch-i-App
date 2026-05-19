@@ -138,7 +138,8 @@
 </div>
 </header>
 <!-- Lỗi 10 FIX: Toàn bộ trang mua hộ hoạt động được -->
-<main class="relative z-10 mt-4 px-container-padding space-y-lg max-w-md mx-auto">
+<main class="relative z-10 mt-4 px-container-padding space-y-lg max-w-md md:max-w-5xl md:grid md:grid-cols-12 md:gap-8 md:space-y-0 mx-auto">
+    <div class="md:col-span-7 space-y-lg">
 <!-- Store Selection -->
 <section class="space-y-sm">
 <h2 class="font-title-sm text-on-surface">Chọn cửa hàng</h2>
@@ -195,6 +196,9 @@
 <span class="font-bold text-primary">50.000 đ</span>
 </div>
 </section>
+    </div>
+    
+    <div class="md:col-span-5 space-y-lg sticky top-24 h-fit">
 <!-- Summary Card -->
 <section class="bg-white p-md rounded-xl soft-shadow border border-outline-variant/20 space-y-md">
 <div class="space-y-xs">
@@ -246,9 +250,10 @@ Phương thức thanh toán
                 Đặt mua hộ — 550.000 đ
             </button>
 </section>
+    </div>
 </main>
 <!-- Bottom Navigation -->
-<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md md:max-w-4xl z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
 <a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="trangchu.html">
 <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
 <span class="text-label-sm font-label-sm">Trang chủ</span>
@@ -281,7 +286,8 @@ Phương thức thanh toán
     hasFamilyPackage: false
   };
 
-  // ===== Kiểm tra gói gia đình =====
+  // ===== Kiểm tra gói gia đình (ĐÃ TẠM ẨN) =====
+  /*
   (async function checkFamilyPackage() {
     try {
       var activePkgs = await apiFetch('/api/packages/my-active');
@@ -291,6 +297,7 @@ Phương thức thanh toán
       }
     } catch (e) { console.warn('[Gói] Không check được gói:', e.message); }
   })();
+  */
 
   var stores = [
     { name: 'WinMart Vinhomes A', distance: '500m' },
@@ -410,10 +417,13 @@ Phương thức thanh toán
     var fee = FEE;
     var discount = 0;
     
+    // KIỂM TRA GÓI GIA ĐÌNH ĐỂ HIỂN THỊ (ĐÃ TẠM ẨN)
+    /*
     if (state.hasFamilyPackage) {
       discount = Math.round(fee * 0.15);
       fee = fee - discount;
     }
+    */
 
     var total = state.budget + fee;
 

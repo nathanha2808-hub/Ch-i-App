@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -138,15 +138,15 @@
 <!-- Section: Tasker Card -->
 <section class="bg-surface-container-lowest rounded-[24px] p-md flex items-center gap-md shadow-[0px_4px_20px_0px_rgba(160,65,0,0.08)] border border-surface-container-low">
 <div class="relative w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container shrink-0">
-<img alt="Nguyễn Lan" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZVSugv299UqahXmjAPFAeviYxHR9yZsRhqGPurWxflfnS6a8k03SsM5HUwAhydanxXz8XpstBesIZq35k6LqVmDNqRa336tBTQs3FV7h1zCSBcvfmBH9WcbiJrpilAAMFWXwkfxttryr-tw3b7S1vvUYRqDBCDgoyBx0ZoP20oN7Jp8kaoaoiNmFeNeoo_zfBSwe2Sde9WvngDXtP-oXC4e6YKlEoLkK6ak_t4aXk_sLKDDvfKdho8h7JDnXgnXRGSoTuktsg8NQ"/>
+<img id="tasker-avatar" alt="Tasker" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZVSugv299UqahXmjAPFAeviYxHR9yZsRhqGPurWxflfnS6a8k03SsM5HUwAhydanxXz8XpstBesIZq35k6LqVmDNqRa336tBTQs3FV7h1zCSBcvfmBH9WcbiJrpilAAMFWXwkfxttryr-tw3b7S1vvUYRqDBCDgoyBx0ZoP20oN7Jp8kaoaoiNmFeNeoo_zfBSwe2Sde9WvngDXtP-oXC4e6YKlEoLkK6ak_t4aXk_sLKDDvfKdho8h7JDnXgnXRGSoTuktsg8NQ"/>
 </div>
 <div class="flex-1">
-<h3 class="text-title-sm font-title-sm text-on-background">Nguyễn Lan</h3>
+<h3 id="tasker-name" class="text-title-sm font-title-sm text-on-background">Đang tìm Tasker...</h3>
 <div class="flex items-center gap-xs mt-1">
 <span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="text-body-sm font-body-sm text-on-surface-variant">4.8</span>
+<span id="tasker-rating" class="text-body-sm font-body-sm text-on-surface-variant">--</span>
 <span class="mx-1 text-outline-variant">•</span>
-<span class="text-body-sm font-body-sm text-on-surface-variant">Dọn dẹp nhà</span>
+<span id="tasker-service" class="text-body-sm font-body-sm text-on-surface-variant">--</span>
 </div>
 </div>
 <div class="flex gap-sm">
@@ -229,15 +229,15 @@
 <div class="space-y-sm">
 <div class="flex justify-between items-center">
 <span class="text-body-sm text-on-surface-variant">Mã đơn</span>
-<span class="text-body-sm font-semibold text-on-background">#DH20261020-001</span>
+<span id="order-code-text" class="text-body-sm font-semibold text-on-background">--</span>
 </div>
 <div class="flex justify-between items-center">
 <span class="text-body-sm text-on-surface-variant">Dịch vụ</span>
-<span class="text-body-sm font-semibold text-on-background">Dọn dẹp nhà</span>
+<span id="order-service-text" class="text-body-sm font-semibold text-on-background">--</span>
 </div>
 <div class="flex justify-between items-center">
 <span class="text-body-sm text-on-surface-variant">Thời gian</span>
-<span class="text-body-sm font-semibold text-on-background">20/10/2026 - 10:00</span>
+<span id="order-time-text" class="text-body-sm font-semibold text-on-background">--</span>
 </div>
 <!-- TC-KH07-008: Hiển thị ghi chú -->
 <div id="note-row" class="flex justify-between items-start" style="display:none;">
@@ -251,7 +251,7 @@
 </div>
 <div class="pt-sm mt-sm border-t border-outline-variant flex justify-between items-center">
 <span class="text-body-lg font-bold text-on-background">Tổng tiền</span>
-<span class="text-headline-md font-bold text-primary">450.000 đ</span>
+<span id="order-total-text" class="text-headline-md font-bold text-primary">--</span>
 </div>
 </div>
 </section>
@@ -272,7 +272,7 @@
 </section>
 </main>
 <!-- BottomNavBar (Floating Pill) -->
-<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md md:max-w-4xl z-50 flex justify-around items-center px-4 py-3 rounded-full bg-white shadow-xl border border-surface-container-high">
 <!-- Trang chủ -->
 <a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="trangchu.html">
 <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
@@ -386,8 +386,20 @@
     var taskerPhone = (order.taskers && order.taskers.users && order.taskers.users.phone) ? order.taskers.users.phone : '';
     var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ';
 
-    var h3 = document.querySelector('section:first-of-type h3');
+    var h3 = document.getElementById('tasker-name');
     if (h3) h3.textContent = taskerName;
+
+    var ratingEl = document.getElementById('tasker-rating');
+    var avatarEl = document.getElementById('tasker-avatar');
+    var serviceEl = document.getElementById('tasker-service');
+    if (serviceEl) serviceEl.textContent = serviceName;
+
+    if (order.taskers) {
+      if (ratingEl) ratingEl.textContent = order.taskers.average_rating ? Number(order.taskers.average_rating).toFixed(1) : '5.0';
+      if (avatarEl && order.taskers.users && order.taskers.users.avatar_url) {
+        avatarEl.src = order.taskers.users.avatar_url;
+      }
+    }
 
     // TC-KH10-007 FIX: Make call button functional
     var callBtn = document.getElementById('btn-call-tasker');
@@ -401,20 +413,23 @@
       });
     }
 
-    var detailSpans = document.querySelectorAll('.space-y-sm .flex.justify-between span:last-child');
-    if (detailSpans.length >= 4) {
-      detailSpans[0].textContent = '#DH' + order.order_id;
-      detailSpans[1].textContent = serviceName;
-      // TC-KH10-001 FIX: Hiển thị thời gian với timezone VN chính xác
+    var orderCodeText = document.getElementById('order-code-text');
+    var orderServiceText = document.getElementById('order-service-text');
+    var orderTimeText = document.getElementById('order-time-text');
+    var orderTotalText = document.getElementById('order-total-text');
+
+    if (orderCodeText) orderCodeText.textContent = order.order_code || 'DH' + order.order_id;
+    if (orderServiceText) orderServiceText.textContent = serviceName;
+    if (orderTimeText) {
       var scheduledDate = new Date(order.scheduled_time);
       var timeOptions = { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
       try {
-        detailSpans[2].textContent = scheduledDate.toLocaleString('vi-VN', timeOptions);
+        orderTimeText.textContent = scheduledDate.toLocaleString('vi-VN', timeOptions);
       } catch(tz) {
-        detailSpans[2].textContent = formatDateTime(order.scheduled_time);
+        orderTimeText.textContent = formatDateTime(order.scheduled_time);
       }
-      detailSpans[3].textContent = formatVND(order.total_price);
     }
+    if (orderTotalText) orderTotalText.textContent = formatVND(order.total_price);
 
     // TC-KH10-003 FIX: Render stepper with timestamps
     renderStepper(order.status || 'PENDING', order);
