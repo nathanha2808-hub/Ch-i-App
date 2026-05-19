@@ -192,7 +192,19 @@ export class ApiService {
 
   async getActiveTaskers(lat?: number, lng?: number) {
     const activeTaskers = await this.prisma.users.findMany({
-      where: { role: 'TASKER', taskers: { is_online: true, kyc_status: 'VERIFIED' } },
+      where: { 
+        role: 'TASKER', 
+        taskers: { 
+          is_online: true, 
+          kyc_status: 'VERIFIED',
+          // Lọc tasker đang rảnh: không có order nào đang xử lý
+          orders: {
+            none: {
+              status: { in: ['ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'] }
+            }
+          }
+        } 
+      },
       include: { taskers: { include: { tasker_services: { include: { services: { select: { name: true } } } } } } },
     });
 
