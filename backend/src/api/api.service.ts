@@ -472,7 +472,7 @@ export class ApiService {
   }
 
   async getAdminUsers() {
-    return this.prisma.users.findMany({
+    const users = await this.prisma.users.findMany({
       select: { 
         user_id: true, 
         phone: true, 
@@ -495,11 +495,44 @@ export class ApiService {
                 status: true,
                 services: { select: { name: true } }
               }
+            },
+            orders: {
+              where: { status: { in: ['ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'] } },
+              select: { order_id: true, status: true },
+              take: 1
             }
           }
         },
         customers: { select: { default_address: true } }
       }
+    });
+
+    const locations = await this.prisma.$queryRaw<any[]>`
+      SELECT tasker_id, ST_Y(current_location::geometry) as lat, ST_X(current_location::geometry) as lng
+      FROM taskers
+      WHERE is_online = true AND current_location IS NOT NULL;
+    `;
+    
+    const locationMap = new Map();
+    for (const loc of locations) {
+      locationMap.set(loc.tasker_id, { lat: loc.lat, lng: loc.lng });
+    }
+
+    return users.map(u => {
+      if (u.role === 'TASKER' && u.taskers) {
+        const loc = locationMap.get(u.taskers.tasker_id);
+        if (loc) {
+          return {
+            ...u,
+            taskers: {
+              ...u.taskers,
+              lat: loc.lat,
+              lng: loc.lng
+            }
+          };
+        }
+      }
+      return u;
     });
   }
 
