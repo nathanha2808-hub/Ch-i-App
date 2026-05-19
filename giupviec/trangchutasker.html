@@ -596,7 +596,7 @@
     // TC-T09-013 FIX: KH xác nhận hoàn thành đơn → reset UI
     socket.on('order_confirmed', function(data) {
       showToast('🎉 ' + (data.message || 'Đơn đã được xác nhận hoàn thành!'));
-      addNotification('complete', 'Đơn #' + data.orderId + ' đã hoàn thành!', data);
+      addNotification('complete', 'Đơn ' + (data.orderCode || data.orderId) + ' đã hoàn thành!', data);
       isHandlingOrder = false;
       hideModal();
       showIdleState();
@@ -874,7 +874,7 @@
       // Lỗi 8 FIX: Hiển thị thông báo thành công rõ ràng với thời gian dài hơn
       showSuccessNotification('🎉 Nhận đơn thành công!', 'Bắt đầu di chuyển tới điểm dọn dẹp');
       // TC-T07-003 FIX: Thêm notification bell
-      addNotification('accept', 'Đã nhận đơn #' + currentOrder.order_id + ' thành công!', currentOrder);
+      addNotification('accept', 'Đã nhận đơn ' + (currentOrder.order_code || currentOrder.order_id) + ' thành công!', currentOrder);
       // Bug 1 FIX (report13): Không gọi hideModal() vì nó có delay 300ms gây mất modal
       // Gọi thẳng showActiveOrderCard() — hàm này tự set display: block
       showActiveOrderCard(Object.assign({}, currentOrder, { status: 'ACCEPTED' }));
@@ -906,7 +906,7 @@
       clearInterval(countdownTimer);
       isHandlingOrder = true;
       showSuccessNotification('⚡ Đã tự động nhận đơn!', 'Bắt đầu di chuyển tới điểm dọn dẹp');
-      addNotification('accept', 'Đã tự động nhận đơn #' + order.order_id + '!', order);
+      addNotification('accept', 'Đã tự động nhận đơn ' + (order.order_code || order.order_id) + '!', order);
       showActiveOrderCard(Object.assign({}, order, { status: 'ACCEPTED' }));
       playNotificationSound();
       if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
@@ -937,7 +937,7 @@
       // TC-T07-009 FIX: Broadcast sang các tab khác
       if (_skipChannel) _skipChannel.postMessage({ type: 'skip_order', orderId: currentOrder.order_id });
       // TC-T07-003 FIX: Thêm vào notification bell
-      addNotification('skip', 'Đã bỏ qua đơn #' + currentOrder.order_id, currentOrder);
+      addNotification('skip', 'Đã bỏ qua đơn ' + (currentOrder.order_code || currentOrder.order_id), currentOrder);
     }
     hideModal();
     showToast('❌ Đã từ chối nhận đơn hàng. Chú ý tỷ lệ nhận đơn!');

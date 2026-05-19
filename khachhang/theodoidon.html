@@ -418,7 +418,7 @@
     var orderTimeText = document.getElementById('order-time-text');
     var orderTotalText = document.getElementById('order-total-text');
 
-    if (orderCodeText) orderCodeText.textContent = order.order_code || '#DH' + order.order_id;
+    if (orderCodeText) orderCodeText.textContent = order.order_code || 'DH' + order.order_id;
     if (orderServiceText) orderServiceText.textContent = serviceName;
     if (orderTimeText) {
       var scheduledDate = new Date(order.scheduled_time);

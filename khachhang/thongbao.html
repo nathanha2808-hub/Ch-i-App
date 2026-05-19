@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
@@ -150,7 +150,7 @@
           var isActive = o.status === 'IN_PROGRESS' || o.status === 'SEARCHING' || o.status === 'ACCEPTED';
           notifs.push({
             type: 'order', icon: 'local_shipping', iconBg: 'bg-primary-container', iconText: 'text-on-primary',
-            title: svcName, body: 'Đơn hàng #' + o.order_id + ' ' + statusText + '.',
+            title: svcName, body: 'Đơn hàng ' + (o.order_code || ('#' + o.order_id)) + ' ' + statusText + '.',
             time: o.updated_at || o.created_at, unread: isActive,
             link: 'theodoidon.html?orderId=' + o.order_id
           });

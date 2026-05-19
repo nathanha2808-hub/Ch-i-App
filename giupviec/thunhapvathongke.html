@@ -535,7 +535,7 @@ tailwind.config = {
           '<div class="flex items-center gap-md">' +
             '<div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center"><span class="material-symbols-outlined text-green-600 text-[20px]" style="font-variation-settings:\'FILL\' 1;">account_balance_wallet</span></div>' +
             '<div>' +
-              '<p class="text-body-sm font-medium text-on-surface">Thu nhập đơn #' + item.order_id + '</p>' +
+              '<p class="text-body-sm font-medium text-on-surface">Thu nhập đơn ' + (item.order_code || ('#' + item.order_id)) + '</p>' +
               '<p class="text-[11px] text-on-surface-variant">' + fmtDate(item.date) + '</p>' +
               '<p class="text-[11px] text-green-600">Thanh toán ví · Tổng ' + fmtVND(item.total_price || 0) + ' · Phí 20%: -' + fmtVND(item.fee) + '</p>' +
             '</div>' +
@@ -547,7 +547,7 @@ tailwind.config = {
           '<div class="flex items-center gap-md">' +
             '<div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center"><span class="material-symbols-outlined text-red-500 text-[20px]" style="font-variation-settings:\'FILL\' 1;">payments</span></div>' +
             '<div>' +
-              '<p class="text-body-sm font-medium text-on-surface">Phí nền tảng đơn #' + item.order_id + '</p>' +
+              '<p class="text-body-sm font-medium text-on-surface">Phí nền tảng đơn ' + (item.order_code || ('#' + item.order_id)) + '</p>' +
               '<p class="text-[11px] text-on-surface-variant">' + fmtDate(item.date) + '</p>' +
               '<p class="text-[11px] text-red-500">Tiền mặt · KH trả ' + fmtVND(item.total_price || 0) + ' · Thu phí 20%</p>' +
             '</div>' +

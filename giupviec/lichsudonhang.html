@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
@@ -418,7 +418,7 @@
       '<h2 class="text-[18px] font-bold">Chi tiết đơn hàng</h2>' +
       '<button onclick="document.getElementById(\'tasker-order-modal\').remove()" class="text-outline"><span class="material-symbols-outlined">close</span></button></div>' +
       '<div class="space-y-3">' +
-      '<div class="flex justify-between"><span class="text-body-sm text-on-surface-variant">Mã đơn</span><span class="text-body-sm font-semibold">#' + order.order_id + '</span></div>' +
+      '<div class="flex justify-between"><span class="text-body-sm text-on-surface-variant">Mã đơn</span><span class="text-body-sm font-semibold">' + (order.order_code || ('#' + order.order_id)) + '</span></div>' +
       '<div class="flex justify-between"><span class="text-body-sm text-on-surface-variant">Dịch vụ</span><span class="text-body-sm font-semibold">' + serviceName + '</span></div>' +
       '<div class="flex justify-between"><span class="text-body-sm text-on-surface-variant">Trạng thái</span><span class="' + statusInfo.bg + ' ' + statusInfo.text + ' px-2 py-0.5 rounded-full text-[11px] font-bold">' + statusInfo.label + '</span></div>' +
       '<div class="flex justify-between"><span class="text-body-sm text-on-surface-variant">Khách hàng</span><span class="text-body-sm font-semibold">' + customerName + '</span></div>' +
