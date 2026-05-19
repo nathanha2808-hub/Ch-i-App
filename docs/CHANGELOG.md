@@ -4,6 +4,15 @@
 
 ---
 
+## [1.5.4] — 2026-05-19
+
+### 🐛 Bug fixes — Admin Tasker Database Loading
+
+#### Fixed
+- **Admin Panel:** `Admin/quanlytasker.html` — Sửa lỗi cú pháp JavaScript (thiếu `return {`) trong hàm map danh sách `allTaskers` khiến dữ liệu danh sách Tasker bị treo ở trạng thái "Đang tải dữ liệu...".
+
+---
+
 ## [1.5.3] — 2026-05-18
 
 ### ✨ New Features — Admin Tasker KYC Detail Modal

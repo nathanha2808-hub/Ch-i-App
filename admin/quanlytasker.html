@@ -909,6 +909,7 @@ document.querySelectorAll('button').forEach(function(btn) {
           .filter(function(ts) { return ts.services && ts.services.name; })
           .map(function(ts) { return ts.services.name; });
       }
+      return {
         user_id: u.user_id,
         tasker_id: u.taskers.tasker_id,
         bio: u.taskers.bio,
