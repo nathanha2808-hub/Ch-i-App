@@ -137,20 +137,31 @@ export class WalletsService {
     }
 
     const wallet = await this.getWallet(userId);
-
-    // TypeScript compilation fix: Ensure balance is treated as a number
-    if (Number(wallet.balance) < amount) {
-      throw new BadRequestException('Số dư không đủ. Hiện có: ' + Number(wallet.balance).toLocaleString('vi-VN') + 'đ');
-    }
-
     const bankInfo = bankName ? `${bankName} - ${accountNumber} - ${accountHolder}` : '';
     const description = bankInfo ? `Yêu cầu rút tiền → ${bankInfo}` : 'Yêu cầu rút tiền';
 
+    // TC-KH19-010 FIX: Pessimistic lock — SELECT FOR UPDATE trong transaction
+    // Chặn race condition khi nhiều request rút tiền đồng thời
     const result = await this.prisma.$transaction(async (prisma) => {
+      // Lock row ví bằng SELECT FOR UPDATE — các request khác phải chờ
+      const [lockedWallet] = await prisma.$queryRawUnsafe<any[]>(
+        `SELECT wallet_id, balance FROM wallets WHERE wallet_id = $1 FOR UPDATE`,
+        wallet.wallet_id
+      );
+
+      if (!lockedWallet || Number(lockedWallet.balance) < amount) {
+        throw new BadRequestException('Số dư không đủ. Hiện có: ' + Number(lockedWallet?.balance || 0).toLocaleString('vi-VN') + 'đ');
+      }
+
       const updatedWallet = await prisma.wallets.update({
         where: { wallet_id: wallet.wallet_id },
         data: { balance: { decrement: amount } },
       });
+
+      // Double-check: chặn balance âm (phòng thủ cuối cùng)
+      if (Number(updatedWallet.balance) < 0) {
+        throw new BadRequestException('Giao dịch bị từ chối: số dư ví sẽ bị âm');
+      }
 
       const transaction = await prisma.transactions.create({
         data: {

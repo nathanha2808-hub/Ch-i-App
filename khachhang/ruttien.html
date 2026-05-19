@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi"><head>
 <meta charset="utf-8"/>
 <meta name="view-transition" content="same-origin"/>
@@ -246,7 +246,10 @@ body { font-family: 'Be Vietnam Pro', sans-serif; }
   accountHolder.addEventListener('input', updateConfirm);
 
   // === TC-KH19-002/003/004/006: Validate + Submit ===
+  // TC-KH19-010 FIX: Chống spam nút rút tiền
+  var isWithdrawSubmitting = false;
   submitBtn.addEventListener('click', async function() {
+    if (isWithdrawSubmitting) return; // Chặn click kép
     hideError(amountError);
     hideError(bankError);
     var valid = true;
@@ -286,6 +289,10 @@ body { font-family: 'Be Vietnam Pro', sans-serif; }
     if (!valid) return;
 
     // TC-KH19-001: Rút tiền thành công
+    isWithdrawSubmitting = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Đang xử lý...';
+    submitBtn.classList.add('opacity-50');
     showLoading();
     try {
       var result = await apiFetch('/api/wallets/withdraw', {
@@ -314,6 +321,11 @@ body { font-family: 'Be Vietnam Pro', sans-serif; }
       hideLoading();
       // TC-KH19-009: Lỗi mạng hoặc lỗi server
       showToastMsg('❌ ' + e.message);
+      // Chỉ mở lại nút khi lỗi
+      isWithdrawSubmitting = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Xác nhận rút tiền';
+      submitBtn.classList.remove('opacity-50');
     }
   });
 })();

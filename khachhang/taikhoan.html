@@ -522,14 +522,18 @@
             function() {
               document.getElementById('save-pw-btn').addEventListener('click', async function() {
                 var cur = document.getElementById('pw-current').value;
-                var np = document.getElementById('pw-new').value;
-                var cf = document.getElementById('pw-confirm').value;
+                var np = document.getElementById('pw-new').value.trim();
+                var cf = document.getElementById('pw-confirm').value.trim();
                 if (!cur || !np) { showToastMsg('Vui lòng nhập đầy đủ'); return; }
+                // TC-KN27-010 FIX: Chặn mật khẩu chỉ chứa khoảng trắng
+                if (/\s/.test(np)) { showToastMsg('Mật khẩu không được chứa khoảng trắng'); return; }
                 if (np.length < 8 || np.length > 20) { showToastMsg('Mật khẩu mới phải từ 8-20 ký tự'); return; }
                 if (!/[A-Z]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa'); return; }
                 if (!/[a-z]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết thường'); return; }
                 if (!/[0-9]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ số'); return; }
                 if (!/[\W_]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt'); return; }
+                // TC-KN27-007 FIX: Chặn mật khẩu mới trùng mật khẩu cũ
+                if (np === cur) { showToastMsg('Mật khẩu mới phải khác mật khẩu hiện tại'); return; }
                 if (np !== cf) { showToastMsg('Mật khẩu xác nhận không khớp'); return; }
                 try { await apiFetch('/api/auth/change-password', { method: 'POST', body: { current_password: cur, new_password: np } }); closeModal(); showToastMsg('✅ Đổi mật khẩu thành công'); }
                 catch (e) { showToastMsg('❌ ' + e.message); }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi"><head>
 <meta charset="utf-8"/>
@@ -291,11 +291,18 @@
   });
 
   // ===== Confirm Deposit =====
+  // TC-KH18-012 FIX: Chống spam nút nạp tiền
   var confirmBtn = document.querySelector('.py-md button');
+  var isDepositSubmitting = false;
   if (confirmBtn) {
     confirmBtn.addEventListener('click', async function() {
+      if (isDepositSubmitting) return; // Chặn click kép
       if (currentAmount < 10000) { showToastMsg('Số tiền tối thiểu là 10.000 đ'); return; }
 
+      isDepositSubmitting = true;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Đang xử lý...';
+      confirmBtn.classList.add('opacity-50');
       showLoading();
       try {
         var result = await apiFetch('/api/wallets/deposit', {
@@ -309,6 +316,11 @@
       } catch (e) {
         hideLoading();
         showToastMsg('❌ ' + e.message);
+        // Chỉ mở lại nút khi lỗi
+        isDepositSubmitting = false;
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Tôi đã chuyển khoản';
+        confirmBtn.classList.remove('opacity-50');
       }
     });
   }

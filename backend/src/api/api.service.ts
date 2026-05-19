@@ -304,11 +304,15 @@ export class ApiService {
   }
 
   // --- Support APIs ---
+  // TC-KN26-008 FIX: Include orders để FE hiển thị mã đơn hàng liên quan
   async getUserTickets(userId: number) {
     return this.prisma.support_tickets.findMany({
       where: { user_id: userId },
       orderBy: { created_at: 'desc' },
       take: 50,
+      include: {
+        orders: { select: { order_id: true, order_code: true, status: true } },
+      },
     });
   }
 
