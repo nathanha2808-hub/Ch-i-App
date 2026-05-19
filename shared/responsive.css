@@ -255,32 +255,18 @@ header[class*="sticky"] {
    BREAKPOINTS: Tablet nhỏ / Landscape phone (481px+)
    =============================================== */
 @media (min-width: 481px) {
-  /* Center content như app mobile */
+  /* Cho phép nội dung giãn ra trên iPad thay vì khoá ở 430px */
   body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     background: #e8e5e5;
   }
-  body > *:not(nav):not(script):not(link):not(style):not([class*="fixed"]):not([class*="toast"]):not([class*="modal"]):not([class*="sms-notification"]):not([id="loading-overlay"]) {
-    max-width: 430px;
-    width: 100%;
-  }
-  /* Background gradient cũng chỉ trong 430px */
+  
+  /* Background gradient tự động giãn */
   body > div[class*="absolute"][class*="pointer-events-none"] {
-    max-width: 430px;
-    left: 50% !important;
-    transform: translateX(-50%);
+    max-width: 100%;
+    left: 0 !important;
+    transform: none;
   }
-  /* Main container */
-  main {
-    max-width: 430px !important;
-    width: 100% !important;
-  }
-  header {
-    max-width: 430px !important;
-    width: 100% !important;
-  }
+  /* Không ghi đè main và header nữa, để Tailwind lo */
   /* Vẫn giữ background toàn trang cho body */
   body::before {
     content: '';
