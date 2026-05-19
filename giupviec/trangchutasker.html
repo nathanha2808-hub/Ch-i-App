@@ -192,15 +192,27 @@
 
     <!-- IDLE STATE (Hidden initially) -->
     <div id="idle-state" class="absolute bottom-28 w-full max-w-sm px-4 hidden pointer-events-auto transition-all duration-500 translate-y-10 opacity-0">
-        <div class="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-[#e6f7fc] flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[#00b1da] animate-spin-slow">radar</span>
+        <div class="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-[#e6f7fc] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#00b1da] animate-spin-slow">radar</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-800">Đang tìm đơn hàng...</p>
+                        <p class="text-xs text-gray-500">Bạn đang ở chế độ trực tuyến</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-bold text-gray-800">Đang tìm đơn hàng...</p>
-                    <p class="text-xs text-gray-500">Bạn đang ở chế độ trực tuyến</p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <span class="material-symbols-outlined text-[#ff7e36] text-[18px]">bolt</span>
+                    Tự động nhận đơn
                 </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="auto-accept-toggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ff7e36]"></div>
+                </label>
             </div>
         </div>
     </div>
@@ -424,6 +436,32 @@
   }
   showIdleState();
 
+  // ===== Tự động nhận đơn (Auto-Accept) =====
+  var autoAcceptInput = document.getElementById('auto-accept-toggle');
+  window.isAutoAcceptEnabled = false; // Dùng global để các hàm khác gọi được dễ dàng
+  if (autoAcceptInput) {
+    var savedAutoAccept = localStorage.getItem('chioi_auto_accept_' + (user ? user.user_id : 'unknown'));
+    window.isAutoAcceptEnabled = (savedAutoAccept === 'true');
+    autoAcceptInput.checked = window.isAutoAcceptEnabled;
+
+    autoAcceptInput.addEventListener('change', function() {
+      var toggleInput = document.querySelector('header input[type="checkbox"]');
+      if (autoAcceptInput.checked && toggleInput && !toggleInput.checked) {
+        showToast('⚠️ Vui lòng bật Nhận Việc trước khi bật Tự động nhận đơn!');
+        autoAcceptInput.checked = false;
+        return;
+      }
+
+      window.isAutoAcceptEnabled = autoAcceptInput.checked;
+      localStorage.setItem('chioi_auto_accept_' + (user ? user.user_id : 'unknown'), String(window.isAutoAcceptEnabled));
+      if (window.isAutoAcceptEnabled) {
+        showToast('⚡ Đã bật Tự động nhận đơn');
+      } else {
+        showToast('🔴 Đã tắt Tự động nhận đơn');
+      }
+    });
+  }
+
   // ===== 5. Khởi tạo Leaflet Map =====
   var defaultLat = 10.7769; // Fallback nếu GPS không có
   var defaultLng = 106.7009;
@@ -521,6 +559,13 @@
       if (skippedOrders.indexOf(data.order.order_id) > -1) return;
       // Nếu đang có đơn → không hiện đơn mới
       if (isHandlingOrder) return;
+
+      // Auto-Accept
+      if (window.isAutoAcceptEnabled) {
+        window.autoAcceptOrder(data.order);
+        return;
+      }
+
       currentOrder = data.order;
       // TC_T05_013 FIX: Phát âm thanh thông báo đơn mới
       playNotificationSound();
@@ -603,9 +648,13 @@
         // Lọc bỏ đơn đã skip
         var filtered = orders.filter(function(o) { return skippedOrders.indexOf(o.order_id) === -1; });
         if (filtered.length > 0) {
-          currentOrder = filtered[0];
-          playNotificationSound();
-          showNewOrderModal(filtered[0]);
+          if (window.isAutoAcceptEnabled) {
+            window.autoAcceptOrder(filtered[0]);
+          } else {
+            currentOrder = filtered[0];
+            playNotificationSound();
+            showNewOrderModal(filtered[0]);
+          }
         }
       }
     } catch (e) {
@@ -831,6 +880,32 @@
         currentOrder = null;
       } else {
         showToast('❌ ' + msg);
+      }
+    }
+  };
+
+  // ===== Tự động nhận đơn (chạy ngầm) =====
+  window.autoAcceptOrder = async function(order) {
+    if (isHandlingOrder) return;
+    try {
+      showToast('⚡ Đang tự động nhận đơn...');
+      var result = await apiFetch('/api/orders/' + order.order_id + '/accept', {
+        method: 'PATCH'
+      });
+      clearInterval(countdownTimer);
+      isHandlingOrder = true;
+      showSuccessNotification('⚡ Đã tự động nhận đơn!', 'Bắt đầu di chuyển tới điểm dọn dẹp');
+      addNotification('accept', 'Đã tự động nhận đơn #' + order.order_id + '!', order);
+      showActiveOrderCard(Object.assign({}, order, { status: 'ACCEPTED' }));
+      playNotificationSound();
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
+    } catch (err) {
+      // Bỏ qua im lặng nếu lỗi race condition
+      var msg = err.message || '';
+      if (msg.indexOf('không còn khả dụng') !== -1 || msg.indexOf('đã được nhận') !== -1) {
+        console.log('Auto-accept failed (race condition):', msg);
+      } else {
+        showToast('❌ Lỗi tự nhận đơn: ' + msg);
       }
     }
   };

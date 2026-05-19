@@ -4,6 +4,16 @@
 
 ---
 
+## [1.5.5] - 2026-05-19
+
+### ✨ New Features — Tasker Auto-Accept Orders
+
+#### Added
+- **Frontend Tasker:** `giupviec/trangchutasker.html` — Bổ sung nút chuyển đổi (Toggle) "Tự động nhận đơn" ở phần trạng thái tìm đơn (Idle State).
+- **Frontend Tasker:** `giupviec/trangchutasker.html` — Triển khai logic chạy ngầm `autoAcceptOrder()`: Tự động gọi API nhận đơn thay vì hiển thị Modal khi có đơn mới tới từ Socket hoặc thông qua Polling, giúp Tasker nhận đơn nhanh nhất mà không cần thao tác bấm. Trạng thái cấu hình được lưu cục bộ trong `localStorage`.
+
+---
+
 ## [1.1.2] - 2026-05-19
 
 ### 🐛 Bug fixes (Platform Stabilization & Bug Fixes Phase)
@@ -12,8 +22,10 @@
 1. **Dịch vụ sai ID (backend/src/auth/auth.service.ts, khachhang/datdichvudonnha.html)** - Sửa logic gán nhầm service_id khi Tasker đăng ký ("Trông trẻ" bị gán vào ID 2 thay vì 4, "Mua hộ" bị gán ID 4 thay vì 7) và sửa Dọn tổng vệ sinh truyền ID 9 thay vì ID 1.
 2. **Crash danh sách Tasker (backend/src/api/api.service.ts)** - Sửa câu lệnh raw SQL `ST_X` truy vấn bằng `tasker_id` thay vì `user_id`.
 3. **Lỗi Upload CCCD (backend/src/main.ts)** - Tăng giới hạn `body-parser` từ 2MB lên 20MB để hỗ trợ xử lý file Base64 khi upload ảnh CCCD kích thước lớn từ điện thoại di động.
-4. **Chat CSKH 10 ký tự (shared/chatadmin.html)** - Xóa đoạn mã validation cứng yêu cầu tin nhắn chat phải >= 10 ký tự.
+4. **Chat CSKH 10 ký tự (shared/chatadmin.html)** - Xóa đoạn mã validation cứng yêu cầu tin nhắn chat phải >= 10 ký tự. Đã trỏ đúng thư mục Nginx.
 5. **Thứ tự dịch vụ (backend/src/api/api.service.ts)** - Áp dụng `orderBy: { service_id: 'asc' }` vào truy vấn lấy danh sách dịch vụ.
+6. **Lỗi 500 Đặt đơn (backend/src/auth/jwt.strategy.ts)** - Sửa lỗi server sập khi token JWT cũ gửi request lên bằng cách Validate trực tiếp trong Database, trả về lỗi 401.
+7. **Nạp tiền Tasker (giupviec/naptienqr.html)** - Tạo riêng trang nạp tiền cho Tasker thay vì dùng chung link trang Khách hàng.
 
 ---
 
