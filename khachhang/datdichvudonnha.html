@@ -365,7 +365,8 @@ Phương thức thanh toán
     }
   })();
 
-  // ===== Kiểm tra gói gia đình =====
+  // ===== Kiểm tra gói gia đình (ĐÃ TẠM ẨN) =====
+  /*
   (async function checkFamilyPackage() {
     try {
       var activePkgs = await apiFetch('/api/packages/my-active');
@@ -376,6 +377,7 @@ Phương thức thanh toán
       }
     } catch (e) { console.warn('[Gói] Không check được gói:', e.message); }
   })();
+  */
 
   // ===== Payment Method Toggle =====
   function setPaymentMethod(method) {
@@ -525,11 +527,13 @@ Phương thức thanh toán
     var originalTotal = total;
     var discount = 0;
 
-    // KIỂM TRA GÓI GIA ĐÌNH ĐỂ HIỂN THỊ
+    // KIỂM TRA GÓI GIA ĐÌNH ĐỂ HIỂN THỊ (ĐÃ TẠM ẨN)
+    /*
     if (state.hasFamilyPackage) {
       discount = Math.round(originalTotal * 0.15);
       total = originalTotal - discount;
     }
+    */
 
     if (hourDisplay) hourDisplay.textContent = state.hours;
 

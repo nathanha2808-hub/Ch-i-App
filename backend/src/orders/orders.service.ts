@@ -41,6 +41,7 @@ export class OrdersService {
     let discountAmount = 0;
     
     try {
+      /* [TẠM ẨN GÓI GIA ĐÌNH]
       const activePackage = await this.prisma.customer_packages.findFirst({
         where: {
           customer_id: customerId,
@@ -53,6 +54,7 @@ export class OrdersService {
         discountAmount = Math.round(originalPrice * 0.15);
         finalPrice = originalPrice - discountAmount;
       }
+      */
     } catch (e) {
       console.warn('[Order] Lỗi khi kiểm tra gói gia đình:', e.message);
     }
