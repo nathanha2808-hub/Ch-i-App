@@ -141,11 +141,6 @@
     async function sendMessage() {
         var text = msgInput.value.trim();
         if (!text) return;
-        
-        if (text.length < 10) {
-            appendSystemMessage('⚠️ Tin nhắn phải có ít nhất 10 ký tự.');
-            return;
-        }
 
         msgInput.value = '';
         msgInput.style.height = 'auto';

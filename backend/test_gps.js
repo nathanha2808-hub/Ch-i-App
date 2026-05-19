@@ -1,0 +1,7 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+async function main() {
+  const t = await prisma.$queryRawUnsafe('SELECT tasker_id, ST_X(current_location::geometry) as lng, ST_Y(current_location::geometry) as lat FROM taskers WHERE is_online = true AND current_location IS NOT NULL');
+  console.log(t);
+}
+main().finally(() => prisma.$disconnect());

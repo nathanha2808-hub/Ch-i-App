@@ -460,6 +460,12 @@ Phương thức thanh toán
       });
       btn.className = 'service-type-btn py-3 px-4 rounded-2xl border-2 border-primary-container bg-orange-50 text-primary-container font-bold shadow-sm transition-all flex items-center justify-center text-center';
       state.serviceType = btn.textContent.trim();
+      // Update serviceId based on type
+      if (state.serviceType === 'Dọn tổng vệ sinh') {
+        state.serviceId = 9; // ID for Dọn tổng vệ sinh
+      } else {
+        state.serviceId = 1; // ID for Dọn tiêu chuẩn
+      }
       updateSummary();
     });
   });

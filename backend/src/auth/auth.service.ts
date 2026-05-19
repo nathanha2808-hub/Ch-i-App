@@ -100,8 +100,8 @@ export class AuthService {
       if (data.services && Array.isArray(data.services) && data.services.length > 0) {
         const serviceMap: Record<string, number> = {
           'don_nha': 1,
-          'trong_tre': 2,
-          'mua_ho': 4
+          'trong_tre': 4,
+          'mua_ho': 7
         };
         
         const taskerServices = data.services

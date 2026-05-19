@@ -93,7 +93,7 @@ export class ApiService {
   }
 
   async getServices() {
-    return this.prisma.services.findMany({ where: { is_active: true } });
+    return this.prisma.services.findMany({ where: { is_active: true }, orderBy: { service_id: 'asc' } });
   }
 
   // --- Package Subscription (Lỗi 7 FIX) ---
@@ -507,20 +507,17 @@ export class ApiService {
       }
     });
 
-    const locations = await this.prisma.$queryRaw<any[]>`
-      SELECT tasker_id, ST_Y(current_location::geometry) as lat, ST_X(current_location::geometry) as lng
-      FROM taskers
-      WHERE is_online = true AND current_location IS NOT NULL;
-    `;
-    
-    const locationMap = new Map();
-    for (const loc of locations) {
-      locationMap.set(loc.tasker_id, { lat: loc.lat, lng: loc.lng });
-    }
+    const taskerGpsQuery = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT tasker_id, ST_X(current_location::geometry) as lng, ST_Y(current_location::geometry) as lat FROM taskers WHERE current_location IS NOT NULL`
+    );
+    const gpsMap = {};
+    taskerGpsQuery.forEach(row => {
+      gpsMap[row.tasker_id] = { lat: row.lat, lng: row.lng };
+    });
 
     return users.map(u => {
       if (u.role === 'TASKER' && u.taskers) {
-        const loc = locationMap.get(u.taskers.tasker_id);
+        const loc = gpsMap[u.taskers.tasker_id];
         if (loc) {
           return {
             ...u,
@@ -882,7 +879,7 @@ export class ApiService {
 
   // --- Tasker: Get All Services with registration status ---
   async getAllServicesForTasker(taskerId: number) {
-    const allServices = await this.prisma.services.findMany({ where: { is_active: true } });
+    const allServices = await this.prisma.services.findMany({ where: { is_active: true }, orderBy: { service_id: 'asc' } });
     const registered = await this.prisma.tasker_services.findMany({
       where: { tasker_id: taskerId },
       select: { service_id: true, status: true },

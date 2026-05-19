@@ -4,12 +4,34 @@
 
 ---
 
+## [1.1.2] - 2026-05-19
+
+### 🐛 Bug fixes (Platform Stabilization & Bug Fixes Phase)
+
+#### Fixed
+1. **Dịch vụ sai ID (backend/src/auth/auth.service.ts, khachhang/datdichvudonnha.html)** - Sửa logic gán nhầm service_id khi Tasker đăng ký ("Trông trẻ" bị gán vào ID 2 thay vì 4, "Mua hộ" bị gán ID 4 thay vì 7) và sửa Dọn tổng vệ sinh truyền ID 9 thay vì ID 1.
+2. **Crash danh sách Tasker (backend/src/api/api.service.ts)** - Sửa câu lệnh raw SQL `ST_X` truy vấn bằng `tasker_id` thay vì `user_id`.
+3. **Lỗi Upload CCCD (backend/src/main.ts)** - Tăng giới hạn `body-parser` từ 2MB lên 20MB để hỗ trợ xử lý file Base64 khi upload ảnh CCCD kích thước lớn từ điện thoại di động.
+4. **Chat CSKH 10 ký tự (shared/chatadmin.html)** - Xóa đoạn mã validation cứng yêu cầu tin nhắn chat phải >= 10 ký tự.
+5. **Thứ tự dịch vụ (backend/src/api/api.service.ts)** - Áp dụng `orderBy: { service_id: 'asc' }` vào truy vấn lấy danh sách dịch vụ.
+
+---
+
 ## [1.5.4] — 2026-05-19
+
+### ✨ New Features — Admin Tasker Advanced Status & GPS Tracking
+
+#### Added
+- **Backend:** `api.service.ts` — Nâng cấp API `getAdminUsers()` để query thêm thông tin từ bảng `orders`. Xác định các trạng thái: `ACCEPTED`, `TASKER_ARRIVED`, `IN_PROGRESS`. Đồng thời thêm Raw SQL query (`ST_X`, `ST_Y`) để lấy trực tiếp toạ độ GPS (`lat`, `lng`) từ trường `current_location`.
+- **Admin Panel:** `admin/quanlytasker.html` — Thay thế hàm `getKycStatus` bằng `getDetailedStatus` để hiển thị 7 trạng thái chi tiết dựa trên tình trạng duyệt hồ sơ, trạng thái Online/Offline, và trạng thái nhận đơn thực tế của Tasker (ví dụ: *Đang di chuyển, Đã đến nơi, Đang làm việc, Đang rảnh*).
+- **Admin Panel:** `admin/quanlytasker.html` — Bổ sung link Google Maps "📍 Vị trí GPS" dưới thông tin Khu vực nếu Tasker đang Online và có truyền toạ độ về server, giúp Admin giám sát lộ trình thực tế.
 
 ### 🐛 Bug fixes — Admin Tasker Database Loading
 
 #### Fixed
-- **Admin Panel:** `Admin/quanlytasker.html` — Sửa lỗi cú pháp JavaScript (thiếu `return {`) trong hàm map danh sách `allTaskers` khiến dữ liệu danh sách Tasker bị treo ở trạng thái "Đang tải dữ liệu...".
+- **Admin Panel:** `admin/quanlytasker.html` — Sửa lỗi cú pháp JavaScript (thiếu `return {`) trong hàm map danh sách `allTaskers` khiến dữ liệu danh sách Tasker bị treo ở trạng thái "Đang tải dữ liệu...".
+- **Admin Panel:** `admin/quanlytasker.html` — Khắc phục thêm lỗi `SyntaxError: Invalid regular expression` ở script `CHIOI-JS-INJECT` (do regex `bg-w+-d+/d+s*text-w+-d+/g` thiếu escape backslash) khiến các chức năng lọc và load DOM script bị vô hiệu hóa.
+- **Deployment:** Khắc phục lỗi sai đường dẫn upload trong phiên bản trước. File đã được copy tới toàn bộ các thư mục mà Nginx có thể map trên VPS (`/var/www/chioi.vn/admin`, `/var/www/chioi/admin`, `/var/www/app.chioi.vn/admin`, `/opt/chioi/admin`).
 
 ---
 
