@@ -574,8 +574,8 @@ tailwind.config = {
   });
 
   // Lỗi 5 FIX: Nút nạp tiền
-  document.getElementById('btn-deposit').addEventListener('click', function() {
-    window.location.href = '../khachhang/naptienqr.html';
+  document.getElementById('btn-deposit')?.addEventListener('click', function() {
+    window.location.href = 'naptienqr.html';
   });
 
   // Mở modal
