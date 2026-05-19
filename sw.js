@@ -5,7 +5,7 @@
 //   - Static khác (CSS/JS/fonts/icons): cache-first, refresh background
 //   - API calls: network-only (real-time data, không cache)
 
-const VERSION = 'chioi-v2.0.0'; // BUMP v2.0.0: HTML = network-first (không serve bản cũ nữa)
+const VERSION = 'chioi-v2.0.1'; // BUMP v2.0.1: Force update HTML pages
 const CACHE_STATIC = `${VERSION}-static`;
 const CACHE_PAGES  = `${VERSION}-pages`;
 
