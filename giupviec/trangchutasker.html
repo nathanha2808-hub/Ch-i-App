@@ -613,6 +613,12 @@
   var isHandlingOrder = false; // Flag: đang xử lý đơn
   var isFirstLoad = true;      // Flag: Kiểm tra lịch sử lần đầu tiên
 
+  // FIX: fixTimezone ở IIFE top-level scope để showNewOrderModal + showActiveOrderCard đều dùng được
+  function fixTimezone(isoStr) {
+    if (!isoStr) return isoStr;
+    return String(isoStr).replace(/Z$/i, '').replace(/\+00:00$/, '');
+  }
+
   // Hàm check đơn hàng — reusable cho cả init lần đầu và polling
   async function checkAvailableOrders() {
     // Nếu đang xử lý đơn → không hiện đơn mới
@@ -646,12 +652,6 @@
         console.warn('[Tasker] Không check được đơn đang xử lý:', e.message);
       }
       isFirstLoad = false;
-    }
-
-    // FIX: fixTimezone ở global scope để showNewOrderModal + showActiveOrderCard đều dùng được
-    function fixTimezone(isoStr) {
-      if (!isoStr) return isoStr;
-      return String(isoStr).replace(/Z$/i, '').replace(/\+00:00$/, '');
     }
 
     // Nếu đang offline → không load đơn mới
