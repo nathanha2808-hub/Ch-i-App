@@ -127,10 +127,13 @@ workflows:
     integrations:
       app_store_connect: chioi-app-store-key   # ⚠️ Tên integration setup trong Codemagic
 
-    # Đã tắt trigger tự động, build hoàn toàn thủ công
+    # Đã tắt trigger tự động bằng tag để tránh lỗi, bạn có thể bấm tay từ main
     # triggering:
-    #  events:
-    #    - tag
+    #   events:
+    #     - tag
+    #   tag_patterns:
+    #     - pattern: 'v*-debug'
+    #       include: true
 
     scripts:
       - name: Setup keychain + signing (force create cert if missing)
@@ -178,7 +181,7 @@ workflows:
         script: |
           cd mobile-ios/ios/App
           agvtool new-version -all $((BUILD_NUMBER + 50))
-          # Đổi Marketing version theo vòng lặp Codemagic
+          # Tự động cập nhật phiên bản theo số vòng lặp của Codemagic
           agvtool new-marketing-version "1.0.$BUILD_NUMBER"
 
       - name: Build .ipa (debug-signed)
@@ -213,7 +216,7 @@ workflows:
   #   - App ID + Distribution certificate + Provisioning profile
   #   - App đã tạo trong App Store Connect (note Apple ID number 10-digit)
   #   - Integration setup trong Codemagic
-  # Trigger: Đã cấu hình để bấm tay (Manual) trên web
+  # Trigger: Đã tắt trigger tag tự động, giờ chạy hoàn toàn bằng nút bấm thủ công từ nhánh main
   # Auto upload TestFlight (Internal Testers group). KHÔNG auto submit Production.
   # ===========================================================================
   ios-release-store:
@@ -235,13 +238,13 @@ workflows:
     integrations:
       app_store_connect: chioi-app-store-key
 
-    # Đã tắt Trigger Tag để bạn chạy thủ công trực tiếp từ nhánh main
+    # Đã tắt Trigger Tag cũ để bạn thoải mái build từ nhánh main
     # triggering:
-    #  events:
-    #    - tag
-    #  tag_patterns:
-    #    - pattern: 'v[0-9]+.[0-9]+.[0-9]+'
-    #      include: true
+    #   events:
+    #     - tag
+    #   tag_patterns:
+    #     - pattern: 'v[0-9]+.[0-9]+.[0-9]+'   # vd v1.0.0, v1.0.1
+    #       include: true
 
     scripts:
       - name: Setup keychain + production signing (force create cert)
@@ -323,14 +326,14 @@ workflows:
           agvtool new-version -all "$NEW_VERSION"
           
           # 2. TỰ ĐỘNG CẬP NHẬT PHIÊN BẢN CÔNG KHAI (KHÔNG DÙNG TAG)
-          # App sẽ có phiên bản dạng 1.0.x (Ví dụ: 1.0.35)
+          # App sẽ tự động tăng tiến thành 1.0.34, 1.0.35, 1.0.36... theo số lần bấm build
           NEW_MKT_VERSION="1.0.$BUILD_NUMBER"
           echo "===== Cập nhật Marketing Version tự động thành $NEW_MKT_VERSION ====="
           agvtool new-marketing-version "$NEW_MKT_VERSION"
           
           echo "Verify after bump:"
           agvtool what-version
-          agvtool what-mkt-version
+          agvtool what-marketing-version
 
       - name: Build Release IPA + dSYM
         script: |
