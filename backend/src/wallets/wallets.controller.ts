@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { WalletsService } from './wallets.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody } from '@nestjs/swagger';
@@ -25,6 +26,7 @@ export class WalletsController {
   }
 
   @Post('deposit')
+  @Throttle({ wallet: { limit: 1, ttl: 10000 } }) // TC-KH18-012 FIX: 1 request/10s
   @ApiOperation({ summary: 'Nạp tiền vào ví' })
   @ApiBody({ type: DepositDto })
   async deposit(@Request() req, @Body() body: DepositDto) {
@@ -32,6 +34,7 @@ export class WalletsController {
   }
 
   @Post('withdraw')
+  @Throttle({ wallet: { limit: 1, ttl: 30000 } }) // TC-KH19-010 FIX: 1 request/30s
   @ApiOperation({ summary: 'Yêu cầu rút tiền từ ví (UC_13)' })
   @ApiBody({ type: WithdrawDto })
   async withdraw(@Request() req, @Body() body: WithdrawDto) {

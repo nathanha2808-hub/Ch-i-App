@@ -340,12 +340,13 @@
             <th class="px-5 py-3 border-b border-outline-variant/20">Người dùng</th>
             <th class="px-5 py-3 border-b border-outline-variant/20">Loại</th>
             <th class="px-5 py-3 border-b border-outline-variant/20">Số tiền</th>
+            <th class="px-5 py-3 border-b border-outline-variant/20">Mô tả</th>
             <th class="px-5 py-3 border-b border-outline-variant/20">Trạng thái</th>
             <th class="px-5 py-3 border-b border-outline-variant/20">Thời gian</th>
           </tr>
         </thead>
         <tbody id="tx-tbody" class="divide-y divide-outline-variant/10 text-body-sm">
-          <tr><td colspan="6" class="text-center py-16 text-on-surface-variant">
+          <tr><td colspan="7" class="text-center py-16 text-on-surface-variant">
             <span class="material-symbols-outlined text-5xl block mb-3 opacity-20">hourglass_empty</span>
             Đang tải dữ liệu...
           </td></tr>
@@ -356,6 +357,24 @@
 
 </div>
 </main>
+
+<!-- TC-AD06-10 FIX: Modal chi tiết giao dịch -->
+<div id="tx-detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('tx-detail-modal').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 z-10" style="animation: fadeIn 0.2s ease">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-title-sm text-title-sm text-on-surface">Chi tiết giao dịch</h3>
+      <button onclick="document.getElementById('tx-detail-modal').classList.add('hidden')" class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div id="tx-detail-body" class="space-y-3">
+    </div>
+    <div class="mt-5 pt-4 border-t border-outline-variant/20">
+      <button onclick="document.getElementById('tx-detail-modal').classList.add('hidden')" class="w-full py-2.5 bg-surface-container-low text-on-surface-variant rounded-xl font-label-bold hover:bg-surface-container transition-all">Đóng</button>
+    </div>
+  </div>
+</div>
 <!-- CHIOI-JS-INJECT -->
 <script>
 (function() {
@@ -595,6 +614,9 @@
     'COMMISSION': { label: 'Hoa hồng', cls: 'bg-indigo-100 text-indigo-700' },
     'TRANSFER':   { label: 'Chuyển tiền', cls: 'bg-pink-100 text-pink-700' },
     'BONUS':      { label: 'Thưởng',     cls: 'bg-amber-100 text-amber-700' },
+    // TC-AD06-12 FIX: Thêm type phụ để cover tất cả giao dịch từ backend
+    'PLATFORM_DEDUCT': { label: 'Trừ nền tảng', cls: 'bg-red-100 text-red-700' },
+    'WALLET_TOPUP':    { label: 'Nạp ví',       cls: 'bg-green-100 text-green-700' },
   };
   var STATUS_MAP = {
     'COMPLETED': { dot: 'bg-green-500', label: 'Thành công' },
@@ -607,13 +629,41 @@
 
   var allTransactions = [];
 
+  // TC-AD06-10 FIX: Hiển thị chi tiết giao dịch
+  function showTxDetail(tx) {
+    var modal = document.getElementById('tx-detail-modal');
+    var body = document.getElementById('tx-detail-body');
+    if (!modal || !body) return;
+    var user = tx.wallets && tx.wallets.users ? tx.wallets.users : null;
+    var typeInfo = TYPE_MAP[tx.type] || { label: tx.type, cls: 'bg-gray-100 text-gray-700' };
+    var statusInfo = STATUS_MAP[tx.status] || { dot: 'bg-gray-400', label: tx.status };
+    var isCredit = tx.type === 'TOPUP' || tx.type === 'REFUND' || tx.type === 'EARNING' || tx.type === 'DEPOSIT' || tx.type === 'BONUS';
+    body.innerHTML = [
+      '<div class="bg-surface-container-low rounded-xl p-4 space-y-2.5">',
+        '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Mã giao dịch</span><span class="font-mono font-bold text-primary text-[12px]">' + (tx.transaction_code || '#TX' + tx.transaction_id) + '</span></div>',
+        '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Người dùng</span><span class="font-semibold text-body-sm">' + (user ? user.full_name : 'N/A') + '</span></div>',
+        (user ? '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">SĐT</span><span class="text-body-sm">' + user.phone + '</span></div>' : ''),
+        '<div class="flex justify-between items-center"><span class="text-[11px] text-on-surface-variant">Loại</span><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ' + typeInfo.cls + '">' + typeInfo.label + '</span></div>',
+        '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Số tiền</span><span class="font-bold text-[16px] ' + (isCredit ? 'text-green-600' : 'text-error') + '">' + (isCredit ? '+' : '-') + fmtVNDFull(tx.amount) + '</span></div>',
+        '<div class="flex justify-between items-center"><span class="text-[11px] text-on-surface-variant">Trạng thái</span><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full ' + statusInfo.dot + '"></span><span class="text-body-sm font-medium">' + statusInfo.label + '</span></div></div>',
+        '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Thời gian</span><span class="text-body-sm">' + fmtDT(tx.created_at) + '</span></div>',
+        (tx.order_id ? '<div class="flex justify-between"><span class="text-[11px] text-on-surface-variant">Đơn hàng</span><span class="text-primary font-semibold text-body-sm">#ORD-' + tx.order_id + '</span></div>' : ''),
+      '</div>',
+      '<div class="bg-white rounded-xl p-4 border border-outline-variant/20">',
+        '<h4 class="text-[11px] font-bold text-on-surface-variant uppercase mb-2">Mô tả</h4>',
+        '<p class="text-body-sm text-on-surface leading-relaxed">' + (tx.description || 'Không có mô tả') + '</p>',
+      '</div>',
+    ].join('');
+    modal.classList.remove('hidden');
+  }
+
   // ---- Render transaction table ----
   function renderTxTable(txs) {
     var tbody = document.getElementById('tx-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
     if (!txs || txs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-12 text-on-surface-variant"><span class="material-symbols-outlined text-4xl block mb-2 opacity-20">inbox</span>Không có giao dịch nào</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-on-surface-variant"><span class="material-symbols-outlined text-4xl block mb-2 opacity-20">inbox</span>Không có giao dịch nào</td></tr>';
       return;
     }
     txs.forEach(function(tx, idx) {
@@ -625,9 +675,12 @@
       var amtClass = isCredit ? 'text-green-600 font-bold' : 'text-error font-bold';
       var amtPrefix = isCredit ? '+' : '-';
       var txCode = tx.transaction_code ? tx.transaction_code.substring(0, 16) + (tx.transaction_code.length > 16 ? '...' : '') : ('#TX' + tx.transaction_id);
+      // TC-AD06-02 FIX: Thêm mô tả giao dịch
+      var desc = tx.description || '—';
+      if (desc.length > 30) desc = desc.substring(0, 30) + '...';
 
       var tr = document.createElement('tr');
-      tr.className = (idx % 2 ? 'bg-surface-container-low/30 ' : '') + 'hover:bg-primary/5 transition-colors';
+      tr.className = (idx % 2 ? 'bg-surface-container-low/30 ' : '') + 'hover:bg-primary/5 transition-colors cursor-pointer';
       tr.innerHTML =
         '<td class="px-5 py-3 font-mono text-[11px] text-on-surface-variant">' + txCode + '</td>' +
         '<td class="px-5 py-3"><div class="flex items-center gap-2.5">' +
@@ -638,8 +691,13 @@
           '</div></div></td>' +
         '<td class="px-5 py-3"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ' + typeInfo.cls + '">' + typeInfo.label + '</span></td>' +
         '<td class="px-5 py-3 ' + amtClass + '">' + amtPrefix + fmtVNDFull(tx.amount) + '</td>' +
+        '<td class="px-5 py-3 text-[12px] text-on-surface-variant max-w-[160px] truncate" title="' + (tx.description || '') + '">' + desc + '</td>' +
         '<td class="px-5 py-3"><div class="flex items-center gap-1.5 text-body-sm"><span class="w-1.5 h-1.5 rounded-full ' + statusInfo.dot + '"></span>' + statusInfo.label + '</div></td>' +
         '<td class="px-5 py-3 text-on-surface-variant text-[12px]">' + fmtDT(tx.created_at) + '</td>';
+      // TC-AD06-10 FIX: Click để xem chi tiết giao dịch
+      (function(txData) {
+        tr.addEventListener('click', function() { showTxDetail(txData); });
+      })(tx);
       tbody.appendChild(tr);
     });
   }
@@ -750,9 +808,12 @@
         });
 
         // Events
+        // TC-AD06-25 FIX: Submit lock chặn double-click
         wdContainer.querySelectorAll('.wd-approve').forEach(function(btn) {
           btn.addEventListener('click', async function() {
+            if (btn.disabled) return;
             if (!confirm('Duyệt yêu cầu rút tiền này?')) return;
+            btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed');
             var wid = btn.getAttribute('data-wid');
             showLoading();
             try {
@@ -760,12 +821,14 @@
               hideLoading();
               showToastMsg('✅ Đã duyệt yêu cầu rút tiền!');
               setTimeout(function() { location.reload(); }, 1200);
-            } catch(e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+            } catch(e) { hideLoading(); btn.disabled = false; btn.classList.remove('opacity-50', 'cursor-not-allowed'); showToastMsg('❌ ' + e.message); }
           });
         });
         wdContainer.querySelectorAll('.wd-reject').forEach(function(btn) {
           btn.addEventListener('click', async function() {
+            if (btn.disabled) return;
             if (!confirm('Từ chối yêu cầu rút tiền này?')) return;
+            btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed');
             var wid = btn.getAttribute('data-wid');
             showLoading();
             try {
@@ -773,7 +836,7 @@
               hideLoading();
               showToastMsg('✅ Đã từ chối yêu cầu!');
               setTimeout(function() { location.reload(); }, 1200);
-            } catch(e) { hideLoading(); showToastMsg('❌ ' + e.message); }
+            } catch(e) { hideLoading(); btn.disabled = false; btn.classList.remove('opacity-50', 'cursor-not-allowed'); showToastMsg('❌ ' + e.message); }
           });
         });
       }

@@ -261,7 +261,7 @@
 <span class="material-symbols-outlined" data-icon="chat">chat</span>
 <span class="text-label-caps font-label-caps">Chat</span>
 </button>
-<button class="flex flex-col items-center justify-center gap-1 py-3 px-2 bg-surface-container-high rounded-[16px] text-primary hover:bg-primary/10 active:scale-95 transition-all">
+<button id="btn-call-action" class="flex flex-col items-center justify-center gap-1 py-3 px-2 bg-surface-container-high rounded-[16px] text-primary hover:bg-primary/10 active:scale-95 transition-all">
 <span class="material-symbols-outlined" data-icon="call">call</span>
 <span class="text-label-caps font-label-caps">Gọi</span>
 </button>
@@ -286,7 +286,7 @@
 <!-- Thông báo (UC-KH-15) → M11 -->
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
 <span class="material-symbols-outlined text-[28px]">notifications</span>
-<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span id="global-notif-badge" style="display:none" class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
 <span class="text-label-sm font-label-sm font-medium">Thông báo</span>
 </a>
 <!-- Tài khoản -->
@@ -421,12 +421,18 @@
     if (orderCodeText) orderCodeText.textContent = order.order_code || 'DH' + order.order_id;
     if (orderServiceText) orderServiceText.textContent = serviceName;
     if (orderTimeText) {
-      var scheduledDate = new Date(order.scheduled_time);
-      var timeOptions = { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
-      try {
-        orderTimeText.textContent = scheduledDate.toLocaleString('vi-VN', timeOptions);
-      } catch(tz) {
-        orderTimeText.textContent = formatDateTime(order.scheduled_time);
+      if (order.scheduled_time) {
+        var st = order.scheduled_time; // ex: 2026-05-19T10:00:00.000Z
+        var dtPart = st.split('T')[0];
+        var tmPart = st.split('T')[1] ? st.split('T')[1].substring(0, 5) : '';
+        var dtParts = dtPart.split('-');
+        if (dtParts.length === 3 && tmPart) {
+          orderTimeText.textContent = tmPart + ', ' + dtParts[2] + '/' + dtParts[1] + '/' + dtParts[0];
+        } else {
+          orderTimeText.textContent = formatDateTime(order.scheduled_time);
+        }
+      } else {
+        orderTimeText.textContent = '--';
       }
     }
     if (orderTotalText) orderTotalText.textContent = formatVND(order.total_price);
@@ -463,10 +469,14 @@
     });
 
     // Make action bar call button also work
-    var actionCallBtns = document.querySelectorAll('section.grid button');
-    if (actionCallBtns.length >= 2 && taskerPhone) {
-      actionCallBtns[1].addEventListener('click', function() {
+    var actionCallBtn = document.getElementById('btn-call-action');
+    if (actionCallBtn && taskerPhone) {
+      actionCallBtn.addEventListener('click', function() {
         window.location.href = 'tel:' + taskerPhone;
+      });
+    } else if (actionCallBtn) {
+      actionCallBtn.addEventListener('click', function() {
+        showToastMsg('Không có số điện thoại Tasker');
       });
     }
   } catch (e) {
@@ -513,7 +523,7 @@
         overlay.remove();
         showLoading();
         try {
-          await apiFetch('/api/orders/' + orderId + '/cancel', { method: 'POST' });
+          await apiFetch('/api/orders/' + orderId + '/cancel', { method: 'PATCH' });
           hideLoading();
           showToastMsg('✅ Đã hủy đơn hàng thành công');
           renderStepper('CANCELLED');

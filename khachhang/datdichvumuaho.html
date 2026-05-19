@@ -264,7 +264,7 @@ Phương thức thanh toán
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
 <span class="material-symbols-outlined text-[28px]">notifications</span>
-<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span id="global-notif-badge" style="display:none" class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
 <span class="text-label-sm font-label-sm font-medium">Thông báo</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="taikhoan.html">
@@ -276,15 +276,36 @@ Phương thức thanh toán
 <script src="../shared/api.js?v=20260514"></script>
 <script src="../shared/prefetch.js" defer></script>
 <script>
-(function() {
+(async function() {
+  if (!ChiOiAuth.requireAuth('dangnhap.html')) return;
+
   var FEE = 50000;
   var state = {
+    serviceId: null,
     selectedStore: 'WinMart Vinhomes A',
     products: [],
     budget: 500000,
     paymentMethod: 'WALLET',
     hasFamilyPackage: false
   };
+
+  // ===== Load service_id and FEE =====
+  try {
+    var services = await apiFetch('/api/services');
+    if (services && services.length > 0) {
+      for (var i = 0; i < services.length; i++) {
+        if (services[i].name && services[i].name.toLowerCase().indexOf('mua') >= 0) {
+          state.serviceId = services[i].service_id;
+          FEE = services[i].base_price || 50000;
+          break;
+        }
+      }
+      if (!state.serviceId) {
+        state.serviceId = services[services.length - 1].service_id;
+        FEE = services[services.length - 1].base_price || 50000;
+      }
+    }
+  } catch (e) { console.warn('[Đặt DV] Không load được services:', e.message); }
 
   // ===== Kiểm tra gói gia đình (ĐÃ TẠM ẨN) =====
   /*
@@ -525,21 +546,8 @@ Phương thức thanh toán
     btn.classList.add('opacity-50');
     btn.textContent = 'Đang đặt đơn...';
 
-    // Tìm service_id cho Mua hộ
-    var serviceId = null;
-    try {
-      var services = await apiFetch('/api/services');
-      if (services && services.length > 0) {
-        for (var i = 0; i < services.length; i++) {
-          if (services[i].name && services[i].name.toLowerCase().indexOf('mua') >= 0) {
-            serviceId = services[i].service_id;
-            break;
-          }
-        }
-        if (!serviceId) serviceId = services[services.length - 1].service_id;
-      }
-    } catch(e) { console.warn('Không load được services'); }
-
+    // Sử dụng serviceId đã load từ đầu
+    var serviceId = state.serviceId;
     if (!serviceId) { 
       showToastMsg('Không tìm thấy dịch vụ Mua hộ'); 
       isSubmitting = false; btn.disabled = false; btn.classList.remove('opacity-50');

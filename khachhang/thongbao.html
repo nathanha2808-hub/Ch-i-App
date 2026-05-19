@@ -106,6 +106,7 @@
 
   var allNotifs = [];
   var activeTab = 'all';
+  var readNotifs = JSON.parse(localStorage.getItem('read_notifs') || '[]');
 
   // ===== Build notifications from multiple sources =====
   async function loadNotifications() {
@@ -127,7 +128,9 @@
           } else {
             body = 'Giao dịch ' + formatVND(tx.amount) + ' đã được xử lý.';
           }
-          notifs.push({ type: 'wallet', icon: icon, iconBg: 'bg-tertiary-container', iconText: 'text-on-tertiary', title: title, body: body, time: tx.created_at, unread: true, link: 'vivalichsu.html' });
+          var id = 'tx_' + tx.transaction_id;
+          var isRead = readNotifs.indexOf(id) >= 0;
+          notifs.push({ id: id, type: 'wallet', icon: icon, iconBg: 'bg-tertiary-container', iconText: 'text-on-tertiary', title: title, body: body, time: tx.created_at, unread: !isRead, link: 'vivalichsu.html' });
         });
       }
     } catch (e) { console.warn('[Notif] Wallet:', e.message); }
@@ -147,20 +150,25 @@
             'CANCELLED': 'đã bị hủy'
           };
           var statusText = statusLabels[o.status] || o.status;
-          var isActive = o.status === 'IN_PROGRESS' || o.status === 'SEARCHING' || o.status === 'ACCEPTED';
+          var isActive = o.status === 'IN_PROGRESS' || o.status === 'SEARCHING' || o.status === 'ACCEPTED' || o.status === 'COMPLETED';
+          var linkUrl = o.status === 'COMPLETED' ? 'danhgiatasker.html?orderId=' + o.order_id : 'theodoidon.html?orderId=' + o.order_id;
+          var bodyText = o.status === 'COMPLETED' 
+              ? 'Đơn hàng ' + (o.order_code || ('#' + o.order_id)) + ' đã hoàn thành. Nhấn để đánh giá Tasker nhé!'
+              : 'Đơn hàng ' + (o.order_code || ('#' + o.order_id)) + ' ' + statusText + '.';
+              
           notifs.push({
             type: 'order', icon: 'local_shipping', iconBg: 'bg-primary-container', iconText: 'text-on-primary',
-            title: svcName, body: 'Đơn hàng ' + (o.order_code || ('#' + o.order_id)) + ' ' + statusText + '.',
-            time: o.updated_at || o.created_at, unread: isActive,
-            link: 'theodoidon.html?orderId=' + o.order_id
+            title: svcName, body: bodyText,
+            time: o.updated_at || o.created_at, unread: (isActive && readNotifs.indexOf('order_' + o.order_id) < 0), id: 'order_' + o.order_id,
+            link: linkUrl
           });
         });
       }
     } catch (e) { console.warn('[Notif] Orders:', e.message); }
 
     // 3. Static system + promo notifications
-    notifs.push({ type: 'system', icon: 'info', iconBg: 'bg-surface-variant', iconText: 'text-on-surface-variant', title: 'Cập nhật hệ thống', body: 'Ứng dụng đã được cập nhật phiên bản mới nhất.', time: new Date(Date.now() - 86400000).toISOString(), unread: false });
-    notifs.push({ type: 'promo', icon: 'sell', iconBg: 'bg-secondary-container/30', iconText: 'text-secondary', title: 'Khuyến mãi 20%', body: 'Nhập mã CHIOI20 để được giảm giá dịch vụ dọn nhà.', time: new Date(Date.now() - 3600000).toISOString(), unread: false });
+    
+    
 
     // Sort by time desc
     notifs.sort(function(a, b) { return new Date(b.time) - new Date(a.time); });
@@ -205,12 +213,14 @@
         div.addEventListener('click', function() {
           // TC-KH15-003/005/006: Đánh dấu đã đọc khi click
           n.unread = false;
+          if (n.id) { readNotifs.push(n.id); localStorage.setItem('read_notifs', JSON.stringify(readNotifs)); }
           renderNotifs();
           window.location.href = n.link;
         });
       } else {
         div.addEventListener('click', function() {
           n.unread = false;
+          if (n.id) { readNotifs.push(n.id); localStorage.setItem('read_notifs', JSON.stringify(readNotifs)); }
           renderNotifs();
         });
       }
@@ -223,6 +233,7 @@
     if (badge) {
       badge.textContent = unreadCount;
       badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+      localStorage.setItem('unread_notifs_count', unreadCount);
     }
   }
 
@@ -241,7 +252,7 @@
 
   // ===== Mark all read =====
   document.getElementById('mark-all-read').addEventListener('click', function() {
-    allNotifs.forEach(function(n) { n.unread = false; });
+    allNotifs.forEach(function(n) { n.unread = false; if (n.id && readNotifs.indexOf(n.id) < 0) readNotifs.push(n.id); }); localStorage.setItem('read_notifs', JSON.stringify(readNotifs));
     renderNotifs();
     showToastMsg('✅ Đã đánh dấu tất cả đã đọc');
   });

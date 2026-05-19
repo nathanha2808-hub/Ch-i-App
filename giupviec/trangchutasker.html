@@ -613,6 +613,12 @@
   var isHandlingOrder = false; // Flag: đang xử lý đơn
   var isFirstLoad = true;      // Flag: Kiểm tra lịch sử lần đầu tiên
 
+  // FIX: fixTimezone ở IIFE top-level scope để showNewOrderModal + showActiveOrderCard đều dùng được
+  function fixTimezone(isoStr) {
+    if (!isoStr) return isoStr;
+    return String(isoStr).replace(/Z$/i, '').replace(/\+00:00$/, '');
+  }
+
   // Hàm check đơn hàng — reusable cho cả init lần đầu và polling
   async function checkAvailableOrders() {
     // Nếu đang xử lý đơn → không hiện đơn mới
@@ -701,15 +707,17 @@
     var customerName = (order.customers && order.customers.users && order.customers.users.full_name) ? order.customers.users.full_name : 'Khách hàng';
     var statusLabel = { 'ACCEPTED': 'Đã nhận đơn', 'TASKER_ARRIVED': 'Đã đến nơi', 'IN_PROGRESS': 'Đang thực hiện' };
 
+    // TC-T08-005 FIX: fixTimezone đã chuyển lên global scope (dòng trên)
+
     // TC-T08-005 FIX: Tính thời gian bắt đầu làm việc
-    var scheduledTime = order.scheduled_time ? formatDateTime(order.scheduled_time) : 'Chưa xác định';
+    var scheduledTime = order.scheduled_time ? formatDateTime(fixTimezone(order.scheduled_time)) : 'Chưa xác định';
     var durationHours = order.duration_hours || order.estimated_hours || '';
     var durationText = durationHours ? (durationHours + ' giờ') : '';
 
     // TC-T08-024 FIX: Format thời gian hiển thị đúng HH:mm:ss
     var startTimeFormatted = '';
     if (order.scheduled_time) {
-      var dt = new Date(order.scheduled_time);
+      var dt = new Date(fixTimezone(order.scheduled_time));
       var hh = ('0' + dt.getHours()).slice(-2);
       var mm = ('0' + dt.getMinutes()).slice(-2);
       var ss = ('0' + dt.getSeconds()).slice(-2);
@@ -801,7 +809,7 @@
     var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ';
     var address = order.address || 'Địa chỉ đơn hàng';
     var durationHours = order.duration_hours || order.estimated_hours || '';
-    var scheduledTime = order.scheduled_time ? formatDateTime(order.scheduled_time) : '';
+    var scheduledTime = order.scheduled_time ? formatDateTime(fixTimezone(order.scheduled_time)) : '';
     var timeText = scheduledTime;
     if (durationHours) timeText += ' (' + durationHours + ' giờ)';
 

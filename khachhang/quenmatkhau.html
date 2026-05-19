@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
 <meta name="view-transition" content="same-origin"/>
@@ -426,8 +426,10 @@
 
   // ===== Step 3: Reset Password =====
   btnResetPassword.addEventListener('click', async function() {
-    var newPass = newPasswordInput.value;
-    var confirmPass = confirmPasswordInput.value;
+    var newPass = newPasswordInput.value.trim();
+    var confirmPass = confirmPasswordInput.value.trim();
+    // TC-KN27-010 FIX: Chặn mật khẩu chứa khoảng trắng
+    if (/\s/.test(newPass)) { showToastMsg('Mật khẩu không được chứa khoảng trắng'); return; }
     if (newPass.length < 8 || newPass.length > 20) { showToastMsg('Mật khẩu phải từ 8 đến 20 ký tự'); return; }
     if (!/[A-Z]/.test(newPass)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa'); return; }
     if (!/[a-z]/.test(newPass)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết thường'); return; }

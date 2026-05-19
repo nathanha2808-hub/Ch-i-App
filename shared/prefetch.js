@@ -131,3 +131,13 @@
   }
 
 })();
+
+// ===== Global Notif Badge Update =====
+(function() {
+  var count = localStorage.getItem('unread_notifs_count') || 0;
+  var badge = document.getElementById('global-notif-badge');
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
+})();

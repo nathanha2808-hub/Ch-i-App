@@ -1,4 +1,0 @@
-UC-KH-04 — Tìm kiếm dịch vụ									
-TC-KH04-001	Tìm kiếm dịch vụ với từ khóa hợp lệ	"1. Tại Trang chủ nhấn thanh tìm kiếm 
-2. Nhập từ khóa “Dọn nhà” 
-3. Quan sát kết quả"	Hệ thống hiển thị danh sách các dịch vụ hiện có 	High	Hiển thị lỗi ảnh và hiển thị các dịch vụ không có 	FAIL			Fixed.

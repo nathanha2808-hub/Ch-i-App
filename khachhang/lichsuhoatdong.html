@@ -122,7 +122,7 @@
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
 <span class="material-symbols-outlined text-[28px]">notifications</span>
-<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span id="global-notif-badge" style="display:none" class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
 <span class="text-label-sm font-label-sm font-medium">Thông báo</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95" href="taikhoan.html">
@@ -214,6 +214,12 @@
     list.innerHTML = '';
     filtered.forEach(function(order) {
       var serviceName = (order.services && order.services.name) ? order.services.name : 'Dịch vụ ' + order.order_code;
+      var noteRaw = order.notes || order.note || '';
+      if (serviceName.toLowerCase() === 'dọn nhà' && noteRaw.indexOf('[Loại:') > -1) {
+        var match = noteRaw.match(/\[Loại:\s*(.*?)\]/);
+        if (match && match[1]) serviceName += ' (' + match[1] + ')';
+      }
+      
       var taskerName = (order.taskers && order.taskers.users && order.taskers.users.full_name) ? order.taskers.users.full_name : 'Chưa phân công';
       var icon = getServiceIcon(serviceName);
       var status = statusMap[order.status] || { label: order.status, bg: 'bg-gray-100', text: 'text-gray-700' };
@@ -222,16 +228,16 @@
 
       var div = document.createElement('div');
       div.className = 'bg-white p-4 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.04)] border border-surface-container transition-all hover:shadow-md cursor-pointer' + (isCancelled ? ' opacity-80' : '');
-      div.innerHTML = '<div class="flex justify-between items-start mb-4">' +
-        '<div class="flex gap-4">' +
-        '<div class="w-12 h-12 bg-primary-container/20 rounded-lg flex items-center justify-center text-primary">' +
+      div.innerHTML = '<div class="flex justify-between items-start mb-4 gap-2">' +
+        '<div class="flex gap-4 min-w-0">' +
+        '<div class="w-12 h-12 bg-primary-container/20 rounded-lg flex items-center justify-center text-primary shrink-0">' +
         '<span class="material-symbols-outlined">' + icon + '</span></div>' +
-        '<div><h3 class="font-title-sm text-title-sm text-on-surface">' + serviceName + '</h3>' +
-        '<p class="text-body-sm text-on-surface-variant">' + formatDateTime(order.created_at) + '</p></div></div>' +
-        '<span class="' + status.bg + ' ' + status.text + ' px-3 py-1 rounded-full text-[12px] font-bold flex items-center gap-1">' + status.label + '</span></div>' +
+        '<div class="min-w-0"><h3 class="font-title-sm text-title-sm text-on-surface truncate">' + serviceName + '</h3>' +
+        '<p class="text-body-sm text-on-surface-variant truncate">' + formatDateTime(order.created_at) + '</p></div></div>' +
+        '<span class="' + status.bg + ' ' + status.text + ' px-2 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 shrink-0 whitespace-nowrap">' + status.label + '</span></div>' +
         '<div class="flex items-center justify-between pt-4 border-t border-surface-variant">' +
-        '<span class="text-body-sm text-on-surface-variant">Tasker: <span class="font-semibold text-on-surface">' + taskerName + '</span></span>' +
-        '<span class="' + priceClass + '">' + formatVND(order.total_price) + '</span></div>';
+        '<span class="text-body-sm text-on-surface-variant truncate pr-2">Tasker: <span class="font-semibold text-on-surface">' + taskerName + '</span></span>' +
+        '<span class="' + priceClass + ' shrink-0">' + formatVND(order.total_price) + '</span></div>';
 
       // Lỗi 9 FIX: Bấm vào hiển thị đúng thông tin đơn hàng
       div.addEventListener('click', function() { showOrderDetail(order); });
@@ -247,13 +253,22 @@
     // Bug 4 FIX (report13): Hiển thị đúng địa chỉ từ DB
     var address = order.address || 'Chưa cập nhật';
     var note = order.notes || order.note || 'Không có ghi chú';
+    
+    if (serviceName.toLowerCase() === 'dọn nhà' && note.indexOf('[Loại:') > -1) {
+      var match = note.match(/\[Loại:\s*(.*?)\]/);
+      if (match && match[1]) serviceName += ' (' + match[1] + ')';
+    }
+
     // TC-KH14-006 FIX: Hiển thị thời gian lên lịch với timezone VN chính xác
     var scheduledTime = 'Chưa xác định';
     if (order.scheduled_time) {
-      try {
-        var sd = new Date(order.scheduled_time);
-        scheduledTime = sd.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
-      } catch(tz) {
+      var st = order.scheduled_time;
+      var dtPart = st.split('T')[0];
+      var tmPart = st.split('T')[1] ? st.split('T')[1].substring(0, 5) : '';
+      var dtParts = dtPart.split('-');
+      if (dtParts.length === 3 && tmPart) {
+        scheduledTime = tmPart + ', ' + dtParts[2] + '/' + dtParts[1] + '/' + dtParts[0];
+      } else {
         scheduledTime = formatDateTime(order.scheduled_time);
       }
     }
@@ -268,22 +283,20 @@
 
     var cancelBtnHtml = '';
     if (canCancel) {
-      cancelBtnHtml = '<button id="btn-cancel-order-' + order.order_id + '" class="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">cancel</span>Hủy đơn</button>';
+      cancelBtnHtml = '<button id="btn-cancel-order-' + order.order_id + '" class="flex-1 min-w-[45%] py-3 rounded-xl bg-red-500 text-white font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">cancel</span>Hủy đơn</button>';
     }
 
     // Action buttons based on order status
     var actionBtnsHtml = '';
     // TC-T09-013 FIX: Nút xác nhận hoàn thành cho KH
     if (order.status === 'PENDING_COMPLETION') {
-      actionBtnsHtml = '<button id="btn-confirm-order-' + order.order_id + '" class="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold active:scale-95 flex items-center justify-center gap-1 animate-pulse"><span class="material-symbols-outlined text-[18px]">check_circle</span>Xác nhận hoàn thành</button>';
+      actionBtnsHtml = '<button id="btn-confirm-order-' + order.order_id + '" class="flex-1 min-w-[100%] py-3 rounded-xl bg-green-500 text-white font-bold active:scale-95 flex items-center justify-center gap-1 animate-pulse"><span class="material-symbols-outlined text-[18px]">check_circle</span>Xác nhận</button>';
     } else if (isCompleted) {
-      // Đơn hoàn thành → hiện nút Đánh giá thay vì Chat Tasker
-      actionBtnsHtml = '<button id="btn-review-order-' + order.order_id + '" class="flex-1 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: \'FILL\' 1;">star</span>Đánh giá Tasker</button>';
+      actionBtnsHtml = '<button id="btn-review-order-' + order.order_id + '" class="flex-1 min-w-[45%] py-3 rounded-xl orange-gradient text-white font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: \'FILL\' 1;">star</span>Đánh giá</button>';
     } else if (order.status !== 'CANCELLED') {
-      // Đang xử lý → hiện nút Theo dõi + Chat
-      actionBtnsHtml = '<button onclick="window.location.href=\'theodoidon.html?orderId=' + order.order_id + '\'" class="flex-1 py-3 rounded-xl orange-gradient text-white font-bold active:scale-95">Theo dõi đơn</button>';
+      actionBtnsHtml = '<button onclick="window.location.href=\'theodoidon.html?orderId=' + order.order_id + '\'" class="flex-1 min-w-[45%] py-3 rounded-xl orange-gradient text-white font-bold active:scale-95">Theo dõi</button>';
       if (order.tasker_id) {
-        actionBtnsHtml += '<button onclick="window.location.href=\'chatvoitasker.html?orderId=' + order.order_id + '&receiverId=' + order.tasker_id + '\'" class="flex-1 py-3 rounded-xl bg-primary-container/20 text-primary border-2 border-primary font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">chat</span>Chat Tasker</button>';
+        actionBtnsHtml += '<button onclick="window.location.href=\'chatvoitasker.html?orderId=' + order.order_id + '&receiverId=' + order.tasker_id + '\'" class="flex-1 min-w-[45%] py-3 rounded-xl bg-primary-container/20 text-primary border-2 border-primary font-bold active:scale-95 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">chat</span>Chat</button>';
       }
     }
 
@@ -304,10 +317,10 @@
       '<span class="text-body-lg font-bold">Tổng tiền</span>' +
       '<span class="text-[20px] font-bold text-primary">' + formatVND(order.total_price) + '</span></div>' +
       '</div>' +
-      '<div class="flex gap-3 mt-4">' +
+      '<div class="flex flex-wrap gap-2 mt-4">' +
       actionBtnsHtml +
       cancelBtnHtml +
-      '<button onclick="document.getElementById(\'order-modal\').remove()" class="' + (isCompleted || order.status === 'CANCELLED' ? 'flex-1' : '') + ' py-3 px-6 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95">Đóng</button></div></div>';
+      '<button onclick="document.getElementById(\'order-modal\').remove()" class="flex-1 min-w-[45%] py-3 px-6 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95">Đóng</button></div></div>';
     overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
     document.body.appendChild(overlay);
 

@@ -306,7 +306,7 @@ Phương thức thanh toán
 <!-- Thông báo -->
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative" href="thongbao.html">
 <span class="material-symbols-outlined text-[28px]">notifications</span>
-<span class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
+<span id="global-notif-badge" style="display:none" class="absolute -top-1 left-1/2 ml-1 bg-secondary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
 <span class="text-label-sm font-label-sm font-medium">Thông báo</span>
 </a>
 <!-- Tài khoản -->
@@ -335,14 +335,22 @@ Phương thức thanh toán
   };
 
   // ===== Load service_id from URL or services API =====
+  window.availableServices = [];
   try {
     var params = new URLSearchParams(window.location.search);
     state.serviceId = params.get('service_id') ? parseInt(params.get('service_id')) : null;
-    if (!state.serviceId) {
-      var services = await apiFetch('/api/services');
-      if (services && services.length > 0) {
+    var services = await apiFetch('/api/services');
+    if (services && services.length > 0) {
+      window.availableServices = services;
+      if (!state.serviceId) {
         state.serviceId = services[0].service_id;
         state.pricePerHour = services[0].base_price || 150000;
+      } else {
+        var defaultService = services.find(function(s) { return s.service_id === state.serviceId; });
+        if (defaultService) {
+          state.pricePerHour = defaultService.base_price || 150000;
+          state.serviceType = defaultService.name || 'Dọn tiêu chuẩn';
+        }
       }
     }
   } catch (e) { console.warn('[Đặt DV] Không load được services:', e.message); }
@@ -473,6 +481,13 @@ Phương thức thanh toán
       } else {
         state.serviceId = 1; // ID for Dọn tiêu chuẩn
       }
+      
+      // Update pricePerHour dynamically
+      var selectedService = window.availableServices.find(function(s) { return s.service_id === state.serviceId; });
+      if (selectedService) {
+        state.pricePerHour = selectedService.base_price;
+      }
+      
       updateSummary();
     });
   });
@@ -613,7 +628,8 @@ Phương thức thanh toán
       }
 
       var textarea = document.getElementById('noteInput');
-      state.note = textarea ? textarea.value.trim() : '';
+      var userNote = textarea ? textarea.value.trim() : '';
+      state.note = '[Loại: ' + state.serviceType + ']' + (userNote ? '\\n- Ghi chú: ' + userNote : '');
 
       // TC-KH07-001,002: Lấy địa chỉ từ input
       var addressEl = document.getElementById('addressInput');

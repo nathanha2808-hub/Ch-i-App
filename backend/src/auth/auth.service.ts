@@ -235,8 +235,13 @@ export class AuthService {
     }
 
     // OTP đúng → đổi mật khẩu
+    // TC-KN27-010 FIX: Trim + chặn mật khẩu chỉ có khoảng trắng
+    const trimmedPassword = data.new_password ? data.new_password.trim() : '';
+    if (!trimmedPassword || /^\s*$/.test(trimmedPassword)) {
+      throw new BadRequestException('Mật khẩu không được chỉ chứa khoảng trắng');
+    }
     const saltOrRounds = 10;
-    const password_hash = await bcrypt.hash(data.new_password, saltOrRounds);
+    const password_hash = await bcrypt.hash(trimmedPassword, saltOrRounds);
 
     await this.prisma.users.update({
       where: { phone: data.phone },
@@ -283,8 +288,19 @@ export class AuthService {
     if (!currentPassword || !newPassword) {
       throw new BadRequestException('Vui lòng nhập đầy đủ mật khẩu cũ và mới');
     }
+
+    // TC-KN27-010 FIX: Trim + chặn mật khẩu chỉ có khoảng trắng
+    newPassword = newPassword.trim();
+    if (!newPassword || /^\s*$/.test(newPassword)) {
+      throw new BadRequestException('Mật khẩu không được chỉ chứa khoảng trắng');
+    }
     if (newPassword.length < 6) {
       throw new BadRequestException('Mật khẩu mới phải ít nhất 6 ký tự');
+    }
+
+    // TC-KN27-007 FIX: Chặn mật khẩu mới trùng mật khẩu cũ
+    if (currentPassword === newPassword) {
+      throw new BadRequestException('Mật khẩu mới phải khác mật khẩu cũ');
     }
 
     const user = await this.prisma.users.findUnique({ where: { user_id: userId } });
