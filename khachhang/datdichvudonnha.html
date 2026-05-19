@@ -627,9 +627,10 @@ Phương thức thanh toán
       if (state.paymentMethod === 'WALLET') {
         try {
           var wallet = await apiFetch('/api/wallets/balance');
-          if (wallet && typeof wallet.balance === 'number' && wallet.balance < totalPrice) {
+          var finalCheckPrice = state.hasFamilyPackage ? Math.round(totalPrice * 0.85) : totalPrice;
+          if (wallet && typeof wallet.balance === 'number' && wallet.balance < finalCheckPrice) {
             // Hiển thị popup không đủ số dư
-            showInsufficientPopup(wallet.balance, totalPrice);
+            showInsufficientPopup(wallet.balance, finalCheckPrice);
             return;
           }
         } catch (walletErr) {
