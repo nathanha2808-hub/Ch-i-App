@@ -392,3 +392,57 @@ workflows:
         notify:
           success: true
           failure: true
+# ===========================================================================
+  # Workflow 4: android-release-store — Build file .aab cho Google Play
+  # ===========================================================================
+  android-release-store:
+    name: Android Release Build (.aab)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    # Nếu bạn có cấu hình cache_cfg ở trên cùng, hãy giữ nguyên dòng này:
+    cache: *cache_cfg 
+
+    environment:
+      # Gọi file Keystore đã lưu ở Bước 1
+      android_signing:
+        - giupviec_keystore 
+      vars:
+        PACKAGE_NAME: "vn.chioi.tasker"
+      node: 20.20.2
+
+    scripts:
+      - name: Cài đặt thư viện Node.js
+        script: |
+          cd mobile-ios
+          npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Đồng bộ Capacitor sang Android
+        script: |
+          cd mobile-ios
+          npx cap sync android
+
+      - name: Cấu hình Android SDK
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > mobile-ios/android/local.properties
+
+      - name: Build file Android App Bundle (.aab) và Ký bảo mật
+        script: |
+          cd mobile-ios/android
+          # Lệnh build Android tự động đọc biến bảo mật từ Codemagic
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file=$CM_KEYSTORE_PATH \
+            -Pandroid.injected.signing.store.password=$CM_KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$CM_KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$CM_KEY_PASSWORD
+
+    artifacts:
+      # Đường dẫn xuất file AAB sau khi build xong
+      - mobile-ios/android/app/build/outputs/bundle/release/*.aab
+
+    publishing:
+      email:
+        recipients:
+          - nathanha.2808@gmail.com
+        notify:
+          success: true
+          failure: true
