@@ -247,7 +247,7 @@ workflows:
     #       include: true
 
     scripts:
-      - name: Setup keychain + production signing (force create cert)
+      - name: Setup keychain + production signing (smart cert handling)
         script: |
           set -e
           echo "===== iOS Signing Setup (App Store) ====="
@@ -255,34 +255,51 @@ workflows:
           echo "App Store Apple ID: $APP_STORE_APPLE_ID"
           keychain initialize
 
-          # CHẨN ĐOÁN turn này:
-          # `certificates create --save` báo "Cannot create resource without
-          # certificate private key" — Codemagic CLI KHÔNG tự sinh private key,
-          # phải cấp file private key qua `--certificate-key`.
+          # ============================================================
+          # FIX BUILD v1.0.38: HTTP 409 Conflict
+          # "You already have a current iOS Distribution certificate
+          #  or a pending certificate request."
           #
-          # FIX: sinh RSA 2048 key bằng openssl trước, rồi pass vào lệnh.
+          # ROOT CAUSE: Apple Dev account đã có Distribution certificate
+          # từ build trước. Lệnh `certificates create` force-create lần nữa
+          # → conflict 409.
+          #
+          # APPROACH MỚI:
+          #   1. List existing IOS_DISTRIBUTION certs
+          #   2. Nếu có ≥1 → fetch trực tiếp (use --save-key-pair)
+          #   3. Nếu rỗng → mới sinh key + create cert
+          # ============================================================
 
           CERT_KEY_PATH=/tmp/distribution_cert_key.pem
-          echo "----- Generating RSA 2048 private key tại $CERT_KEY_PATH -----"
-          openssl genrsa -out "$CERT_KEY_PATH" 2048
-          ls -l "$CERT_KEY_PATH"
+          echo "----- Listing existing Distribution certs -----"
+          EXISTING_COUNT=$(app-store-connect certificates list --type IOS_DISTRIBUTION --json 2>/dev/null | python3 -c 'import sys, json; data=json.load(sys.stdin); print(len(data) if isinstance(data, list) else 0)' 2>/dev/null || echo 0)
+          echo "Existing certs: $EXISTING_COUNT"
 
-          echo "----- Listing existing Distribution certs (debug) -----"
-          app-store-connect certificates list --type IOS_DISTRIBUTION --json | head -100 || true
+          if [ "$EXISTING_COUNT" -gt 0 ]; then
+            echo "----- Có cert sẵn — fetch existing thay vì tạo mới (tránh 409) -----"
+            # fetch-signing-files với --create sẽ DÙNG existing cert nếu có
+            # KHÔNG generate key mới — Codemagic CLI tự handle key matching
+            app-store-connect fetch-signing-files "$BUNDLE_ID" \
+              --type IOS_APP_STORE \
+              --create \
+              --verbose
+          else
+            echo "----- Chưa có cert — generate key + create cert mới -----"
+            openssl genrsa -out "$CERT_KEY_PATH" 2048
+            ls -l "$CERT_KEY_PATH"
 
-          echo "----- Creating Distribution certificate với key vừa sinh -----"
-          app-store-connect certificates create \
-            --type IOS_DISTRIBUTION \
-            --certificate-key=@file:"$CERT_KEY_PATH" \
-            --save \
-            --verbose
+            app-store-connect certificates create \
+              --type IOS_DISTRIBUTION \
+              --certificate-key=@file:"$CERT_KEY_PATH" \
+              --save \
+              --verbose
 
-          echo "----- Fetching/creating profile cho bundle ID -----"
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --certificate-key=@file:"$CERT_KEY_PATH" \
-            --create \
-            --verbose
+            app-store-connect fetch-signing-files "$BUNDLE_ID" \
+              --type IOS_APP_STORE \
+              --certificate-key=@file:"$CERT_KEY_PATH" \
+              --create \
+              --verbose
+          fi
 
           keychain add-certificates
           xcode-project use-profiles
