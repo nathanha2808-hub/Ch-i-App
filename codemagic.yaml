@@ -279,15 +279,7 @@ workflows:
           app-store-connect certificates list --type IOS_DISTRIBUTION --json > /tmp/certs.json 2>/dev/null || echo "[]" > /tmp/certs.json
           cat /tmp/certs.json | python3 -m json.tool 2>/dev/null | head -30 || cat /tmp/certs.json | head -30
 
-          EXISTING_IDS=$(cat /tmp/certs.json | python3 -c 'import sys, json
-try:
-  data = json.load(sys.stdin)
-  if isinstance(data, list):
-    for c in data:
-      cid = c.get("id") if isinstance(c, dict) else None
-      if cid: print(cid)
-except: pass
-' 2>/dev/null || echo "")
+          EXISTING_IDS=$(cat /tmp/certs.json | python3 -c "import sys, json; data=json.load(sys.stdin); [print(c['id']) for c in data if isinstance(c, dict) and c.get('id')]" 2>/dev/null || echo "")
 
           if [ -n "$EXISTING_IDS" ]; then
             echo "----- Step 2: Revoking stale certs (Codemagic ko có private key match) -----"
