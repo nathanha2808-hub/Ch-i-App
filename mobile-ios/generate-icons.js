@@ -5,7 +5,7 @@ const path = require('path');
 
 const SVG_PATH = path.join(__dirname, '../frontend/icons/icon.svg');
 const OUT_DIR = path.join(__dirname, 'ios/App/App/Assets.xcassets/AppIcon.appiconset');
-const OUT_FILE = path.join(OUT_DIR, 'AppIcon-512@2x.png');
+const OUT_FILE = path.join(OUT_DIR, 'AppIcon.png');
 
 (async () => {
   if (!fs.existsSync(SVG_PATH)) { console.error('SVG not found:', SVG_PATH); process.exit(1); }

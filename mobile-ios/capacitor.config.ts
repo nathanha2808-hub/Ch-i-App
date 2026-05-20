@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
   // Apple Review Note: kết hợp với native plugins (Geolocation, Push, Browser)
   // để pass guideline 4.2 — không phải pure WebView
   server: {
-    url: 'https://app.chioi.vn',
+    url: 'https://app.chioi.vn/giupviec/trangchutasker.html',
     cleartext: false,
     allowNavigation: [
       'app.chioi.vn',
