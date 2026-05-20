@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'vn.chioi.app',
+  appId: 'vn.chioi.tasker',
   appName: 'Chị Ơi!',
   webDir: 'www',
 
