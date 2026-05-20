@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'vn.chioi.tasker',
-  appName: 'Chị Ơi!',
+  appName: 'Chị Ơi Tasker',
   webDir: 'www',
 
   // Load PWA từ remote URL (KHÔNG bundle static files)
