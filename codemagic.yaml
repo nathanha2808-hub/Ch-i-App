@@ -381,9 +381,13 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_testflight: true
-        beta_groups:
-          - "Test phòng NAM"            # Khớp đúng group trong App Store Connect → TestFlight → Internal Testing
+        submit_to_testflight: true      # Upload IPA → TestFlight Processing
+        # beta_groups: TẠM TẮT — Apple API tra cứu group name case-sensitive,
+        # mismatch nhỏ (Phòng vs phòng, Nam vs NAM, trailing space) cũng fail.
+        # User manual add build vào group trong App Store Connect UI:
+        #   ASC → app → TestFlight → Internal Testing → group → click +Build
+        # beta_groups:
+        #   - "Test Phòng Nam"
         submit_to_app_store: false      # Manual review submission
 
       email:
