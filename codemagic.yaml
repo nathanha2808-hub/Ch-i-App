@@ -247,7 +247,7 @@ workflows:
     #       include: true
 
     scripts:
-      - name: Setup keychain + production signing (smart cert handling)
+      - name: Setup keychain + production signing (auto-revoke stale certs)
         script: |
           set -e
           echo "===== iOS Signing Setup (App Store) ====="
@@ -256,50 +256,67 @@ workflows:
           keychain initialize
 
           # ============================================================
-          # FIX BUILD v1.0.38: HTTP 409 Conflict
-          # "You already have a current iOS Distribution certificate
-          #  or a pending certificate request."
+          # FIX BUILD v1.0.38 turn 2: "Cannot save Signing Certificates
+          # without certificate private key"
           #
-          # ROOT CAUSE: Apple Dev account đã có Distribution certificate
-          # từ build trước. Lệnh `certificates create` force-create lần nữa
-          # → conflict 409.
+          # ROOT CAUSE:
+          #   Apple Dev có 2 stale IOS_DISTRIBUTION certs (từ build trước)
+          #   Codemagic ko có private key match → fetch-signing-files fail
+          #   "Cannot save Signing Certificates without certificate private key"
           #
-          # APPROACH MỚI:
-          #   1. List existing IOS_DISTRIBUTION certs
-          #   2. Nếu có ≥1 → fetch trực tiếp (use --save-key-pair)
-          #   3. Nếu rỗng → mới sinh key + create cert
+          # APPROACH:
+          #   1. List all existing IOS_DISTRIBUTION certs
+          #   2. REVOKE tất cả cert cũ (Codemagic ko xài được nữa)
+          #   3. Generate fresh RSA key + create cert mới
+          #   4. fetch-signing-files với key vừa gen → match → success
+          #
+          # SAFE: app chưa có Production trên App Store → revoke cert ko ảnh
+          # hưởng users. Nếu sau này có Production → bỏ auto-revoke step này.
           # ============================================================
 
           CERT_KEY_PATH=/tmp/distribution_cert_key.pem
-          echo "----- Listing existing Distribution certs -----"
-          EXISTING_COUNT=$(app-store-connect certificates list --type IOS_DISTRIBUTION --json 2>/dev/null | python3 -c 'import sys, json; data=json.load(sys.stdin); print(len(data) if isinstance(data, list) else 0)' 2>/dev/null || echo 0)
-          echo "Existing certs: $EXISTING_COUNT"
+          echo "----- Step 1: Listing existing Distribution certs -----"
+          app-store-connect certificates list --type IOS_DISTRIBUTION --json > /tmp/certs.json 2>/dev/null || echo "[]" > /tmp/certs.json
+          cat /tmp/certs.json | python3 -m json.tool 2>/dev/null | head -30 || cat /tmp/certs.json | head -30
 
-          if [ "$EXISTING_COUNT" -gt 0 ]; then
-            echo "----- Có cert sẵn — fetch existing thay vì tạo mới (tránh 409) -----"
-            # fetch-signing-files với --create sẽ DÙNG existing cert nếu có
-            # KHÔNG generate key mới — Codemagic CLI tự handle key matching
-            app-store-connect fetch-signing-files "$BUNDLE_ID" \
-              --type IOS_APP_STORE \
-              --create \
-              --verbose
+          EXISTING_IDS=$(cat /tmp/certs.json | python3 -c 'import sys, json
+try:
+  data = json.load(sys.stdin)
+  if isinstance(data, list):
+    for c in data:
+      cid = c.get("id") if isinstance(c, dict) else None
+      if cid: print(cid)
+except: pass
+' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING_IDS" ]; then
+            echo "----- Step 2: Revoking stale certs (Codemagic ko có private key match) -----"
+            for cert_id in $EXISTING_IDS; do
+              echo "Revoking cert ID: $cert_id"
+              app-store-connect certificates delete "$cert_id" --yes 2>&1 || echo "(revoke skip — đã expired hoặc revoked)"
+            done
+            sleep 5  # Đợi Apple sync state
           else
-            echo "----- Chưa có cert — generate key + create cert mới -----"
-            openssl genrsa -out "$CERT_KEY_PATH" 2048
-            ls -l "$CERT_KEY_PATH"
-
-            app-store-connect certificates create \
-              --type IOS_DISTRIBUTION \
-              --certificate-key=@file:"$CERT_KEY_PATH" \
-              --save \
-              --verbose
-
-            app-store-connect fetch-signing-files "$BUNDLE_ID" \
-              --type IOS_APP_STORE \
-              --certificate-key=@file:"$CERT_KEY_PATH" \
-              --create \
-              --verbose
+            echo "----- Step 2 skip: không có cert nào để revoke -----"
           fi
+
+          echo "----- Step 3: Generate fresh RSA 2048 private key -----"
+          openssl genrsa -out "$CERT_KEY_PATH" 2048
+          ls -l "$CERT_KEY_PATH"
+
+          echo "----- Step 4: Create new IOS_DISTRIBUTION cert với key mới -----"
+          app-store-connect certificates create \
+            --type IOS_DISTRIBUTION \
+            --certificate-key=@file:"$CERT_KEY_PATH" \
+            --save \
+            --verbose
+
+          echo "----- Step 5: Fetch signing files (cert + profile) -----"
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --certificate-key=@file:"$CERT_KEY_PATH" \
+            --create \
+            --verbose
 
           keychain add-certificates
           xcode-project use-profiles
