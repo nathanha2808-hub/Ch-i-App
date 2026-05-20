@@ -127,12 +127,13 @@ workflows:
     integrations:
       app_store_connect: chioi-app-store-key   # ⚠️ Tên integration setup trong Codemagic
 
-    triggering:
-      events:
-        - tag
-      tag_patterns:
-        - pattern: 'v*-debug'
-          include: true
+    # Đã tắt trigger tự động bằng tag để tránh lỗi, bạn có thể bấm tay từ main
+    # triggering:
+    #   events:
+    #     - tag
+    #   tag_patterns:
+    #     - pattern: 'v*-debug'
+    #       include: true
 
     scripts:
       - name: Setup keychain + signing (force create cert if missing)
@@ -176,10 +177,12 @@ workflows:
           npx cap sync ios
           cd ios/App && pod install --repo-update
 
-      - name: Bump build number
+      - name: Bump build number and Version
         script: |
           cd mobile-ios/ios/App
           agvtool new-version -all $((BUILD_NUMBER + 50))
+          # Tự động cập nhật phiên bản theo số vòng lặp của Codemagic
+          agvtool new-marketing-version "1.0.$BUILD_NUMBER"
 
       - name: Build .ipa (debug-signed)
         script: |
@@ -213,7 +216,7 @@ workflows:
   #   - App ID + Distribution certificate + Provisioning profile
   #   - App đã tạo trong App Store Connect (note Apple ID number 10-digit)
   #   - Integration setup trong Codemagic
-  # Trigger: push tag v1.0.0 (production version)
+  # Trigger: Đã tắt trigger tag tự động, giờ chạy hoàn toàn bằng nút bấm thủ công từ nhánh main
   # Auto upload TestFlight (Internal Testers group). KHÔNG auto submit Production.
   # ===========================================================================
   ios-release-store:
@@ -235,12 +238,13 @@ workflows:
     integrations:
       app_store_connect: chioi-app-store-key
 
-    triggering:
-      events:
-        - tag
-      tag_patterns:
-        - pattern: 'v[0-9]+.[0-9]+.[0-9]+'   # vd v1.0.0, v1.0.1
-          include: true
+    # Đã tắt Trigger Tag cũ để bạn thoải mái build từ nhánh main
+    # triggering:
+    #   events:
+    #     - tag
+    #   tag_patterns:
+    #     - pattern: 'v[0-9]+.[0-9]+.[0-9]+'   # vd v1.0.0, v1.0.1
+    #       include: true
 
     scripts:
       - name: Setup keychain + production signing (force create cert)
@@ -302,7 +306,7 @@ workflows:
           cd mobile-ios/ios/App
           pod install --repo-update
 
-      - name: Bump build number
+      - name: Bump build number and Marketing Version (Auto)
         script: |
           set -e
           cd mobile-ios/ios/App
@@ -314,12 +318,22 @@ workflows:
           # Cách cũ dùng `app-store-connect get-latest-app-store-build-number`
           # KHÔNG hoạt động — query về empty hoặc output thừa whitespace làm
           # $(()) math fail, agvtool giữ nguyên version=1 → upload reject.
+          
+          # 1. TĂNG BUILD NUMBER NHƯ CŨ
           NEW_VERSION=$(($BUILD_NUMBER + 100))
           echo "===== Bump CFBundleVersion to $NEW_VERSION ====="
           echo "Codemagic BUILD_NUMBER: $BUILD_NUMBER"
           agvtool new-version -all "$NEW_VERSION"
+          
+          # 2. TỰ ĐỘNG CẬP NHẬT PHIÊN BẢN CÔNG KHAI (KHÔNG DÙNG TAG)
+          # App sẽ tự động tăng tiến thành 1.0.34, 1.0.35, 1.0.36... theo số lần bấm build
+          NEW_MKT_VERSION="1.0.$BUILD_NUMBER"
+          echo "===== Cập nhật Marketing Version tự động thành $NEW_MKT_VERSION ====="
+          agvtool new-marketing-version "$NEW_MKT_VERSION"
+          
           echo "Verify after bump:"
           agvtool what-version
+          agvtool what-marketing-version
 
       - name: Build Release IPA + dSYM
         script: |
@@ -343,7 +357,7 @@ workflows:
         auth: integration
         submit_to_testflight: true
         beta_groups:
-          - "Test Phòng Nam"            # Khớp đúng group trong App Store Connect → TestFlight → Internal Testing
+          - "Test phòng NAM"            # Khớp đúng group trong App Store Connect → TestFlight → Internal Testing
         submit_to_app_store: false      # Manual review submission
 
       email:
