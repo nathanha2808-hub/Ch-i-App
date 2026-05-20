@@ -105,7 +105,7 @@ workflows:
   # ===========================================================================
   # YÊU CẦU:
   #   - Apple Developer Program active ($99/năm)
-  #   - App ID `vn.chioi.app` đã tạo
+  #   - App ID `vn.chioi.tasker` đã tạo
   #   - Integration `chioi-app-store-key` đã setup trong Codemagic Teams
   # Trigger: manual hoặc tag v*-debug
   # ===========================================================================
@@ -117,7 +117,7 @@ workflows:
 
     environment:
       vars:
-        BUNDLE_ID: "vn.chioi.app"
+        BUNDLE_ID: "vn.chioi.tasker"
         XCODE_WORKSPACE: "mobile-ios/ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
       node: 20.20.2
@@ -227,7 +227,7 @@ workflows:
 
     environment:
       vars:
-        BUNDLE_ID: "vn.chioi.app"
+        BUNDLE_ID: "vn.chioi.tasker"
         XCODE_WORKSPACE: "mobile-ios/ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
         APP_STORE_APPLE_ID: "6769330882"   # App Store Connect → Chị Ơi! → App Info
