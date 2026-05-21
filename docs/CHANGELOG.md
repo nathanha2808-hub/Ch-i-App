@@ -4,6 +4,35 @@
 
 ---
 
+## [1.5.8] - 2026-05-21
+
+### 📱 Tối ưu hóa phản hồi (Responsive Onboarding & Luxury Desktop Experience)
+
+#### Fixed
+- **Frontend Tasker:** Sửa lỗi giao diện màn hình giới thiệu **[MODIFY]** `Giupviec/gioithieu.html` bị bóp méo, co rúm và mất nội dung khi hiển thị trên các màn hình có chiều cao thấp, giả lập iPad hoặc máy tính.
+- Triển khai **Bộ chia 3 cấp độ hiển thị (Multi-Tier Viewports)**: 
+  - *Điện thoại (iPhone/Android <768px):* Tràn viền toàn diện (`100dvh`) tối ưu di động.
+  - *Máy tính bảng (iPad 768px - 1023px):* Dạng card rộng rãi, sang trọng (`md:max-w-[680px] h-[90dvh]`) giúp thông tin trải đều tự nhiên, khắc phục tình trạng card bị nhỏ lọt thỏm giữa màn hình.
+  - *Máy tính lớn (Desktop >=1024px):* Trở lại dạng khung mô phỏng điện thoại (`lg:max-w-[450px] h-[820px]`) tinh tế và gọn gàng.
+- Giải quyết triệt để lỗi **Sập chiều cao (Height Collapse)** trong các bộ giả lập iOS/Webkit bằng cách chuyển đổi toàn bộ cấu trúc chiều cao tĩnh sang cơ chế co dãn tự động của Flexbox (`flex-1` trên card chính và slide container). Đảm bảo vòng tròn Icon cái bắt tay cam không bao giờ bị cắt xén hay đè lấp.
+- Triển khai bộ truy vấn kích thước theo chiều cao màn hình (`@media (max-height: 740px)` và `@media (max-height: 660px)`) giúp tự động thu nhỏ icon và chữ một cách mượt mà và trực quan.
+- Nâng cấp trải nghiệm thẩm mỹ cao cấp trên màn hình máy tính lớn bằng cách bổ sung thêm 3 vòng tròn chuyển sắc mờ ảo ở hậu cảnh (`Ambient Background Blobs`), tạo cảm giác chiều sâu (Depth/Glassmorphism) cực kỳ chuyên nghiệp.
+
+---
+
+## [1.5.7] - 2026-05-21
+
+### ✨ Tính năng mới (Onboarding Screen & Apple App Store Forced Login Bypass)
+
+#### Added
+- Tạo mới màn hình giới thiệu **[NEW]** `Giupviec/gioithieu.html` với thiết kế cao cấp (Premium UI/UX, Glassmorphism card), bộ điều hướng Carousel mượt mà hỗ trợ cử chỉ vuốt (Touch gestures/Swipe) trên điện thoại iOS/Android.
+- Bổ sung liên kết công khai tới **Điều khoản sử dụng** (`terms.html`) và **Chính sách bảo mật** (`privacy.html`) ngay trên màn hình giới thiệu chưa đăng nhập để giải quyết triệt để lỗi từ chối duyệt của Apple (**Guideline 5.1.1(v) - Forced Login**).
+
+#### Changed
+- Cập nhật logic điều hướng cổng gốc của Tasker **[MODIFY]** `Giupviec/index.html` để kiểm tra cờ trạng thái `chioi_tasker_introduced` trong `localStorage` của máy. Màn hình giới thiệu sẽ chỉ hiển thị duy nhất trong lần đầu tiên mở ứng dụng sau khi cài đặt. Từ lần sau, người dùng sẽ tự động đi tiếp tới trang đăng nhập hoặc trang chủ làm việc.
+
+---
+
 ## [1.5.6] - 2026-05-21
 
 ### 🐛 Sửa lỗi Android Native (Location Access & App Logo Sync)

@@ -11,7 +11,13 @@
             if (token && user && user.role === 'TASKER') {
                 window.location.replace('trangchutasker.html');
             } else {
-                window.location.replace('dangnhaptasker.html');
+                // Kiểm tra xem đã xem màn hình giới thiệu chưa
+                var introduced = localStorage.getItem('chioi_tasker_introduced');
+                if (introduced === 'true') {
+                    window.location.replace('dangnhaptasker.html');
+                } else {
+                    window.location.replace('gioithieu.html');
+                }
             }
         });
     </script>
