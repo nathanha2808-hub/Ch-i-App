@@ -381,7 +381,7 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_testflight: true
+        submit_to_testflight: false     # Tắt tự động gửi duyệt TestFlight để tránh lỗi thiếu thông tin thử nghiệm (Feedback Email, Review Info). Tester nội bộ vẫn tự động nhận được build bình thường.
         # beta_groups:
         #   - "Test phòng NAM"            # Nhóm thử nghiệm nội bộ (Internal Group) tự động nhận build, không cần gán qua API (gán qua API sẽ gây lỗi 'Cannot add internal group to a build')
         submit_to_app_store: false      # Manual review submission
