@@ -1,13 +1,13 @@
 /**
- * Regenerate ALL app icons from logo/logo.jpg master
+ * Regenerate ALL app icons from assets/images/logo.jpg master
  * Run: cd mobile-ios && node regen-icons.js
  *
  * Output PWA:
- *   frontend/icons/icon-192.png            PWA 192x192
- *   frontend/icons/icon-512.png            PWA 512x512
- *   frontend/icons/icon-maskable-512.png   PWA maskable (76% safe area)
- *   frontend/apple-touch-icon.png          iOS Safari 180x180 (white bg)
- *   frontend/favicon-32.png                Browser tab favicon
+ *   icons/icon-192.png            PWA 192x192
+ *   icons/icon-512.png            PWA 512x512
+ *   icons/icon-maskable-512.png   PWA maskable (76% safe area)
+ *   apple-touch-icon.png          iOS Safari 180x180 (white bg)
+ *   favicon-32.png                Browser tab favicon
  *
  * Output iOS (18 sizes — full coverage):
  *   AppIcon-20.png       20x20  @1x ipad
@@ -25,16 +25,26 @@
  *   AppIcon-76@2x.png    152x152 @2x ipad
  *   AppIcon-83.5@2x.png  167x167 @2x ipad Pro
  *   AppIcon-512@2x.png   1024x1024 ios-marketing (App Store)
+ * 
+ * Output Android (5 sizes for legacy, round and adaptive):
+ *   mipmap-mdpi/ic_launcher.png             48x48
+ *   mipmap-mdpi/ic_launcher_round.png       48x48
+ *   mipmap-mdpi/ic_launcher_foreground.png  108x108
+ *   mipmap-hdpi/...                         72x72 / 72x72 / 162x162
+ *   mipmap-xhdpi/...                        96x96 / 96x96 / 216x216
+ *   mipmap-xxhdpi/...                       144x144 / 144x144 / 324x324
+ *   mipmap-xxxhdpi/...                      192x192 / 192x192 / 432x432
  *
- * iOS requirement: KHÔNG có alpha channel (flatten white bg)
+ * iOS/Android requirements: Flattened backgrounds for non-adaptive launcher icons.
  */
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
 
 const ROOT = path.resolve(__dirname, '..');
-const SRC = path.join(ROOT, 'logo', 'logo.jpg');
+const SRC = path.join(ROOT, 'assets', 'images', 'logo.jpg');
 const IOS_ICON_DIR = path.join(__dirname, 'ios', 'App', 'App', 'Assets.xcassets', 'AppIcon.appiconset');
+const ANDROID_RES_DIR = path.join(__dirname, 'android', 'app', 'src', 'main', 'res');
 
 // iOS icon sizes (filename, dimensions in pixels)
 const IOS_SIZES = [
@@ -55,7 +65,7 @@ const IOS_SIZES = [
   ['AppIcon-512@2x.png', 1024],
 ];
 
-// New iOS Contents.json with all sizes
+// iOS Contents.json with all sizes
 const IOS_CONTENTS_JSON = {
   images: [
     { size: '20x20', idiom: 'iphone', filename: 'AppIcon-20@2x.png', scale: '2x' },
@@ -80,6 +90,15 @@ const IOS_CONTENTS_JSON = {
   info: { author: 'xcode', version: 1 },
 };
 
+// Android density mappings for generating icons
+const ANDROID_DENSITIES = [
+  { name: 'mipmap-mdpi', size: 48, foregroundSize: 108 },
+  { name: 'mipmap-hdpi', size: 72, foregroundSize: 162 },
+  { name: 'mipmap-xhdpi', size: 96, foregroundSize: 216 },
+  { name: 'mipmap-xxhdpi', size: 144, foregroundSize: 324 },
+  { name: 'mipmap-xxxhdpi', size: 192, foregroundSize: 432 },
+];
+
 async function main() {
   if (!fs.existsSync(SRC)) {
     console.error('❌ Source not found:', SRC);
@@ -91,24 +110,29 @@ async function main() {
 
   // ============ PWA icons ============
   console.log('\n🌐 PWA icons:');
-  await sharp(SRC).resize(192, 192, { fit: 'cover' }).png().toFile(path.join(ROOT, 'frontend', 'icons', 'icon-192.png'));
+  const pwaIconsDir = path.join(ROOT, 'icons');
+  if (!fs.existsSync(pwaIconsDir)) {
+    fs.mkdirSync(pwaIconsDir, { recursive: true });
+  }
+
+  await sharp(SRC).resize(192, 192, { fit: 'cover' }).png().toFile(path.join(pwaIconsDir, 'icon-192.png'));
   console.log('  ✓ icon-192.png');
 
-  await sharp(SRC).resize(512, 512, { fit: 'cover' }).png().toFile(path.join(ROOT, 'frontend', 'icons', 'icon-512.png'));
+  await sharp(SRC).resize(512, 512, { fit: 'cover' }).png().toFile(path.join(pwaIconsDir, 'icon-512.png'));
   console.log('  ✓ icon-512.png');
 
   const SAFE = 0.76;
-  const inner = await sharp(SRC).resize(Math.round(512*SAFE), Math.round(512*SAFE), { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 0 } }).png().toBuffer();
+  const inner = await sharp(SRC).resize(Math.round(512 * SAFE), Math.round(512 * SAFE), { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 0 } }).png().toBuffer();
   await sharp({ create: { width: 512, height: 512, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } } })
     .composite([{ input: inner, gravity: 'center' }])
     .png()
-    .toFile(path.join(ROOT, 'frontend', 'icons', 'icon-maskable-512.png'));
+    .toFile(path.join(pwaIconsDir, 'icon-maskable-512.png'));
   console.log('  ✓ icon-maskable-512.png');
 
-  await sharp(SRC).resize(180, 180, { fit: 'cover' }).flatten({ background: { r: 255, g: 255, b: 255 } }).png().toFile(path.join(ROOT, 'frontend', 'apple-touch-icon.png'));
+  await sharp(SRC).resize(180, 180, { fit: 'cover' }).flatten({ background: { r: 255, g: 255, b: 255 } }).png().toFile(path.join(ROOT, 'apple-touch-icon.png'));
   console.log('  ✓ apple-touch-icon.png');
 
-  await sharp(SRC).resize(32, 32, { fit: 'cover' }).flatten({ background: { r: 255, g: 255, b: 255 } }).png().toFile(path.join(ROOT, 'frontend', 'favicon-32.png'));
+  await sharp(SRC).resize(32, 32, { fit: 'cover' }).flatten({ background: { r: 255, g: 255, b: 255 } }).png().toFile(path.join(ROOT, 'favicon-32.png'));
   console.log('  ✓ favicon-32.png');
 
   // ============ iOS icons (15 unique files) ============
@@ -133,7 +157,63 @@ async function main() {
   fs.writeFileSync(contentsPath, JSON.stringify(IOS_CONTENTS_JSON, null, 2));
   console.log(`\n📝 Contents.json updated (${IOS_CONTENTS_JSON.images.length} entries: ${[...new Set(IOS_CONTENTS_JSON.images.map(i=>i.idiom))].join(', ')})`);
 
-  console.log('\n✅ Done. Next: cd mobile-ios && npx cap sync ios');
+  // ============ Android icons ============
+  console.log('\n🤖 Android icons (generating legacy, round, and adaptive foreground icons):');
+  if (!fs.existsSync(ANDROID_RES_DIR)) {
+    console.error('❌ Android resources directory not found:', ANDROID_RES_DIR);
+    process.exit(1);
+  }
+
+  for (const density of ANDROID_DENSITIES) {
+    const dirPath = path.join(ANDROID_RES_DIR, density.name);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // 1. Legacy Launcher Icon (ic_launcher.png)
+    const legacyPath = path.join(dirPath, 'ic_launcher.png');
+    await sharp(SRC)
+      .resize(density.size, density.size, { fit: 'cover' })
+      .png()
+      .toFile(legacyPath);
+    console.log(`  ✓ ${density.name}/ic_launcher.png (${density.size}x${density.size})`);
+
+    // 2. Round Launcher Icon (ic_launcher_round.png)
+    const roundPath = path.join(dirPath, 'ic_launcher_round.png');
+    const radius = density.size / 2;
+    const circleSvg = Buffer.from(
+      `<svg><circle cx="${radius}" cy="${radius}" r="${radius}" fill="white"/></svg>`
+    );
+    await sharp(SRC)
+      .resize(density.size, density.size, { fit: 'cover' })
+      .composite([{ input: circleSvg, blend: 'dest-in' }])
+      .png()
+      .toFile(roundPath);
+    console.log(`  ✓ ${density.name}/ic_launcher_round.png (${density.size}x${density.size})`);
+
+    // 3. Adaptive Foreground Icon (ic_launcher_foreground.png)
+    const fgPath = path.join(dirPath, 'ic_launcher_foreground.png');
+    const innerSize = Math.round(density.foregroundSize * 0.66);
+    const innerBuffer = await sharp(SRC)
+      .resize(innerSize, innerSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toBuffer();
+
+    await sharp({
+      create: {
+        width: density.foregroundSize,
+        height: density.foregroundSize,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      }
+    })
+      .composite([{ input: innerBuffer, gravity: 'center' }])
+      .png()
+      .toFile(fgPath);
+    console.log(`  ✓ ${density.name}/ic_launcher_foreground.png (${density.foregroundSize}x${density.foregroundSize})`);
+  }
+
+  console.log('\n✅ All assets generated successfully. Next step: npx cap sync android');
 }
 
-main().catch((e) => { console.error('❌', e.message); process.exit(1); });
+main().catch((e) => { console.error('❌ Error generating assets:', e.stack || e.message); process.exit(1); });
