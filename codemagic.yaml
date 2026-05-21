@@ -382,8 +382,8 @@ workflows:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
-        beta_groups:
-          - "Test phòng NAM"            # Khớp đúng group trong App Store Connect → TestFlight → Internal Testing
+        # beta_groups:
+        #   - "Test phòng NAM"            # Nhóm thử nghiệm nội bộ (Internal Group) tự động nhận build, không cần gán qua API (gán qua API sẽ gây lỗi 'Cannot add internal group to a build')
         submit_to_app_store: false      # Manual review submission
 
       email:

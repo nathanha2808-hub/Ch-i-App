@@ -4,6 +4,14 @@
 
 ---
 
+## [1.5.9] - 2026-05-21
+
+### 🚀 Sửa lỗi Build CI/CD (Codemagic TestFlight Internal Group Deployment)
+
+#### Fixed
+- **Codemagic Configuration:** Vô hiệu hóa cấu hình gán tự động nhóm thử nghiệm nội bộ (`beta_groups: - "Test phòng NAM"`) trong **[MODIFY]** [codemagic.yaml](file:///c:/Users/cuong/Documents/GitHub/Ch-i-App/codemagic.yaml).
+  - *Lý do:* Nhóm `"Test phòng NAM"` được cấu hình là nhóm **Internal Beta Group** (Thử nghiệm Nội bộ) trên App Store Connect. Theo cơ chế của Apple, các thành viên thuộc nhóm nội bộ này sẽ tự động nhận được toàn bộ các bản dựng (builds) mới được tải lên mà không cần gán thủ công qua API. Việc cố gắng gán thủ công qua API của Codemagic đã gây ra lỗi nghiêm trọng từ Apple API: `Cannot add internal group to a build` làm gián đoạn tiến trình xuất bản cuối cùng. Việc ẩn cấu hình gán qua API giúp khắc phục triệt để lỗi này, trong khi nhóm thử nghiệm nội bộ vẫn tự động nhận được bản dựng mới từ App Store Connect.
+
 ## [1.5.8] - 2026-05-21
 
 ### 📱 Tối ưu hóa phản hồi (Responsive Onboarding & Luxury Desktop Experience)
