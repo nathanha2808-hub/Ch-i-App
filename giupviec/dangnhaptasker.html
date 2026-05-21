@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
@@ -12,6 +12,22 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Đăng nhập Tasker | Chị Ơi!</title>
+<script src="../shared/api.js?v=20260521"></script>
+<script>
+    // Kiểm tra trạng thái điều hướng ngay lập tức trước khi render giao diện đăng nhập
+    (function() {
+        var token = ChiOiAuth.getToken();
+        var user = ChiOiAuth.getUser();
+        if (token && user && user.role === 'TASKER') {
+            window.location.replace('trangchutasker.html');
+            return;
+        }
+        var introduced = localStorage.getItem('chioi_tasker_introduced');
+        if (introduced !== 'true') {
+            window.location.replace('gioithieu.html');
+        }
+    })();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/responsive.css"/>
@@ -189,7 +205,7 @@
         <!-- Object Selection Tabs -->
         <div class="flex justify-center border-b border-surface-container-high/30 pb-2 mb-2">
             <span class="font-title-sm text-[14px] text-primary font-bold uppercase tracking-wider">
-                Dành cho Người Giúp Việc
+               - Dành cho Người Giúp Việc -
             </span>
         </div>
 
@@ -242,7 +258,6 @@
     <!-- Footer Spacer -->
     <div class="flex-1"></div>
 </main>
-<script src="../shared/api.js?v=20260514"></script>
 <script src="../shared/prefetch.js" defer></script>
 <script>
 // Toggle password visibility

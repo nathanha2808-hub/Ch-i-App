@@ -4,6 +4,17 @@
 
 ---
 
+## [1.6.0] - 2026-05-21
+
+### 📱 Tối ưu hóa điều hướng & Trải nghiệm Người giúp việc (Tasker Onboarding Flow)
+
+#### Changed
+- **Frontend Tasker:** Tích hợp cơ chế tự động chuyển hướng giới thiệu (Onboarding) thông minh trực tiếp vào trang Đăng nhập **[MODIFY]** [Giupviec/dangnhaptasker.html](file:///c:/Users/cuong/Documents/GitHub/Ch-i-App/Giupviec/dangnhaptasker.html).
+  - *Tác dụng:* Đảm bảo ngay cả khi ứng dụng di động được cấu hình trỏ thẳng vào trang Đăng nhập khi khởi chạy, người dùng mới (chưa từng xem màn hình giới thiệu) vẫn sẽ được tự động chuyển hướng sang màn hình giới thiệu `gioithieu.html` một cách hoàn hảo.
+  - *Cách hoạt động:* Sử dụng khối mã JavaScript tự chạy (IIFE) đặt ngay trong thẻ `<head>` để kiểm tra trạng thái token và cờ `chioi_tasker_introduced` trong `localStorage`. Nếu là lần đầu tiên mở app, lập tức thực hiện chuyển hướng. Nếu đã đăng nhập thành công từ trước, tự động chuyển thẳng vào trang chủ `trangchutasker.html`.
+  - *Tối ưu hóa:* Đặt mã điều hướng ở đầu phần `<head>` (trước khi tải các thư viện CSS/Tailwind nặng và trước khi dựng thẻ `<body>`), giúp tiến trình chuyển hướng diễn ra tức thì, triệt tiêu hoàn toàn hiện tượng nhấp nháy màn hình (screen flashing).
+  - *Dọn dẹp mã nguồn:* Loại bỏ tệp script `shared/api.js` tải trùng lặp ở cuối file đăng nhập để ngăn chặn lỗi `SyntaxError` (khai báo lại hằng số) làm crash script trang web.
+
 ## [1.5.9] - 2026-05-21
 
 ### 🚀 Sửa lỗi Build CI/CD (Codemagic TestFlight Internal Group Deployment)
