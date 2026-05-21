@@ -10,6 +10,7 @@
 
 #### Added
 - Khai báo các quyền định vị GPS thiết bị (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`) và tính năng phần cứng `android.hardware.location.gps` trong `AndroidManifest.xml`.
+- Khai báo thêm các quyền cần thiết cho thiết bị Android: Máy ảnh (`CAMERA`), Album/Thư viện ảnh (`READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE`), và Microphone (`RECORD_AUDIO`, `MODIFY_AUDIO_SETTINGS`) trong `AndroidManifest.xml`.
 - Khai báo quyền đẩy thông báo (`POST_NOTIFICATIONS`) trong `AndroidManifest.xml` cho các thiết bị chạy Android 13+ để đảm bảo nhận đơn hàng realtime đồng bộ với iOS.
 - Tích hợp thêm thuật toán tự động sinh toàn bộ launcher icons cho Android trong file script `mobile-ios/regen-icons.js`.
 

@@ -46,4 +46,19 @@
 
     <!-- Push Notifications Permission (Đồng bộ nhận đơn realtime trên Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Camera Permissions (Chụp ảnh KYC, ảnh báo cáo đơn hàng) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Album / Thư viện ảnh Permissions -->
+    <!-- Dành cho Android 13+ (API 33+) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <!-- Dành cho Android 12 trở xuống (API 32 trở xuống) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+
+    <!-- Microphone Permissions (Ghi âm voice message, đàm thoại WebRTC) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 </manifest>
