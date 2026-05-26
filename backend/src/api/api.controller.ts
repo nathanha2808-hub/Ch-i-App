@@ -38,6 +38,13 @@ export class ApiController {
     });
   }
 
+  @Delete('users/profile')
+  @Roles('CUSTOMER', 'TASKER')
+  @ApiOperation({ summary: 'Xóa tài khoản người dùng (Soft Delete - Guideline 5.1.1(v))' })
+  async deleteProfile(@Request() req) {
+    return this.apiService.deleteUserProfile(req.user.userId);
+  }
+
   @Get('services')
   @Roles('CUSTOMER', 'ADMIN') // Tasker doesn't typically need this, but we can allow
   @ApiOperation({ summary: 'Lấy danh sách dịch vụ (Cần Token Customer/Admin)' })

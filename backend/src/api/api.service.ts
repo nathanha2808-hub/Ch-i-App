@@ -117,6 +117,19 @@ export class ApiService {
     return { ...user, address: resolvedAddress, bio: tasker?.bio || data.bio || null };
   }
 
+  async deleteUserProfile(userId: number) {
+    const user = await this.prisma.users.findUnique({ where: { user_id: userId } });
+    if (!user) throw new BadRequestException('Không tìm thấy người dùng');
+
+    // Cập nhật trạng thái thành INACTIVE
+    await this.prisma.users.update({
+      where: { user_id: userId },
+      data: { status: 'INACTIVE', updated_at: new Date() }
+    });
+
+    return { message: 'Xóa tài khoản thành công. Tài khoản đã bị vô hiệu hóa.' };
+  }
+
   async getServices() {
     return this.prisma.services.findMany({ where: { is_active: true }, orderBy: { service_id: 'asc' } });
   }

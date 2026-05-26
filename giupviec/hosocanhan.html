@@ -282,6 +282,14 @@
 </button>
 </section>
 
+<!-- Delete Account Section -->
+<section class="pt-sm">
+<button id="btnDeleteAccount" class="w-full bg-error-container/20 text-error font-title-sm py-3 rounded-xl flex items-center justify-center gap-sm transition-transform active:scale-95 border border-error/10">
+<span class="material-symbols-outlined">delete</span>
+Xóa tài khoản
+</button>
+</section>
+
 <!-- Logout Section -->
 <section class="pt-sm">
 <button id="btnLogout" class="w-full bg-error-container/50 text-error font-title-sm py-3 rounded-xl flex items-center justify-center gap-sm transition-transform active:scale-95 border border-error/20">
@@ -567,6 +575,31 @@
                     localStorage.removeItem('chioi_user');
                     window.location.href = 'dangnhaptasker.html';
                 }
+            }
+        });
+    }
+
+    // ===== 8. Nút Xóa tài khoản =====
+    var btnDeleteAccount = document.getElementById('btnDeleteAccount');
+    if (btnDeleteAccount) {
+        btnDeleteAccount.addEventListener('click', function() {
+            if (confirm('⚠️ Bạn có chắc chắn muốn xóa tài khoản?\nHành động này không thể hoàn tác. Tài khoản của bạn sẽ bị vô hiệu hóa ngay lập tức.')) {
+                apiFetch('/api/users/profile', {
+                    method: 'DELETE'
+                }).then(function(result) {
+                    showToastMsg('✅ Xóa tài khoản thành công!');
+                    setTimeout(function() {
+                        if (typeof ChiOiAuth !== 'undefined') {
+                            ChiOiAuth.logout('dangnhaptasker.html');
+                        } else {
+                            localStorage.removeItem('chioi_token');
+                            localStorage.removeItem('chioi_user');
+                            window.location.href = 'dangnhaptasker.html';
+                        }
+                    }, 1500);
+                }).catch(function(e) {
+                    showToastMsg('❌ ' + e.message);
+                });
             }
         });
     }

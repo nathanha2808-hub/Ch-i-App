@@ -4,6 +4,24 @@
 
 ---
 
+## [1.6.1] - 2026-05-26
+
+### 📱 Tích hợp Xóa tài khoản & Cập nhật bộ App Icon Độc quyền (Apple App Store Compliance)
+
+#### Added
+- **Backend:** Thêm endpoint `DELETE /api/users/profile` trong [api.controller.ts](file:///c:/Users/cuong/Documents/GitHub/Ch-i-App/backend/src/api/api.controller.ts) phục vụ soft delete.
+- **Backend:** Triển khai hàm `deleteUserProfile` trong [api.service.ts](file:///c:/Users/cuong/Documents/GitHub/Ch-i-App/backend/src/api/api.service.ts) để cập nhật trạng thái người dùng thành `INACTIVE`.
+- **Frontend Tasker:** Thêm nút **Xóa tài khoản** màu đỏ trong [hosocanhan.html](file:///c:/Users/cuong/Documents/GitHub/Ch-i-App/giupviec/hosocanhan.html), hoàn tất luồng xác nhận, gọi API xóa tài khoản và tự động đăng xuất về trang đăng nhập.
+
+#### Changed
+- **Frontend Khách hàng:** Hoàn thiện luồng xóa tài khoản thực tế cho nút "Xác nhận xóa" trong modal [taikhoan.html](file:///c:/Users/cuong/Documents/GitHub/Ch-i-App/khachhang/taikhoan.html) gọi API `DELETE /api/users/profile` và tự động đăng xuất.
+- **App Icons:** Cập nhật Logo gốc `assets/images/logo.jpg` theo hình ảnh người dùng cung cấp và tái tạo thành công toàn bộ 15 kích cỡ icon di động iOS, 15 icon di động Android (legacy, round, adaptive foreground) và bộ icon PWA/Favicon bằng script `regen-icons.js`. Thực hiện đồng bộ Capacitor (`npx cap sync`).
+
+#### Fixed
+- **Frontend:** Sửa triệt để lỗi vỡ thẻ HTML `<main-w-md>` bị lỗi cú pháp thành thẻ `<main>` tiêu chuẩn, khôi phục lại layout hiển thị hoàn hảo ở 5 trang đăng nhập/hồ sơ (`dangnhaptasker.html`, `dangkytasker.html`, `dangnhap.html`, `goigiadinh.html`, `quenmatkhau.html`).
+
+---
+
 ## [1.6.0] - 2026-05-21
 
 ### 📱 Tối ưu hóa điều hướng & Trải nghiệm Người giúp việc (Tasker Onboarding Flow)

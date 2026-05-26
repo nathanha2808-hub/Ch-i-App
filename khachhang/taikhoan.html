@@ -564,7 +564,21 @@
       '<p class="text-body-lg font-bold text-error">Bạn có chắc chắn muốn xóa tài khoản?</p>' +
       '<p class="text-body-sm text-on-surface-variant">Hành động này không thể hoàn tác. Tất cả dữ liệu sẽ bị xóa sau 30 ngày.</p>' +
       '<div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95">Hủy</button>' +
-      '<button class="flex-1 py-3 rounded-xl bg-error text-white font-bold active:scale-95">Xác nhận xóa</button></div></div>'
+      '<button id="confirm-delete-account" class="flex-1 py-3 rounded-xl bg-error text-white font-bold active:scale-95">Xác nhận xóa</button></div></div>',
+      function() {
+        document.getElementById('confirm-delete-account').addEventListener('click', async function() {
+          try {
+            await apiFetch('/api/users/profile', { method: 'DELETE' });
+            closeModal();
+            showToastMsg('✅ Xóa tài khoản thành công!');
+            setTimeout(function() {
+              ChiOiAuth.logout('dangnhap.html');
+            }, 1500);
+          } catch(e) {
+            showToastMsg('❌ ' + e.message);
+          }
+        });
+      }
     );
   });
 
