@@ -57,7 +57,7 @@ export class AuthService {
     const password_hash = await bcrypt.hash(data.password, saltOrRounds);
 
     // Tasker mới phải chờ Admin phê duyệt
-    const userStatus = data.role === 'TASKER' ? 'PENDING' : 'ACTIVE';
+    const userStatus = data.role === 'TASKER' ? 'PENDING_KYC' : 'ACTIVE';
 
     const user = await this.prisma.users.create({
       data: {
@@ -92,27 +92,40 @@ export class AuthService {
       await this.prisma.taskers.create({
         data: { 
           tasker_id: user.user_id, 
-          kyc_status: 'PENDING_APPROVAL',
+          kyc_status: 'PENDING', // Thay đổi từ 'PENDING_APPROVAL' thành 'PENDING' để thỏa mãn check constraint của Postgres
           bio: bioData
         },
       });
 
-      // Handle Tasker Services Mapping
       if (data.services && Array.isArray(data.services) && data.services.length > 0) {
-        const serviceMap: Record<string, number> = {
-          'don_nha': 1,
-          'trong_tre': 4,
-          'mua_ho': 7
-        };
-        
-        const taskerServices = data.services
-          .map((svc: string) => serviceMap[svc])
-          .filter((id: number | undefined) => id !== undefined)
-          .map((service_id: number) => ({
-            tasker_id: user.user_id,
-            service_id,
-            status: 'PENDING_APPROVAL'
-          }));
+        // Lấy danh sách dịch vụ đang hoạt động từ database để so khớp động
+        const dbServices = await this.prisma.services.findMany({
+          where: { is_active: true }
+        });
+
+        const taskerServices: any[] = [];
+
+        for (const svc of data.services) {
+          let matchedService: any = null;
+          if (svc === 'don_nha') {
+            matchedService = dbServices.find(s => s.name.toLowerCase().includes('dọn') || s.name.toLowerCase().includes('don'));
+            if (!matchedService) matchedService = { service_id: 1 }; // Fallback an toàn
+          } else if (svc === 'trong_tre') {
+            matchedService = dbServices.find(s => s.name.toLowerCase().includes('trông') || s.name.toLowerCase().includes('trong'));
+            if (!matchedService) matchedService = { service_id: 3 }; // Fallback an toàn
+          } else if (svc === 'mua_ho') {
+            matchedService = dbServices.find(s => s.name.toLowerCase().includes('mua') || s.name.toLowerCase().includes('cho') || s.name.toLowerCase().includes('chợ'));
+            if (!matchedService) matchedService = { service_id: 4 }; // Fallback an toàn
+          }
+
+          if (matchedService) {
+            taskerServices.push({
+              tasker_id: user.user_id,
+              service_id: matchedService.service_id,
+              status: 'PENDING_APPROVAL'
+            });
+          }
+        }
 
         if (taskerServices.length > 0) {
           await this.prisma.tasker_services.createMany({

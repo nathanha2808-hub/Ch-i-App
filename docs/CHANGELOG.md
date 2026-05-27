@@ -4,6 +4,19 @@
 
 ---
 
+## [1.5.6] - 2026-05-27
+
+### ðŸ› Bug fixes â€” Tasker Registration Internal Server Error (PostgreSQL Constraints & Service IDs)
+
+#### Fixed
+- **Backend Auth:** `backend/src/auth/auth.service.ts` â€” Thay tháº¿ cÆ¡ cháº¿ map `service_id` tÄ©nh (`1`, `4`, `7`) báº±ng cÆ¡ cháº¿ **so khá»›p Ä‘á»™ng theo tÃªn** (`dbServices.find`) Ä‘á»ƒ trÃ¡nh lá»‡ch ID giá»¯a cÃ¡c mÃ´i trÆ°á»ng database.
+- **PostgreSQL Constraints:** Sá»­a lá»—i vi pháº¡m CHECK Constraint cá»§a PostgreSQL khi táº¡o tÃ i khoáº£n Tasker:
+  - Cáº­p nháº­t `users.status` thÃ nh `'PENDING_KYC'` (thay vÃ¬ `'PENDING'` vá»‘n bá»‹ cáº¥m bá»Ÿi CHECK constraint cá»§a báº£ng `users`).
+  - Cáº­p nháº­t `taskers.kyc_status` thÃ nh `'PENDING'` (thay vÃ¬ `'PENDING_APPROVAL'` vá»‘n bá»‹ cáº¥m bá»Ÿi CHECK constraint cá»§a báº£ng `taskers`).
+- **Backend API:** `backend/src/api/api.service.ts` â€” Cáº­p nháº­t endpoint `submitKyc` Ä‘á»ƒ lÆ°u `kyc_status` lÃ  `'PENDING'` (thay vÃ¬ `'PENDING_APPROVAL'`) nháº±m tuÃ¢n thá»§ hoÃ n toÃ n check constraint cá»§a database PostgreSQL trÃªn production server.
+
+---
+
 ## [1.5.5] - 2026-05-19
 
 ### âœ¨ New Features â€” Tasker Auto-Accept Orders & Polling Optimization
@@ -320,6 +333,6 @@ Sau khi PR #1 (backend hardening) merge vÃ o main, PR #2 (`testvps1` â€” chat re
 
 > Format: `[VERSION] â€” YYYY-MM-DD`  
 > Má»—i entry pháº£i cÃ³: **Ai thay Ä‘á»•i** (náº¿u cÃ³), **File bá»‹ áº£nh hÆ°á»Ÿng**, **LÃ½ do**
-- **Frontend & Backend:** T?m ?n toàn b? giao di?n và logic c?a tính nang Gói Gia Ðình (Family Package). Ðã ?n banner khuy?n mãi, nút mua gói, menu trong tài kho?n, ph?n hi?n th? uu dãi trên các màn hình d?t d?ch v?, cung nhu vô hi?u hoá logic tính toán gi?m giá 15% t?i backend (orders.service.ts).
--   * * F r o n t e n d : * *   F i x   L ×i   4   t ë  A p p l e   ( G i a o   d i Çn   k h ô n g   t Ñi   °u   t r ê n   i P a d ) .   Á p   d ån g   C S S   G r i d / T a i l w i n d   r e s p o n s i v e   ( c h i a   c Ùt )   c h o   c á c   m à n   h ì n h   ·t   d Ëc h   v å,   t Ñi   °u   k í c h   t h °Ûc   B o t t o m   N a v   v à   m ß  r Ùn g   c o n t a i n e r   t ë  m a x - w - m d   s a n g   m d : m a x - w - 4 x l .  
+- **Frontend & Backend:** T?m ?n toï¿½n b? giao di?n vï¿½ logic c?a tï¿½nh nang Gï¿½i Gia ï¿½ï¿½nh (Family Package). ï¿½ï¿½ ?n banner khuy?n mï¿½i, nï¿½t mua gï¿½i, menu trong tï¿½i kho?n, ph?n hi?n th? uu dï¿½i trï¿½n cï¿½c mï¿½n hï¿½nh d?t d?ch v?, cung nhu vï¿½ hi?u hoï¿½ logic tï¿½nh toï¿½n gi?m giï¿½ 15% t?i backend (orders.service.ts).
+-   * * F r o n t e n d : * *   F i x   L ï¿½i   4   t ï¿½  A p p l e   ( G i a o   d i ï¿½n   k h ï¿½ n g   t ï¿½i   ï¿½u   t r ï¿½ n   i P a d ) .   ï¿½ p   d ï¿½n g   C S S   G r i d / T a i l w i n d   r e s p o n s i v e   ( c h i a   c ï¿½t )   c h o   c ï¿½ c   m ï¿½ n   h ï¿½ n h   ï¿½t   d ï¿½c h   v ï¿½,   t ï¿½i   ï¿½u   k ï¿½ c h   t h ï¿½ï¿½c   B o t t o m   N a v   v ï¿½   m ï¿½  r ï¿½n g   c o n t a i n e r   t ï¿½  m a x - w - m d   s a n g   m d : m a x - w - 4 x l .  
  
