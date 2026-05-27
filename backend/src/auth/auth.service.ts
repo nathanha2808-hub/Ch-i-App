@@ -66,6 +66,7 @@ export class AuthService {
         full_name: data.full_name || 'Chưa cập nhật',
         role: data.role,
         status: userStatus,
+        email: data.email || null,
       },
     });
 
@@ -330,5 +331,96 @@ export class AuthService {
       where: { bio: { contains: `CCCD: ${idNumber}` } }
     });
     return { exists: !!existing };
+  }
+
+  /**
+   * App Store 5.1.1(v) + Google Play account deletion requirement.
+   * Soft-delete: anonymize PII, set status=DELETED, giải phóng SĐT để đăng ký lại,
+   * giữ lại các record orders/transactions/reviews phục vụ kế toán & lịch sử của bên còn lại.
+   */
+  async deleteAccount(userId: number, password: string, reason?: string) {
+    const user = await this.prisma.users.findUnique({
+      where: { user_id: userId },
+      include: { wallets: true, taskers: true, customers: true },
+    });
+    if (!user) {
+      throw new BadRequestException('Người dùng không tồn tại');
+    }
+    if (user.status === 'DELETED') {
+      throw new BadRequestException('Tài khoản đã bị xóa trước đó');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      throw new BadRequestException('Mật khẩu không đúng');
+    }
+
+    // Chặn xóa nếu còn đơn đang chạy (cả Customer lẫn Tasker)
+    const activeStatuses = ['SEARCHING', 'PENDING', 'ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'];
+    const activeOrderCount = await this.prisma.orders.count({
+      where: {
+        status: { in: activeStatuses },
+        OR: [
+          user.customers ? { customer_id: userId } : undefined,
+          user.taskers ? { tasker_id: userId } : undefined,
+        ].filter(Boolean) as any,
+      },
+    });
+    if (activeOrderCount > 0) {
+      throw new BadRequestException(
+        `Bạn còn ${activeOrderCount} đơn hàng đang xử lý. Vui lòng hoàn tất hoặc hủy đơn trước khi xóa tài khoản.`,
+      );
+    }
+
+    // Chặn xóa nếu ví còn tiền (yêu cầu rút hết để không mất tiền của user)
+    const balance = Number(user.wallets?.balance ?? 0);
+    if (balance > 0) {
+      throw new BadRequestException(
+        `Ví của bạn còn ${balance.toLocaleString('vi-VN')}đ. Vui lòng rút hết trước khi xóa tài khoản.`,
+      );
+    }
+
+    // Anonymize: đổi phone & email để giải phóng cho người khác đăng ký lại
+    const tag = `DELETED_${userId}_${Date.now()}`;
+    await this.prisma.$transaction(async (tx) => {
+      await tx.users.update({
+        where: { user_id: userId },
+        data: {
+          phone: tag,
+          email: null,
+          full_name: 'Người dùng đã xóa',
+          avatar_url: null,
+          gender: null,
+          status: 'DELETED',
+          updated_at: new Date(),
+        },
+      });
+
+      if (user.taskers) {
+        await tx.taskers.update({
+          where: { tasker_id: userId },
+          data: {
+            is_online: false,
+            bio: reason ? `[DELETED] Lý do: ${reason.substring(0, 200)}` : '[DELETED]',
+            address: null,
+          },
+        });
+      }
+
+      if (user.customers) {
+        await tx.customers.update({
+          where: { customer_id: userId },
+          data: { default_address: null },
+        });
+      }
+
+      // Xóa push subscriptions để không nhận thông báo nữa
+      await tx.push_subscriptions.deleteMany({ where: { user_id: userId } });
+    });
+
+    return {
+      message: 'Tài khoản đã được xóa. Cảm ơn bạn đã sử dụng Chị Ơi!',
+      deleted_at: new Date().toISOString(),
+    };
   }
 }

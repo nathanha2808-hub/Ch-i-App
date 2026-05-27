@@ -289,7 +289,63 @@
 Đăng xuất
 </button>
 </section>
+
+<!-- App Store 5.1.1(v): Delete Account Section -->
+<section class="pt-sm">
+<button id="btnDeleteAccount" class="w-full bg-white text-error font-title-sm py-3 rounded-xl flex items-center justify-center gap-sm transition-transform active:scale-95 border-2 border-error/40">
+<span class="material-symbols-outlined">delete_forever</span>
+Xóa tài khoản
+</button>
+<p class="text-[11px] text-on-surface-variant text-center mt-2 px-md">
+  Hành động này không thể hoàn tác. Dữ liệu cá nhân sẽ bị xóa vĩnh viễn.
+</p>
+</section>
 </main>
+
+<!-- Delete Account Modal -->
+<div id="delete-account-modal" class="fixed inset-0 z-[300] hidden">
+  <div class="absolute inset-0 bg-black/60" onclick="closeDeleteModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-md bg-white rounded-2xl p-6 shadow-2xl">
+    <div class="text-center">
+      <div class="w-16 h-16 mx-auto rounded-full bg-error-container/40 flex items-center justify-center mb-4">
+        <span class="material-symbols-outlined text-error text-[36px]">warning</span>
+      </div>
+      <h2 class="text-title-sm font-bold text-error mb-2">Xóa tài khoản vĩnh viễn?</h2>
+      <p class="text-body-sm text-on-surface-variant mb-4">
+        Sau khi xóa, bạn <strong>không thể khôi phục</strong>. Toàn bộ thông tin cá nhân, KYC, dịch vụ đã đăng ký sẽ bị xóa. Lịch sử đơn hàng được giữ ẩn danh để đối soát.
+      </p>
+      <ul class="text-left text-body-sm text-on-surface-variant bg-error-container/20 rounded-xl p-3 mb-4 space-y-1">
+        <li>• Không xóa được nếu còn đơn đang xử lý</li>
+        <li>• Không xóa được nếu ví còn tiền (vui lòng rút trước)</li>
+        <li>• Số điện thoại sẽ được giải phóng để đăng ký mới</li>
+      </ul>
+    </div>
+
+    <div class="space-y-3">
+      <div>
+        <label class="text-body-sm font-bold text-on-surface block mb-1">Nhập mật khẩu để xác nhận <span class="text-error">*</span></label>
+        <input id="delete-password" type="password" autocomplete="current-password"
+               class="w-full p-3 rounded-xl border-2 border-outline-variant focus:border-error focus:outline-none text-body-lg"
+               placeholder="Mật khẩu hiện tại" />
+      </div>
+      <div>
+        <label class="text-body-sm text-on-surface-variant block mb-1">Lý do xóa <span class="text-on-surface-variant/60">(tùy chọn)</span></label>
+        <textarea id="delete-reason" rows="2"
+                  class="w-full p-3 rounded-xl border border-outline-variant focus:border-primary focus:outline-none text-body-sm resize-none"
+                  placeholder="Ví dụ: Không còn nhu cầu sử dụng..."></textarea>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-5">
+      <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95">
+        Hủy
+      </button>
+      <button id="btnConfirmDelete" class="flex-1 py-3 rounded-xl bg-error text-white font-bold active:scale-95">
+        Xóa tài khoản
+      </button>
+    </div>
+  </div>
+</div>
 <!-- BottomNavBar -->
 
 <!-- Navigation Shell -->
@@ -570,7 +626,55 @@
             }
         });
     }
+
+    // ===== 8. App Store 5.1.1(v): Xóa tài khoản =====
+    var btnDelete = document.getElementById('btnDeleteAccount');
+    var modal = document.getElementById('delete-account-modal');
+    var btnConfirm = document.getElementById('btnConfirmDelete');
+    if (btnDelete && modal) {
+        btnDelete.addEventListener('click', function() {
+            document.getElementById('delete-password').value = '';
+            document.getElementById('delete-reason').value = '';
+            modal.classList.remove('hidden');
+        });
+    }
+    if (btnConfirm) {
+        btnConfirm.addEventListener('click', async function() {
+            var pwd = document.getElementById('delete-password').value;
+            var reason = document.getElementById('delete-reason').value.trim();
+            if (!pwd || pwd.length < 6) {
+                showToastMsg('❌ Vui lòng nhập mật khẩu (tối thiểu 6 ký tự)');
+                return;
+            }
+            btnConfirm.disabled = true;
+            btnConfirm.textContent = 'Đang xóa...';
+            try {
+                await apiFetch('/api/auth/account', {
+                    method: 'DELETE',
+                    body: { password: pwd, reason: reason || undefined },
+                });
+                showToastMsg('✅ Đã xóa tài khoản. Tạm biệt!');
+                setTimeout(function() {
+                    if (typeof ChiOiAuth !== 'undefined') {
+                        ChiOiAuth.logout('dangnhaptasker.html');
+                    } else {
+                        localStorage.clear();
+                        window.location.href = 'dangnhaptasker.html';
+                    }
+                }, 1200);
+            } catch (e) {
+                showToastMsg('❌ ' + (e.message || 'Không thể xóa tài khoản'));
+                btnConfirm.disabled = false;
+                btnConfirm.textContent = 'Xóa tài khoản';
+            }
+        });
+    }
 })();
+
+function closeDeleteModal() {
+    var m = document.getElementById('delete-account-modal');
+    if (m) m.classList.add('hidden');
+}
 
 function showToastMsg(msg) {
     var toast = document.getElementById('toast-notify');
