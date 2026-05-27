@@ -9,13 +9,15 @@
     "open": "cap open ios"
   },
   "dependencies": {
+    "@capacitor/android": "^6.2.1",
     "@capacitor/app": "^6.0.1",
     "@capacitor/browser": "^6.0.3",
     "@capacitor/core": "^6.1.2",
     "@capacitor/geolocation": "^6.0.1",
     "@capacitor/ios": "^6.1.2",
     "@capacitor/push-notifications": "^6.0.2",
-    "@capacitor/splash-screen": "^6.0.2"
+    "@capacitor/splash-screen": "^6.0.2",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",
