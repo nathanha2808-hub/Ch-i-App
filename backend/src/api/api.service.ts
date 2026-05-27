@@ -317,7 +317,7 @@ export class ApiService {
   async submitKyc(taskerId: number, kycData: any) {
     return this.prisma.taskers.update({
       where: { tasker_id: taskerId },
-      data: { kyc_status: 'PENDING_APPROVAL' },
+      data: { kyc_status: 'PENDING' }, // Thay đổi thành 'PENDING' để hợp lệ với Postgres CHECK constraint
     });
   }
 

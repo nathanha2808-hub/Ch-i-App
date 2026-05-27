@@ -4,22 +4,16 @@
 
 ---
 
-## [1.5.6] - 2026-05-21
+## [1.5.6] - 2026-05-27
 
-### 🐛 Sửa lỗi Android Native (Location Access & App Logo Sync)
-
-#### Added
-- Khai báo các quyền định vị GPS thiết bị (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`) và tính năng phần cứng `android.hardware.location.gps` trong `AndroidManifest.xml`.
-- Khai báo quyền đẩy thông báo (`POST_NOTIFICATIONS`) trong `AndroidManifest.xml` cho các thiết bị chạy Android 13+ để đảm bảo nhận đơn hàng realtime đồng bộ với iOS.
-- Tích hợp thêm thuật toán tự động sinh toàn bộ launcher icons cho Android trong file script `mobile-ios/regen-icons.js`.
+### 🐛 Bug fixes — Tasker Registration Internal Server Error (PostgreSQL Constraints & Service IDs)
 
 #### Fixed
-- Sửa lỗi đường dẫn logo gốc và thư mục output của PWA trong `mobile-ios/regen-icons.js` (logo gốc chuyển từ `logo/logo.jpg` không tồn tại thành `assets/images/logo.jpg`, thư mục PWA lưu trực tiếp ở `/icons/` thay vì `/frontend/`).
-- Tạo thành công 15 tệp logo Android cho 5 mức mật độ màn hình (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`), bao gồm:
-  - Legacy vuông (`ic_launcher.png`)
-  - Round tròn (`ic_launcher_round.png`) sử dụng SVG circle mask.
-  - Adaptive foreground (`ic_launcher_foreground.png`) co giãn 66% an toàn trên transparent canvas.
-- Hoàn thành đồng bộ cấu hình ứng dụng Android (`npx cap sync android`).
+- **Backend Auth:** `backend/src/auth/auth.service.ts` — Thay thế cơ chế map `service_id` tĩnh (`1`, `4`, `7`) bằng cơ chế **so khớp động theo tên** (`dbServices.find`) để tránh lệch ID giữa các môi trường database.
+- **PostgreSQL Constraints:** Sửa lỗi vi phạm CHECK Constraint của PostgreSQL khi tạo tài khoản Tasker:
+  - Cập nhật `users.status` thành `'PENDING_KYC'` (thay vì `'PENDING'` vốn bị cấm bởi CHECK constraint của bảng `users`).
+  - Cập nhật `taskers.kyc_status` thành `'PENDING'` (thay vì `'PENDING_APPROVAL'` vốn bị cấm bởi CHECK constraint của bảng `taskers`).
+- **Backend API:** `backend/src/api/api.service.ts` — Cập nhật endpoint `submitKyc` để lưu `kyc_status` là `'PENDING'` (thay vì `'PENDING_APPROVAL'`) nhằm tuân thủ hoàn toàn check constraint của database PostgreSQL trên production server.
 
 ---
 

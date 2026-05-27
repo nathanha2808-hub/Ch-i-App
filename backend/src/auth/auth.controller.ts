@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Query, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Query, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -9,6 +9,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ResendOtpDto } from './dto/resend-otp.dto';
+import { DeleteAccountDto } from './dto/delete-account.dto';
 
 @ApiTags('Authentication')
 @Controller('api/auth')
@@ -31,6 +32,10 @@ export class AuthController {
     // Bug Report20: Chặn login nếu tài khoản bị ban
     if (user.status === 'BANNED') {
       throw new UnauthorizedException('Tài khoản của bạn đã bị tạm khóa. Vui lòng liên hệ Admin để được hỗ trợ.');
+    }
+    // App Store 5.1.1(v): Chặn login nếu tài khoản đã bị xóa
+    if (user.status === 'DELETED') {
+      throw new UnauthorizedException('Tài khoản này đã bị xóa và không thể đăng nhập.');
     }
     return this.authService.login(user);
   }
@@ -85,6 +90,20 @@ export class AuthController {
   @ApiBody({ type: ChangePasswordDto })
   async changePassword(@Request() req, @Body() body: ChangePasswordDto) {
     return this.authService.changePassword(req.user.userId, body.current_password, body.new_password);
+  }
+
+  // App Store 5.1.1(v) + Google Play: bắt buộc có endpoint xóa tài khoản
+  @Delete('account')
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ auth: { limit: 5, ttl: 60_000 } })
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Xóa tài khoản (Customer + Tasker) — soft-delete, anonymize PII',
+    description: 'Yêu cầu xác nhận mật khẩu. Từ chối nếu còn đơn đang xử lý hoặc ví còn tiền.',
+  })
+  @ApiBody({ type: DeleteAccountDto })
+  async deleteAccount(@Request() req, @Body() body: DeleteAccountDto) {
+    return this.authService.deleteAccount(req.user.userId, body.password, body.reason);
   }
 }
 

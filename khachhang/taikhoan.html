@@ -520,13 +520,22 @@
             '<div><label class="text-body-sm text-on-surface-variant block mb-1">Xác nhận mật khẩu mới</label><input id="pw-confirm" type="password" class="w-full p-3 rounded-xl border border-outline-variant bg-surface-container-low text-body-lg" placeholder="Nhập lại mật khẩu mới" /></div>' +
             '<button id="save-pw-btn" class="orange-gradient w-full py-3 rounded-xl text-white font-bold active:scale-95 transition-all">Đổi mật khẩu</button></div>',
             function() {
+              // TC-KN27-010 FIX: Chặn nhập khoảng trắng realtime
+              ['pw-current', 'pw-new', 'pw-confirm'].forEach(function(id) {
+                document.getElementById(id).addEventListener('input', function() {
+                  this.value = this.value.replace(/\s/g, '');
+                });
+              });
+
               document.getElementById('save-pw-btn').addEventListener('click', async function() {
                 var cur = document.getElementById('pw-current').value;
-                var np = document.getElementById('pw-new').value.trim();
-                var cf = document.getElementById('pw-confirm').value.trim();
+                var np = document.getElementById('pw-new').value;
+                var cf = document.getElementById('pw-confirm').value;
                 if (!cur || !np) { showToastMsg('Vui lòng nhập đầy đủ'); return; }
                 // TC-KN27-010 FIX: Chặn mật khẩu chỉ chứa khoảng trắng
                 if (/\s/.test(np)) { showToastMsg('Mật khẩu không được chứa khoảng trắng'); return; }
+                np = np.trim();
+                cf = cf.trim();
                 if (np.length < 8 || np.length > 20) { showToastMsg('Mật khẩu mới phải từ 8-20 ký tự'); return; }
                 if (!/[A-Z]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa'); return; }
                 if (!/[a-z]/.test(np)) { showToastMsg('Mật khẩu phải chứa ít nhất 1 chữ cái viết thường'); return; }
@@ -557,14 +566,53 @@
     );
   });
 
+  // App Store 5.1.1(v): Xóa tài khoản — gọi DELETE /api/auth/account
   document.getElementById('btn-delete-account').addEventListener('click', function() {
     showModal('Xóa tài khoản',
-      '<div class="space-y-4 text-center">' +
+      '<div class="space-y-3">' +
+      '<div class="text-center">' +
       '<span class="material-symbols-outlined text-[48px] text-error">warning</span>' +
-      '<p class="text-body-lg font-bold text-error">Bạn có chắc chắn muốn xóa tài khoản?</p>' +
-      '<p class="text-body-sm text-on-surface-variant">Hành động này không thể hoàn tác. Tất cả dữ liệu sẽ bị xóa sau 30 ngày.</p>' +
-      '<div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95">Hủy</button>' +
-      '<button class="flex-1 py-3 rounded-xl bg-error text-white font-bold active:scale-95">Xác nhận xóa</button></div></div>'
+      '<p class="text-body-lg font-bold text-error mt-2">Xóa tài khoản vĩnh viễn?</p>' +
+      '<p class="text-body-sm text-on-surface-variant mt-1">Hành động này <strong>không thể hoàn tác</strong>. Dữ liệu cá nhân sẽ bị xóa, lịch sử đơn được giữ ẩn danh để đối soát.</p>' +
+      '</div>' +
+      '<ul class="text-left text-body-sm text-on-surface-variant bg-error-container/20 rounded-xl p-3 space-y-1">' +
+      '<li>• Không xóa được nếu còn đơn đang xử lý</li>' +
+      '<li>• Không xóa được nếu ví còn tiền</li>' +
+      '<li>• Số điện thoại sẽ được giải phóng</li>' +
+      '</ul>' +
+      '<div><label class="text-body-sm font-bold text-on-surface block mb-1">Mật khẩu hiện tại <span class="text-error">*</span></label>' +
+      '<input id="del-pwd" type="password" autocomplete="current-password" class="w-full p-3 rounded-xl border-2 border-outline-variant focus:border-error focus:outline-none text-body-lg" placeholder="Nhập mật khẩu" /></div>' +
+      '<div><label class="text-body-sm text-on-surface-variant block mb-1">Lý do (tùy chọn)</label>' +
+      '<textarea id="del-reason" rows="2" class="w-full p-3 rounded-xl border border-outline-variant focus:border-primary focus:outline-none text-body-sm resize-none" placeholder="Vd: Không còn nhu cầu..."></textarea></div>' +
+      '<div class="flex gap-3 mt-2"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold active:scale-95">Hủy</button>' +
+      '<button id="confirm-delete-account" class="flex-1 py-3 rounded-xl bg-error text-white font-bold active:scale-95">Xác nhận xóa</button></div>' +
+      '</div>',
+      function() {
+        document.getElementById('confirm-delete-account').addEventListener('click', async function() {
+          var btn = this;
+          var pwd = document.getElementById('del-pwd').value;
+          var reason = document.getElementById('del-reason').value.trim();
+          if (!pwd || pwd.length < 6) {
+            showToastMsg('❌ Vui lòng nhập mật khẩu (tối thiểu 6 ký tự)');
+            return;
+          }
+          btn.disabled = true;
+          btn.textContent = 'Đang xóa...';
+          try {
+            await apiFetch('/api/auth/account', {
+              method: 'DELETE',
+              body: { password: pwd, reason: reason || undefined },
+            });
+            closeModal();
+            showToastMsg('✅ Đã xóa tài khoản. Tạm biệt!');
+            setTimeout(function() { ChiOiAuth.logout('dangnhap.html'); }, 1200);
+          } catch (e) {
+            showToastMsg('❌ ' + (e.message || 'Không thể xóa tài khoản'));
+            btn.disabled = false;
+            btn.textContent = 'Xác nhận xóa';
+          }
+        });
+      }
     );
   });
 

@@ -57,7 +57,7 @@ export class AuthService {
     const password_hash = await bcrypt.hash(data.password, saltOrRounds);
 
     // Tasker mới phải chờ Admin phê duyệt
-    const userStatus = data.role === 'TASKER' ? 'PENDING' : 'ACTIVE';
+    const userStatus = data.role === 'TASKER' ? 'PENDING_KYC' : 'ACTIVE';
 
     const user = await this.prisma.users.create({
       data: {
@@ -66,6 +66,7 @@ export class AuthService {
         full_name: data.full_name || 'Chưa cập nhật',
         role: data.role,
         status: userStatus,
+        email: data.email || null,
       },
     });
 
@@ -91,27 +92,40 @@ export class AuthService {
       await this.prisma.taskers.create({
         data: { 
           tasker_id: user.user_id, 
-          kyc_status: 'PENDING_APPROVAL',
+          kyc_status: 'PENDING', // Thay đổi từ 'PENDING_APPROVAL' thành 'PENDING' để thỏa mãn check constraint của Postgres
           bio: bioData
         },
       });
 
-      // Handle Tasker Services Mapping
       if (data.services && Array.isArray(data.services) && data.services.length > 0) {
-        const serviceMap: Record<string, number> = {
-          'don_nha': 1,
-          'trong_tre': 4,
-          'mua_ho': 7
-        };
-        
-        const taskerServices = data.services
-          .map((svc: string) => serviceMap[svc])
-          .filter((id: number | undefined) => id !== undefined)
-          .map((service_id: number) => ({
-            tasker_id: user.user_id,
-            service_id,
-            status: 'PENDING_APPROVAL'
-          }));
+        // Lấy danh sách dịch vụ đang hoạt động từ database để so khớp động
+        const dbServices = await this.prisma.services.findMany({
+          where: { is_active: true }
+        });
+
+        const taskerServices: any[] = [];
+
+        for (const svc of data.services) {
+          let matchedService: any = null;
+          if (svc === 'don_nha') {
+            matchedService = dbServices.find(s => s.name.toLowerCase().includes('dọn') || s.name.toLowerCase().includes('don'));
+            if (!matchedService) matchedService = { service_id: 1 }; // Fallback an toàn
+          } else if (svc === 'trong_tre') {
+            matchedService = dbServices.find(s => s.name.toLowerCase().includes('trông') || s.name.toLowerCase().includes('trong'));
+            if (!matchedService) matchedService = { service_id: 3 }; // Fallback an toàn
+          } else if (svc === 'mua_ho') {
+            matchedService = dbServices.find(s => s.name.toLowerCase().includes('mua') || s.name.toLowerCase().includes('cho') || s.name.toLowerCase().includes('chợ'));
+            if (!matchedService) matchedService = { service_id: 4 }; // Fallback an toàn
+          }
+
+          if (matchedService) {
+            taskerServices.push({
+              tasker_id: user.user_id,
+              service_id: matchedService.service_id,
+              status: 'PENDING_APPROVAL'
+            });
+          }
+        }
 
         if (taskerServices.length > 0) {
           await this.prisma.tasker_services.createMany({
@@ -330,5 +344,97 @@ export class AuthService {
       where: { bio: { contains: `CCCD: ${idNumber}` } }
     });
     return { exists: !!existing };
+  }
+
+  /**
+   * App Store 5.1.1(v) + Google Play account deletion requirement.
+   * Soft-delete: anonymize PII, set status=DELETED, giải phóng SĐT để đăng ký lại,
+   * giữ lại các record orders/transactions/reviews phục vụ kế toán & lịch sử của bên còn lại.
+   */
+  async deleteAccount(userId: number, password: string, reason?: string) {
+    const user = await this.prisma.users.findUnique({
+      where: { user_id: userId },
+      include: { wallets: true, taskers: true, customers: true },
+    });
+    if (!user) {
+      throw new BadRequestException('Người dùng không tồn tại');
+    }
+    if (user.status === 'DELETED') {
+      throw new BadRequestException('Tài khoản đã bị xóa trước đó');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      throw new BadRequestException('Mật khẩu không đúng');
+    }
+
+    // Chặn xóa nếu còn đơn đang chạy (cả Customer lẫn Tasker)
+    const activeStatuses = ['SEARCHING', 'PENDING', 'ACCEPTED', 'TASKER_ARRIVED', 'IN_PROGRESS'];
+    const activeOrderCount = await this.prisma.orders.count({
+      where: {
+        status: { in: activeStatuses },
+        OR: [
+          user.customers ? { customer_id: userId } : undefined,
+          user.taskers ? { tasker_id: userId } : undefined,
+        ].filter(Boolean) as any,
+      },
+    });
+    if (activeOrderCount > 0) {
+      throw new BadRequestException(
+        `Bạn còn ${activeOrderCount} đơn hàng đang xử lý. Vui lòng hoàn tất hoặc hủy đơn trước khi xóa tài khoản.`,
+      );
+    }
+
+    // Chặn xóa nếu ví còn tiền (yêu cầu rút hết để không mất tiền của user)
+    const balance = Number(user.wallets?.balance ?? 0);
+    if (balance > 0) {
+      throw new BadRequestException(
+        `Ví của bạn còn ${balance.toLocaleString('vi-VN')}đ. Vui lòng rút hết trước khi xóa tài khoản.`,
+      );
+    }
+
+    // Anonymize: đổi phone & email để giải phóng cho người khác đăng ký lại
+    // phone là VARCHAR(20) → tag phải <= 20 ký tự
+    const tag = `D${userId}_${Date.now().toString(36)}`.slice(0, 20);
+    await this.prisma.$transaction(async (tx) => {
+      await tx.users.update({
+        where: { user_id: userId },
+        data: {
+          phone: tag,
+          email: null,
+          full_name: 'Người dùng đã xóa',
+          avatar_url: null,
+          gender: null,
+          status: 'DELETED',
+          updated_at: new Date(),
+        },
+      });
+
+      if (user.taskers) {
+        await tx.taskers.update({
+          where: { tasker_id: userId },
+          data: {
+            is_online: false,
+            bio: reason ? `[DELETED] Lý do: ${reason.substring(0, 200)}` : '[DELETED]',
+            address: null,
+          },
+        });
+      }
+
+      if (user.customers) {
+        await tx.customers.update({
+          where: { customer_id: userId },
+          data: { default_address: null },
+        });
+      }
+
+      // Xóa push subscriptions để không nhận thông báo nữa
+      await tx.push_subscriptions.deleteMany({ where: { user_id: userId } });
+    });
+
+    return {
+      message: 'Tài khoản đã được xóa. Cảm ơn bạn đã sử dụng Chị Ơi!',
+      deleted_at: new Date().toISOString(),
+    };
   }
 }
