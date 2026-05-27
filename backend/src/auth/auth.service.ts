@@ -381,7 +381,8 @@ export class AuthService {
     }
 
     // Anonymize: đổi phone & email để giải phóng cho người khác đăng ký lại
-    const tag = `DELETED_${userId}_${Date.now()}`;
+    // phone là VARCHAR(20) → tag phải <= 20 ký tự
+    const tag = `D${userId}_${Date.now().toString(36)}`.slice(0, 20);
     await this.prisma.$transaction(async (tx) => {
       await tx.users.update({
         where: { user_id: userId },
