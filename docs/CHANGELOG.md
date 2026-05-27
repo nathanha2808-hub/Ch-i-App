@@ -4,6 +4,17 @@
 
 ---
 
+## [1.6.2] - 2026-05-27
+
+### 📱 Cập nhật Logo Mới cho App Tasker (Phân biệt với Logo Khách Hàng)
+
+#### Changed
+- **App Icons:** Sao chép ảnh `logoTasker.jpg` mới của người dùng đè lên `assets/images/logo.jpg`.
+- **Icon Generation:** Chạy script `regen-icons.js` tái tạo thành công 15 kích cỡ icon di động iOS, 15 icon di động Android (legacy, round, adaptive foreground) và bộ icon PWA/Favicon mới để đảm bảo tính riêng biệt cho app Tasker, tránh lỗi trùng lặp thương hiệu từ Apple (Guideline 4.3(a)).
+- **Capacitor Sync:** Thực hiện đồng bộ hóa thành công Capacitor (`npx cap sync`) cập nhật toàn bộ assets sang các thư mục native của iOS (`ios/`) và Android (`android/`).
+
+---
+
 ## [1.6.1] - 2026-05-26
 
 ### 📱 Tích hợp Xóa tài khoản & Cập nhật bộ App Icon Độc quyền (Apple App Store Compliance)
