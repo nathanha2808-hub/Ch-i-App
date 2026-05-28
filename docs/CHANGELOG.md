@@ -4,6 +4,25 @@
 
 ---
 
+## [1.6.3] - 2026-05-28
+
+### 🤖 Cấu hình CI/CD Android trên Codemagic
+
+#### Added
+- **Codemagic:** `codemagic.yaml` — Thêm **Workflow 4: `android-debug-apk`** — Build debug APK không cần signing, để test nhanh trên device/emulator. Chạy thủ công từ Codemagic UI.
+- **Codemagic:** `codemagic.yaml` — Thêm **Workflow 5: `android-release-aab`** — Build signed release AAB (.aab) để upload Google Play Console. Sử dụng keystore được inject qua biến môi trường (`CM_KEYSTORE` base64) + auto bump `versionCode`/`versionName`.
+- **Codemagic:** Cập nhật header comment file từ "3 workflows (iOS)" thành "5 workflows (iOS + Android)".
+
+#### Hướng dẫn Setup
+1. Tạo keystore bằng `keytool` → encode base64 → paste vào Codemagic env var `CM_KEYSTORE`
+2. Tạo Environment Group `android_keystore` trên Codemagic chứa: `CM_KEYSTORE`, `CM_KEY_ALIAS`, `CM_KEY_PASSWORD`, `CM_KEYSTORE_PASSWORD`
+3. Bấm "Start new build" → chọn workflow `Android Debug APK` hoặc `Android Release → Google Play (AAB)`
+
+#### Files ảnh hưởng
+- `codemagic.yaml` (SỬA — thêm 2 workflow Android)
+
+---
+
 ## [1.5.6] - 2026-05-27
 
 ### 🐛 Bug fixes — Tasker Registration Internal Server Error (PostgreSQL Constraints & Service IDs)

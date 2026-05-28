@@ -1,12 +1,12 @@
 # =============================================================================
-# Codemagic CI/CD config cho Chị Ơi! iOS
-# 3 workflows:
-#   1. ios-verify         — Build .app simulator (no signing). Chạy ngay sau khi
-#                            connect repo. KHÔNG cần Apple Developer.
-#   2. ios-debug-ipa      — Build debug-signed IPA (dùng auto-managed signing
-#                            của Codemagic). Cần Apple Dev + integration.
-#   3. ios-release-store  — Build release IPA + auto upload TestFlight + dSYM.
-#                            Cần Apple Dev + integration + tag v*.
+# Codemagic CI/CD config cho Chị Ơi! (iOS + Android)
+# 4 workflows:
+#   iOS:
+#     1. ios-verify         — Build .app simulator (no signing).
+#     2. ios-debug-ipa      — Build debug-signed IPA.
+#     3. ios-release-store  — Build release IPA + auto upload TestFlight.
+#   Android:
+#     4. android-release-aab — Build signed AAB → Google Play.
 # =============================================================================
 
 definitions:
@@ -389,6 +389,162 @@ workflows:
         # beta_groups:
         #   - "Test Phòng Nam"
         submit_to_app_store: false      # Manual review submission
+
+      email:
+        recipients:
+          - nathanha.2808@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  # ===========================================================================
+  # Workflow 4: android-release-aab — Build signed AAB → Google Play
+  # ===========================================================================
+  # YÊU CẦU:
+  #   - Google Play Console đã tạo app (package name: vn.chioi.app)
+  #   - Codemagic Environment Variables (đặt ở Team/App settings):
+  #       CM_KEYSTORE          — base64 của file .jks keystore
+  #       CM_KEY_ALIAS         — alias của key (vd: chioi-release)
+  #       CM_KEY_PASSWORD      — mật khẩu key
+  #       CM_KEYSTORE_PASSWORD — mật khẩu keystore
+  #   - (TÙY CHỌN) Google Play integration trong Codemagic → auto upload
+  #
+  # HƯỚNG DẪN TẠO KEYSTORE:
+  #   keytool -genkeypair -v -keystore chioi-release.jks \
+  #     -keyalg RSA -keysize 2048 -validity 10000 \
+  #     -alias chioi-release \
+  #     -storepass YOUR_STORE_PASSWORD \
+  #     -keypass YOUR_KEY_PASSWORD
+  #
+  #   Rồi encode base64:
+  #     base64 -i chioi-release.jks | tr -d '\n'   (macOS/Linux)
+  #     [Convert]::ToBase64String([IO.File]::ReadAllBytes("chioi-release.jks"))  (PowerShell)
+  #
+  #   Paste giá trị base64 vào biến CM_KEYSTORE trên Codemagic.
+  # ===========================================================================
+  android-release-aab:
+    name: Android Release → Google Play (AAB)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    cache: *cache_cfg
+
+    environment:
+      vars:
+        PACKAGE_NAME: "vn.chioi.app"
+      node: 20.20.2
+      java: 17
+      groups:
+        - android_keystore    # ⚠️ Tạo group này trong Codemagic Settings
+                              # chứa: CM_KEYSTORE, CM_KEY_ALIAS,
+                              # CM_KEY_PASSWORD, CM_KEYSTORE_PASSWORD
+
+    # Manual trigger — bấm nút Build từ Codemagic UI
+    # Bỏ comment triggering bên dưới nếu muốn tự động build khi push tag
+    # triggering:
+    #   events:
+    #     - tag
+    #   tag_patterns:
+    #     - pattern: 'v*-android'
+    #       include: true
+
+    scripts:
+      - name: Install Capacitor deps
+        script: |
+          cd mobile-ios
+          npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Capacitor sync Android
+        script: |
+          cd mobile-ios
+          npx cap sync android
+
+      - name: Setup Android keystore from env
+        script: |
+          set -e
+          echo "===== Android Keystore Setup ====="
+          KEYSTORE_PATH=$CM_BUILD_DIR/mobile-ios/android/app/chioi-release.jks
+
+          # Decode base64 keystore từ biến môi trường
+          echo "$CM_KEYSTORE" | base64 --decode > "$KEYSTORE_PATH"
+          echo "Keystore decoded to: $KEYSTORE_PATH"
+          ls -la "$KEYSTORE_PATH"
+
+          # Tạo key.properties để Gradle đọc
+          cat > $CM_BUILD_DIR/mobile-ios/android/key.properties <<EOF
+          storeFile=$KEYSTORE_PATH
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          keyPassword=$CM_KEY_PASSWORD
+          EOF
+
+          echo "key.properties created"
+          echo "===== Keystore setup done ====="
+
+      - name: Bump versionCode + versionName
+        script: |
+          set -e
+          cd mobile-ios/android/app
+
+          # Tự động tăng versionCode theo BUILD_NUMBER của Codemagic
+          NEW_VERSION_CODE=$((BUILD_NUMBER + 10))
+          NEW_VERSION_NAME="1.0.$BUILD_NUMBER"
+
+          echo "===== Bump Android version ====="
+          echo "versionCode: $NEW_VERSION_CODE"
+          echo "versionName: $NEW_VERSION_NAME"
+
+          # Dùng sed để cập nhật build.gradle
+          sed -i "s/versionCode [0-9]*/versionCode $NEW_VERSION_CODE/" build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"$NEW_VERSION_NAME\"/" build.gradle
+
+          echo "Updated build.gradle:"
+          grep -E "versionCode|versionName" build.gradle
+
+      - name: Build signed release AAB
+        script: |
+          set -e
+          cd mobile-ios/android
+
+          chmod +x gradlew
+
+          # Inject signing config vào build.gradle trước khi build
+          # Gradle đọc key.properties → ký AAB
+          cat > /tmp/signing_inject.gradle <<'GRADLEOF'
+          android.signingConfigs {
+              release {
+                  def keystorePropertiesFile = rootProject.file("key.properties")
+                  def keystoreProperties = new Properties()
+                  keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+                  storeFile file(keystoreProperties['storeFile'].trim())
+                  storePassword keystoreProperties['storePassword'].trim()
+                  keyAlias keystoreProperties['keyAlias'].trim()
+                  keyPassword keystoreProperties['keyPassword'].trim()
+              }
+          }
+          android.buildTypes.release.signingConfig android.signingConfigs.release
+          GRADLEOF
+
+          # Append signing config vào app/build.gradle
+          cat /tmp/signing_inject.gradle >> app/build.gradle
+
+          echo "===== Building release AAB ====="
+          ./gradlew bundleRelease
+
+          echo "===== AAB built successfully ====="
+          ls -la app/build/outputs/bundle/release/
+
+    artifacts:
+      - mobile-ios/android/app/build/outputs/bundle/release/*.aab
+      - mobile-ios/android/app/build/outputs/apk/release/*.apk
+
+    publishing:
+      # ── TÙY CHỌN: Auto upload lên Google Play ──
+      # Bỏ comment block bên dưới sau khi setup Google Play integration
+      # trong Codemagic (Settings → Integrations → Google Play).
+      # google_play:
+      #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+      #   track: internal          # internal → alpha → beta → production
+      #   submit_as_draft: true
 
       email:
         recipients:
