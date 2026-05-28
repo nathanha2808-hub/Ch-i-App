@@ -493,9 +493,9 @@ workflows:
           echo "versionCode: $NEW_VERSION_CODE"
           echo "versionName: $NEW_VERSION_NAME"
 
-          # Dùng sed để cập nhật build.gradle
-          sed -i "s/versionCode [0-9]*/versionCode $NEW_VERSION_CODE/" build.gradle
-          sed -i "s/versionName \"[^\"]*\"/versionName \"$NEW_VERSION_NAME\"/" build.gradle
+          # Dùng sed để cập nhật build.gradle (macOS cần -i '')
+          sed -i '' "s/versionCode [0-9]*/versionCode $NEW_VERSION_CODE/" build.gradle
+          sed -i '' "s/versionName \"[^\"]*\"/versionName \"$NEW_VERSION_NAME\"/" build.gradle
 
           echo "Updated build.gradle:"
           grep -E "versionCode|versionName" build.gradle
