@@ -538,13 +538,16 @@ workflows:
       - mobile-ios/android/app/build/outputs/apk/release/*.apk
 
     publishing:
-      # ── TÙY CHỌN: Auto upload lên Google Play ──
-      # Bỏ comment block bên dưới sau khi setup Google Play integration
-      # trong Codemagic (Settings → Integrations → Google Play).
-      # google_play:
-      #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-      #   track: internal          # internal → alpha → beta → production
-      #   submit_as_draft: true
+      # ── Auto upload lên Google Play (giống TestFlight cho iOS) ──
+      # YÊU CẦU: Biến GCLOUD_SERVICE_ACCOUNT_CREDENTIALS trong group android_keystore
+      # chứa nội dung file JSON của Google Play Service Account.
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal              # Upload vào kênh Internal Testing
+                                     # Các kênh khác: alpha → beta → production
+        submit_as_draft: true        # Tạo bản draft → anh vào Google Play Console
+                                     # bấm "Review release" → "Start rollout" để phát hành
+                                     # Đổi thành false nếu muốn tự động phát hành luôn
 
       email:
         recipients:
