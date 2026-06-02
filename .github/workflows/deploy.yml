@@ -16,6 +16,7 @@ on:
       - main
       - testvps1
       - chioinhanh2
+      - chioinhanh3
       - 'fix/**'
       - 'feature/**'
   workflow_dispatch:  # Cho phép trigger thủ công từ Actions tab
