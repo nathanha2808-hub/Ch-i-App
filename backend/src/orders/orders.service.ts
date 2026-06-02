@@ -197,6 +197,21 @@ export class OrdersService {
     });
   }
 
+  // FCM: wrapper to send after acceptOrder - called from controller
+  async notifyCustomerOrderAccepted(orderId: number, updated: any) {
+    try {
+      const taskerName = updated.taskers?.users?.full_name || 'Tasker';
+      this.pushService.sendAllChannels(updated.customer_id, {
+        title: '✅ Tasker đã nhận đơn!',
+        body: `${taskerName} đã nhận đơn #${updated.order_code}. Đang trên đường đến!`,
+        url: '/khachhang/theodoidon.html',
+        data: { order_id: orderId.toString(), type: 'order_accepted' },
+      }).catch((e) => console.warn('[Push] acceptOrder error:', e.message));
+    } catch (e) {
+      console.warn('[Push] notifyCustomerOrderAccepted error:', e.message);
+    }
+  }
+
   async updateOrderStatus(orderId: number, taskerId: number, status: string) {
     const order = await this.prisma.orders.findFirst({
       where: { order_id: orderId, tasker_id: taskerId },
@@ -222,6 +237,23 @@ export class OrdersService {
       where: { order_id: orderId },
       data: { status },
     });
+
+    // FCM: Thông báo cho KH khi Tasker đến nơi hoặc bắt đầu làm việc
+    if (status === 'TASKER_ARRIVED') {
+      this.pushService.sendAllChannels(order.customer_id, {
+        title: '📍 Tasker đã đến nơi!',
+        body: `Tasker đã đến địa chỉ của bạn cho đơn #${orderId}.`,
+        url: '/khachhang/theodoidon.html',
+        data: { order_id: orderId.toString(), type: 'tasker_arrived' },
+      }).catch((e) => console.warn('[Push] TASKER_ARRIVED error:', e.message));
+    } else if (status === 'IN_PROGRESS') {
+      this.pushService.sendAllChannels(order.customer_id, {
+        title: '🔨 Tasker đang thực hiện!',
+        body: `Tasker đã bắt đầu thực hiện dịch vụ cho đơn #${orderId}.`,
+        url: '/khachhang/theodoidon.html',
+        data: { order_id: orderId.toString(), type: 'in_progress' },
+      }).catch((e) => console.warn('[Push] IN_PROGRESS error:', e.message));
+    }
 
     // HOÀN TIỀN NẾU TASKER HỦY ĐƠN
     if (status === 'CANCELLED' && order.payment_method === 'WALLET') {
@@ -288,16 +320,18 @@ export class OrdersService {
       
       // Nếu Tasker báo hoàn thành (PENDING_COMPLETION), báo cho KH xác nhận
       if (status === 'PENDING_COMPLETION') {
-        this.pushService.sendPushToUser(fullOrder!.customer_id, {
+        this.pushService.sendAllChannels(fullOrder!.customer_id, {
           title: '✅ Tasker đã hoàn thành!',
           body: `Đơn ${serviceName} #${orderId} đã xong. Xác nhận để hoàn tất.`,
           url: '/khachhang/lichsuhoatdong.html',
+          data: { order_id: orderId.toString(), type: 'pending_completion' },
         }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
       } else if (status === 'COMPLETED') {
-        this.pushService.sendPushToUser(fullOrder!.customer_id, {
+        this.pushService.sendAllChannels(fullOrder!.customer_id, {
           title: '🎉 Đơn đã hoàn thành!',
           body: `Tasker đã hoàn thành đơn ${serviceName} #${orderId}. Cảm ơn bạn đã sử dụng dịch vụ!`,
           url: '/khachhang/lichsuhoatdong.html',
+          data: { order_id: orderId.toString(), type: 'order_completed' },
         }).catch((e) => console.warn('[Push] Error sending to customer:', e.message));
       }
     }
@@ -333,10 +367,11 @@ export class OrdersService {
 
     // TC-T09-025 FIX: Push notification cho Tasker khi KH xác nhận hoàn thành
     if (order.tasker_id) {
-      this.pushService.sendPushToUser(order.tasker_id, {
+      this.pushService.sendAllChannels(order.tasker_id, {
         title: '🎉 Đơn đã hoàn thành!',
         body: `KH đã xác nhận đơn #${orderId}. Thu nhập đã được cộng vào ví.`,
         url: '/giupviec/thunhapvathongke.html',
+        data: { order_id: orderId.toString(), type: 'order_confirmed' },
       }).catch((e) => console.warn('[Push] Error sending to tasker:', e.message));
     }
 
@@ -375,6 +410,16 @@ export class OrdersService {
       } catch (e) {
         console.warn('[Order] Lỗi hoàn tiền ví KH:', e.message);
       }
+    }
+
+    // FCM: Thông báo cho Tasker khi KH hủy đơn
+    if (order.tasker_id) {
+      this.pushService.sendAllChannels(order.tasker_id, {
+        title: '❌ Đơn hàng đã bị hủy',
+        body: `Khách hàng đã hủy đơn #${order.order_code || orderId}`,
+        url: '/giupviec/trangchutasker.html',
+        data: { order_id: orderId.toString(), type: 'order_cancelled' },
+      }).catch((e) => console.warn('[Push] cancelOrder error:', e.message));
     }
 
     return updatedOrder;

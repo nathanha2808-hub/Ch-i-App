@@ -47,8 +47,11 @@ export class OrdersController {
     }
     const updatedOrder = await this.ordersService.acceptOrder(id, req.user.userId);
     
-    // Notify customer that tasker accepted
+    // Notify customer that tasker accepted (WebSocket)
     this.ordersGateway.notifyCustomerOrderAccepted(updatedOrder.customer_id, updatedOrder);
+    
+    // FCM: Notify customer via push notification (all channels)
+    this.ordersService.notifyCustomerOrderAccepted(id, updatedOrder);
     
     return updatedOrder;
   }

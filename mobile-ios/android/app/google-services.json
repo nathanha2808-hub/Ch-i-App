@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "394419671322",
+    "project_id": "chioi-app-99660",
+    "storage_bucket": "chioi-app-99660.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:394419671322:android:924af375ae3c98b63c9ca3",
+        "android_client_info": {
+          "package_name": "vn.chioi.tasker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXvmKn0O8ko7_VgspXyftvUxc8_g8WC64"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

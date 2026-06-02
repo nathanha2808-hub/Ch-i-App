@@ -1,4 +1,4 @@
-// TC-T09-025 + TC-T13-023: Web Push Subscription Controller
+// TC-T09-025 + TC-T13-023: Web Push Subscription Controller + FCM Device Registration
 import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { PushService } from './push.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -27,5 +27,27 @@ export class PushController {
   async unsubscribe(@Body('endpoint') endpoint: string) {
     await this.pushService.removeSubscription(endpoint);
     return { message: 'Push subscription removed' };
+  }
+
+  @Post('register-device')
+  @Roles('CUSTOMER', 'TASKER', 'ADMIN')
+  @ApiOperation({ summary: 'Đăng ký FCM device token (native mobile push)' })
+  async registerDevice(@Request() req, @Body() body: { token: string; platform: string }) {
+    if (!body.token || !body.platform) {
+      return { message: 'Token and platform are required' };
+    }
+    await this.pushService.saveFcmToken(req.user.userId, body.token, body.platform);
+    return { message: 'FCM device token registered' };
+  }
+
+  @Post('unregister-device')
+  @Roles('CUSTOMER', 'TASKER', 'ADMIN')
+  @ApiOperation({ summary: 'Hủy đăng ký FCM device token (khi logout)' })
+  async unregisterDevice(@Body('token') token: string) {
+    if (!token) {
+      return { message: 'Token is required' };
+    }
+    await this.pushService.removeFcmToken(token);
+    return { message: 'FCM device token removed' };
   }
 }
