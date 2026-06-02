@@ -364,22 +364,10 @@ workflows:
       - name: Build Release IPA + dSYM
         script: |
           cd mobile-ios
-          # Build với raw xcodebuild để xem lỗi chi tiết
-          set -o pipefail
-          xcodebuild -workspace ios/App/App.xcworkspace \
-            -scheme App \
-            -config Release \
-            -archivePath build/ios/xcarchive/App.xcarchive \
-            archive \
-            COMPILER_INDEX_STORE_ENABLE=NO \
-            2>&1 | tee /tmp/xcodebuild_raw.log | tail -100
-          
-          # Nếu archive thành công, export IPA
-          xcodebuild -exportArchive \
-            -archivePath build/ios/xcarchive/App.xcarchive \
-            -exportOptionsPlist ios/App/exportOptions.plist \
-            -exportPath build/ios/ipa \
-            2>&1 | tee -a /tmp/xcodebuild_raw.log | tail -50
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App \
+            --config Release
 
     # IPA xuất ở `mobile-ios/build/ios/ipa/App.ipa` (xác nhận từ build log
     # "Successfully exported ipa to build/ios/ipa/App.ipa"). dSYMs nằm trong
