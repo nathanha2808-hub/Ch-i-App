@@ -285,7 +285,7 @@ workflows:
             echo "----- Step 2: Revoking stale certs (Codemagic ko có private key match) -----"
             for cert_id in $EXISTING_IDS; do
               echo "Revoking cert ID: $cert_id"
-              app-store-connect certificates delete "$cert_id" --yes 2>&1 || echo "(revoke skip — đã expired hoặc revoked)"
+              app-store-connect certificates delete "$cert_id" 2>&1 || echo "(revoke skip — đã expired hoặc revoked)"
             done
             sleep 5  # Đợi Apple sync state
           else
