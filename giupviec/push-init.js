@@ -1,96 +1,110 @@
 // Push Notification Init — Capacitor FCM for Chị Ơi! Tasker App
-// Chỉ chạy trên native mobile (Android/iOS), bỏ qua trên browser
+// DEBUG VERSION — thêm alert để trace lỗi
 (function() {
   'use strict';
 
   async function initPush() {
-    // Kiểm tra Capacitor có sẵn không (đợi bridge inject xong)
-    if (typeof Capacitor === 'undefined' || !Capacitor.isNativePlatform()) {
-      console.log('[Push] Not native platform, skipping FCM init');
+    // Step 1: Check Capacitor
+    if (typeof Capacitor === 'undefined') {
+      console.log('[Push] Capacitor undefined');
+      return;
+    }
+    
+    if (!Capacitor.isNativePlatform()) {
+      console.log('[Push] Not native platform');
       return;
     }
 
-    const { PushNotifications } = Capacitor.Plugins;
+    // Step 2: Check plugin
+    var PushNotifications = null;
+    try {
+      PushNotifications = Capacitor.Plugins.PushNotifications;
+    } catch(e) {
+      alert('[Push DEBUG] Error accessing plugin: ' + e.message);
+      return;
+    }
+
     if (!PushNotifications) {
-      console.warn('[Push] PushNotifications plugin not available');
+      alert('[Push DEBUG] PushNotifications plugin = null. Plugins available: ' + Object.keys(Capacitor.Plugins).join(', '));
       return;
     }
 
     try {
-      // 1. Xin quyền
-      console.log('[Push] Requesting permissions...');
-      const permission = await PushNotifications.requestPermissions();
-      console.log('[Push] Permission result:', JSON.stringify(permission));
+      // Step 3: Request permission
+      alert('[Push DEBUG] Requesting permission...');
+      var permission = await PushNotifications.requestPermissions();
+      alert('[Push DEBUG] Permission result: ' + JSON.stringify(permission));
+      
       if (permission.receive !== 'granted') {
-        console.warn('[Push] Permission not granted');
+        alert('[Push DEBUG] Permission NOT granted: ' + permission.receive);
         return;
       }
 
-      // 2. Đăng ký nhận push
+      // Step 4: Register
       await PushNotifications.register();
-      console.log('[Push] Register called');
+      alert('[Push DEBUG] Register called OK');
 
-      // 3. Nhận token → gửi lên backend
-      PushNotifications.addListener('registration', async (token) => {
+      // Step 5: Listen for token
+      PushNotifications.addListener('registration', async function(token) {
         console.log('[Push] FCM Token:', token.value);
-        const storedToken = localStorage.getItem('chioi_fcm_token');
+        alert('[Push DEBUG] Got token: ' + token.value.substring(0, 20) + '...');
         
-        // Chỉ gửi lên server nếu token mới hoặc khác token cũ
+        var storedToken = localStorage.getItem('chioi_fcm_token');
         if (storedToken !== token.value) {
           try {
-            const platform = Capacitor.getPlatform(); // 'android' | 'ios'
+            var platform = Capacitor.getPlatform();
             await apiFetch('/api/push/register-device', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ token: token.value, platform: platform }),
             });
             localStorage.setItem('chioi_fcm_token', token.value);
-            console.log('[Push] FCM token registered successfully');
+            alert('[Push DEBUG] Token registered with server OK!');
           } catch (err) {
-            console.warn('[Push] Failed to register FCM token:', err);
+            alert('[Push DEBUG] Failed to register token: ' + err.message);
           }
         }
       });
 
-      // 4. Lỗi đăng ký
-      PushNotifications.addListener('registrationError', (err) => {
-        console.error('[Push] Registration error:', JSON.stringify(err));
+      // Lỗi đăng ký
+      PushNotifications.addListener('registrationError', function(err) {
+        alert('[Push DEBUG] Registration ERROR: ' + JSON.stringify(err));
       });
 
-      // 5. Nhận notification khi app đang mở (foreground)
-      PushNotifications.addListener('pushNotificationReceived', (notification) => {
+      // Nhận notification foreground
+      PushNotifications.addListener('pushNotificationReceived', function(notification) {
         console.log('[Push] Notification received:', notification);
-        // Hiển thị toast trong app
         if (typeof showToastMsg === 'function') {
           showToastMsg(notification.title + ': ' + notification.body, 'info');
         }
       });
 
-      // 6. User tap vào notification
-      PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+      // Tap notification
+      PushNotifications.addListener('pushNotificationActionPerformed', function(action) {
         console.log('[Push] Notification tapped:', action);
-        const data = action.notification.data;
+        var data = action.notification.data;
         if (data && data.order_id) {
-          // Navigate tới trang theo dõi đơn hoặc trang chủ
           window.location.href = 'trangchutasker.html';
         }
       });
 
-      console.log('[Push] FCM init completed');
     } catch (err) {
-      console.error('[Push] Init error:', err);
+      alert('[Push DEBUG] Init error: ' + err.message);
     }
   }
 
-  // Đợi 2 giây cho Capacitor bridge inject xong (remote URL cần thêm thời gian)
+  // Đợi 3 giây cho Capacitor bridge
   function waitAndInit() {
     setTimeout(function() {
-      if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()) {
-        initPush();
+      if (typeof Capacitor !== 'undefined') {
+        alert('[Push DEBUG] Capacitor found! Platform: ' + Capacitor.getPlatform() + ', Native: ' + Capacitor.isNativePlatform());
+        if (Capacitor.isNativePlatform()) {
+          initPush();
+        }
       } else {
-        console.log('[Push] Capacitor not available after wait, skipping');
+        alert('[Push DEBUG] Capacitor NOT found after 3s wait');
       }
-    }, 2500);
+    }, 3000);
   }
 
   if (document.readyState === 'complete') {
