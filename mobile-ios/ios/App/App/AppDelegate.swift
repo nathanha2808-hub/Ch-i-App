@@ -10,30 +10,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
     var window: UIWindow?
     private var fcmToken: String?
-    private var tokenInjected = false
+    private var retryTimer: Timer?
+    private var retryCount = 0
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // 1. Configure Firebase (reads GoogleService-Info.plist)
         FirebaseApp.configure()
-        
-        // 2. Set FCM delegate
         Messaging.messaging().delegate = self
-        
-        // 3. Request push notification permission
         requestPushPermission(application)
-        
         return true
     }
 
-    // MARK: - Push Notification Permission
+    // MARK: - Push Permission
     private func requestPushPermission(_ application: UIApplication) {
-        let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-            if let error = error {
-                print("[Push] Permission error: \(error.localizedDescription)")
-                return
-            }
-            print("[Push] Permission granted: \(granted)")
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            print("[Push] Permission granted: \(granted), error: \(error?.localizedDescription ?? "none")")
             if granted {
                 DispatchQueue.main.async {
                     application.registerForRemoteNotifications()
@@ -42,84 +32,103 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         }
     }
 
-    // MARK: - APNs Token → Forward to Capacitor
+    // MARK: - APNs Token
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        print("[Push] APNs Token: \(token)")
-        
-        // Forward to Firebase for APNs → FCM conversion
         Messaging.messaging().apnsToken = deviceToken
-        
-        // Forward to Capacitor plugin
-        NotificationCenter.default.post(
-            name: .capacitorDidRegisterForRemoteNotifications,
-            object: deviceToken
-        )
+        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
+        print("[Push] APNs token set")
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("[Push] Failed to register APNs: \(error.localizedDescription)")
-        NotificationCenter.default.post(
-            name: .capacitorDidFailToRegisterForRemoteNotifications,
-            object: error
-        )
+        print("[Push] APNs failed: \(error.localizedDescription)")
+        NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
     }
 
-    // MARK: - Firebase MessagingDelegate — FCM Token
+    // MARK: - FCM Token
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let token = fcmToken else { return }
         self.fcmToken = token
-        print("[Push] FCM Token received: \(token.prefix(20))...")
-        
-        // Store in UserDefaults
         UserDefaults.standard.set(token, forKey: "chioi_fcm_token")
+        print("[Push] FCM Token: \(token.prefix(30))...")
         
-        // Inject token into WebView (retry until success)
-        injectTokenIntoWebView()
+        // Start trying to register with backend
+        retryCount = 0
+        startTokenRegistration()
     }
 
-    // MARK: - Inject FCM Token into WebView
-    private func injectTokenIntoWebView() {
-        guard let token = self.fcmToken, !tokenInjected else { return }
-        
-        // Try to find WKWebView and inject
+    // MARK: - Register Token with Backend (native HTTP)
+    private func startTokenRegistration() {
+        retryTimer?.invalidate()
+        retryTimer = Timer.scheduledTimer(withTimeInterval: 8.0, repeats: true) { [weak self] timer in
+            self?.attemptTokenRegistration()
+        }
+        // Also try immediately after a delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
-            guard let self = self else { return }
-            guard let rootVC = self.window?.rootViewController else {
-                // Retry later
-                self.scheduleTokenInjection()
+            self?.attemptTokenRegistration()
+        }
+    }
+
+    private func attemptTokenRegistration() {
+        guard let token = self.fcmToken else { return }
+        retryCount += 1
+        
+        if retryCount > 60 { // Stop after ~8 minutes
+            retryTimer?.invalidate()
+            print("[Push] Gave up registering token after 60 retries")
+            return
+        }
+        
+        print("[Push] Registration attempt \(retryCount)...")
+        
+        // Find WebView and read auth token from localStorage
+        guard let rootVC = self.window?.rootViewController,
+              let webView = findWKWebView(in: rootVC.view) else {
+            print("[Push] WebView not found yet")
+            return
+        }
+        
+        webView.evaluateJavaScript("localStorage.getItem('chioi_token')") { [weak self] result, error in
+            if let error = error {
+                print("[Push] JS eval error: \(error.localizedDescription)")
+                return
+            }
+            guard let authToken = result as? String, !authToken.isEmpty else {
+                print("[Push] No auth token in localStorage yet")
                 return
             }
             
-            if let webView = self.findWKWebView(in: rootVC.view) {
-                let js = """
-                window.__CHIOI_FCM_TOKEN = '\(token)';
-                console.log('[Push Native] FCM token injected');
-                if (window.__onFcmToken) { window.__onFcmToken('\(token)'); }
-                """
-                webView.evaluateJavaScript(js) { _, error in
-                    if let error = error {
-                        print("[Push] JS injection error: \(error.localizedDescription)")
-                        self.scheduleTokenInjection()
-                    } else {
-                        print("[Push] FCM token injected into WebView OK")
-                        self.tokenInjected = true
-                    }
-                }
-            } else {
-                self.scheduleTokenInjection()
-            }
-        }
-    }
-    
-    private func scheduleTokenInjection() {
-        // Retry every 10 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) { [weak self] in
-            self?.tokenInjected = false
-            self?.injectTokenIntoWebView()
+            print("[Push] Got auth token, sending FCM token to backend...")
+            self?.sendTokenToBackend(fcmToken: token, authToken: authToken)
         }
     }
 
+    private func sendTokenToBackend(fcmToken: String, authToken: String) {
+        guard let url = URL(string: "https://app.chioi.vn/api/push/register-device") else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
+        
+        let body: [String: Any] = ["token": fcmToken, "platform": "ios"]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            if let error = error {
+                print("[Push] Backend error: \(error.localizedDescription)")
+                return
+            }
+            if let httpResponse = response as? HTTPURLResponse {
+                print("[Push] Backend response: \(httpResponse.statusCode)")
+                if httpResponse.statusCode == 200 || httpResponse.statusCode == 201 {
+                    print("[Push] ✅ FCM token registered successfully!")
+                    self?.retryTimer?.invalidate()
+                }
+            }
+        }.resume()
+    }
+
+    // MARK: - Find WKWebView
     private func findWKWebView(in view: UIView) -> WKWebView? {
         if let webView = view as? WKWebView { return webView }
         for subview in view.subviews {
@@ -131,7 +140,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     // MARK: - App Lifecycle
     func applicationWillResignActive(_ application: UIApplication) {}
     func applicationDidEnterBackground(_ application: UIApplication) {}
-    func applicationWillEnterForeground(_ application: UIApplication) {}
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        // Retry when app comes back to foreground
+        if let token = fcmToken, UserDefaults.standard.string(forKey: "chioi_fcm_registered") != token {
+            retryCount = 0
+            startTokenRegistration()
+        }
+    }
     func applicationDidBecomeActive(_ application: UIApplication) {}
     func applicationWillTerminate(_ application: UIApplication) {}
 
