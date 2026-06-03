@@ -270,6 +270,15 @@ export class OrdersService {
       }
     }
 
+    // Push thông báo cho KH khi Tasker hủy đơn
+    if (status === 'CANCELLED') {
+      this.pushService.sendAllChannels(order.customer_id, {
+        title: '⚠️ Tasker đã hủy đơn',
+        body: `Đơn #${orderId} đã bị Tasker hủy. Tiền đã hoàn vào ví.`,
+        data: { type: 'order_cancelled_by_tasker', order_id: String(orderId) },
+      }).catch(e => console.warn('[Push] Tasker cancel push error:', e.message));
+    }
+
     // TC-T09-012 FIX: Khi PENDING_COMPLETION — KHÔNG tính tiền ngay, chờ KH xác nhận
 
     // THỰC HIỆN TÍNH TIỀN KHI TASKER BÁO HOÀN THÀNH (PENDING_COMPLETION) HOẶC COMPLETED
@@ -459,6 +468,13 @@ export class OrdersService {
       where: { tasker_id: order.tasker_id },
       data: { average_rating: stats._avg.rating || rating },
     });
+
+    // Push thông báo đánh giá cho Tasker
+    this.pushService.sendAllChannels(order.tasker_id, {
+      title: `⭐ Bạn nhận được đánh giá ${rating} sao!`,
+      body: comment || 'Khách hàng đã đánh giá bạn.',
+      data: { type: 'review', order_id: String(orderId) },
+    }).catch(e => console.warn('[Push] Review push error:', e.message));
 
     return review;
   }

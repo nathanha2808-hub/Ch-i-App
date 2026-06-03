@@ -2,6 +2,7 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, Conne
 import { Server, Socket } from 'socket.io';
 import { OrdersService } from './orders.service';
 import { JwtService } from '@nestjs/jwt';
+import { PushService } from '../push/push.service';
 
 @WebSocketGateway({ cors: true, maxHttpBufferSize: 10 * 1024 * 1024 }) // 10MB cho chat image base64
 export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -13,7 +14,8 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private ordersService: OrdersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private pushService: PushService,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -94,6 +96,14 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
       });
     });
+
+    // FCM push cho Taskers offline
+    this.pushService.sendFcmToMultipleUsers(
+      taskerIds.map(id => Number(id)),
+      '📋 Đơn hàng mới gần bạn!',
+      `Có đơn mới - Nhấn để xem chi tiết`,
+      { type: 'new_order', order_id: String(order.order_id) }
+    ).catch(e => console.warn('[Push] New order FCM error:', e.message));
   }
 
   notifyCustomerOrderAccepted(customerId: number, order: any) {
@@ -173,6 +183,16 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // Gửi confirm cho sender riêng (tick "đã gửi")
     client.emit('message_sent', { ...message, status: 'sent' });
+
+    // Push cho người nhận nếu offline
+    const receiverSockets = this.getSocketIds(Number(data.receiverId));
+    if (receiverSockets.length === 0) {
+      this.pushService.sendAllChannels(data.receiverId, {
+        title: '💬 Tin nhắn mới',
+        body: data.content.substring(0, 100),
+        data: { type: 'chat', order_id: String(data.orderId) },
+      }).catch(e => console.warn('[Push] Chat push error:', e.message));
+    }
   }
 
   // ===== BƯỚC 2.1: WebRTC Voice Call Signaling =====

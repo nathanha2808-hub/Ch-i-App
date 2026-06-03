@@ -413,6 +413,21 @@ export class ApiService {
       }
     });
 
+    // Push thông báo KYC cho Tasker
+    if (finalStatus === 'VERIFIED') {
+      this.pushService.sendAllChannels(taskerId, {
+        title: '✅ Hồ sơ đã được duyệt!',
+        body: 'Bạn có thể bắt đầu nhận đơn hàng ngay.',
+        data: { type: 'kyc_approved' },
+      }).catch(e => console.warn('[Push] KYC push error:', e.message));
+    } else if (finalStatus === 'REJECTED' || finalStatus === 'SUSPENDED') {
+      this.pushService.sendAllChannels(taskerId, {
+        title: '❌ Hồ sơ bị từ chối',
+        body: 'Vui lòng cập nhật lại hồ sơ của bạn.',
+        data: { type: 'kyc_rejected' },
+      }).catch(e => console.warn('[Push] KYC push error:', e.message));
+    }
+
     return tasker;
   }
 
@@ -526,10 +541,17 @@ export class ApiService {
   }
 
   async resolveTicket(adminId: number, ticketId: number, status: string) {
-    return this.prisma.support_tickets.update({
+    const ticket = await this.prisma.support_tickets.update({
       where: { ticket_id: ticketId },
       data: { status, admin_id: adminId, updated_at: new Date() }
     });
+    // Push thông báo cho user
+    this.pushService.sendAllChannels(ticket.user_id, {
+      title: '📝 Khiếu nại đã được xử lý',
+      body: 'Admin đã xem xét khiếu nại của bạn.',
+      data: { type: 'ticket_resolved', ticket_id: String(ticketId) },
+    }).catch(e => console.warn('[Push] Ticket push error:', e.message));
+    return ticket;
   }
 
   async getAdminUsers() {
@@ -611,6 +633,16 @@ export class ApiService {
         new_data: { status }
       }
     });
+
+    // Push thông báo cho user
+    if (status === 'BANNED') {
+      this.pushService.sendAllChannels(userId, {
+        title: '🚫 Tài khoản bị khóa',
+        body: 'Tài khoản của bạn đã bị khóa. Liên hệ Admin nếu cần hỗ trợ.',
+        data: { type: 'account_banned' },
+      }).catch(e => console.warn('[Push] Ban push error:', e.message));
+    }
+
     return user;
   }
 
@@ -679,6 +711,20 @@ export class ApiService {
       }
     });
 
+    // Push thông báo cho KH + Tasker
+    this.pushService.sendAllChannels(order.customer_id, {
+      title: '❌ Đơn hàng đã bị hủy bởi Admin',
+      body: `Đơn #${order.order_code || orderId} đã bị hủy. Tiền đã hoàn vào ví.`,
+      data: { type: 'order_cancelled_admin', order_id: String(orderId) },
+    }).catch(e => console.warn('[Push] Admin cancel push error:', e.message));
+    if (order.tasker_id) {
+      this.pushService.sendAllChannels(order.tasker_id, {
+        title: '❌ Đơn hàng đã bị hủy bởi Admin',
+        body: `Đơn #${order.order_code || orderId} đã bị hủy.`,
+        data: { type: 'order_cancelled_admin', order_id: String(orderId) },
+      }).catch(e => console.warn('[Push] Admin cancel push error:', e.message));
+    }
+
     return updatedOrder;
   }
 
@@ -708,6 +754,19 @@ export class ApiService {
         new_data: { status: 'ACCEPTED', tasker_id: taskerId }
       }
     });
+
+    // Push thông báo cho Tasker + KH
+    this.pushService.sendAllChannels(taskerId, {
+      title: '📋 Bạn được gán đơn hàng mới!',
+      body: `Đơn #${order.order_code || orderId} - Hãy xem chi tiết.`,
+      data: { type: 'order_assigned', order_id: String(orderId) },
+    }).catch(e => console.warn('[Push] Assign push error:', e.message));
+    this.pushService.sendAllChannels(order.customer_id, {
+      title: '✅ Đã tìm được Tasker!',
+      body: 'Tasker đã được gán cho đơn hàng của bạn.',
+      data: { type: 'tasker_assigned', order_id: String(orderId) },
+    }).catch(e => console.warn('[Push] Assign push error:', e.message));
+
     return order;
   }
 
@@ -1265,6 +1324,14 @@ export class ApiService {
         users_messages_sender_idTousers: { select: { user_id: true, full_name: true, role: true } },
       }
     });
+
+    // Push thông báo cho user
+    this.pushService.sendAllChannels(userId, {
+      title: '📩 Tin nhắn từ Admin',
+      body: content.substring(0, 100),
+      data: { type: 'admin_message' },
+    }).catch(e => console.warn('[Push] Admin msg push error:', e.message));
+
     return message;
   }
 
@@ -1399,6 +1466,20 @@ export class ApiService {
         },
       }),
     ]);
+
+    // Push thông báo hoàn tiền cho KH + Tasker
+    this.pushService.sendAllChannels(order.customer_id, {
+      title: '💰 Hoàn tiền thành công!',
+      body: `Bạn được hoàn ${refundAmount.toLocaleString('vi-VN')}đ vào ví do khiếu nại.`,
+      data: { type: 'refund', order_id: String(orderId) },
+    }).catch(e => console.warn('[Push] Refund push error:', e.message));
+    if (order.tasker_id) {
+      this.pushService.sendAllChannels(order.tasker_id, {
+        title: '⚠️ Bị trừ tiền do khiếu nại',
+        body: `Trừ ${refundAmount.toLocaleString('vi-VN')}đ từ ví do khiếu nại đơn #${order.order_code || orderId}.`,
+        data: { type: 'refund_deduction', order_id: String(orderId) },
+      }).catch(e => console.warn('[Push] Refund push error:', e.message));
+    }
 
     return {
       success: true,

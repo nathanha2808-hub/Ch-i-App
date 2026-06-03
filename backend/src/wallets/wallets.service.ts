@@ -65,6 +65,13 @@ export class WalletsService {
       return { wallet: updatedWallet, transaction };
     });
 
+    // Push thông báo nạp tiền
+    this.pushService.sendAllChannels(userId, {
+      title: '💳 Nạp tiền thành công!',
+      body: `+${amount.toLocaleString('vi-VN')} đ đã vào ví.`,
+      data: { type: 'deposit' },
+    }).catch(e => console.warn('[Push] Deposit push error:', e.message));
+
     return result;
   }
 
