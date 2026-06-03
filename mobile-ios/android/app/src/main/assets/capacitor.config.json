@@ -1,9 +1,9 @@
 {
-	"appId": "vn.chioi.app",
-	"appName": "Chị Ơi!",
+	"appId": "vn.chioi.tasker",
+	"appName": "Chị Ơi Tasker",
 	"webDir": "www",
 	"server": {
-		"url": "https://app.chioi.vn",
+		"url": "https://app.chioi.vn/giupviec/trangchutasker.html",
 		"cleartext": false,
 		"allowNavigation": [
 			"app.chioi.vn",
@@ -11,12 +11,6 @@
 			"api.chioi.vn",
 			"*.chioi.vn"
 		]
-	},
-	"ios": {
-		"contentInset": "always",
-		"scheme": "chioi",
-		"limitsNavigationsToAppBoundDomains": true,
-		"backgroundColor": "#a04100"
 	},
 	"plugins": {
 		"SplashScreen": {
