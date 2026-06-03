@@ -506,16 +506,18 @@ export class ApiService {
     if (wallet) {
       const amount = Number(transaction.amount).toLocaleString('vi-VN');
       if (status === 'COMPLETED') {
-        this.pushService.sendPushToUser(wallet.user_id, {
+        this.pushService.sendAllChannels(wallet.user_id, {
           title: '💰 Rút tiền thành công!',
           body: `Yêu cầu rút ${amount}đ đã được duyệt.`,
           url: '/giupviec/thunhapvathongke.html',
+          data: { type: 'withdrawal_approved' },
         }).catch((e) => console.warn('[Push] Error:', e.message));
       } else if (status === 'FAILED') {
-        this.pushService.sendPushToUser(wallet.user_id, {
+        this.pushService.sendAllChannels(wallet.user_id, {
           title: '❌ Yêu cầu rút tiền bị từ chối',
           body: `Yêu cầu rút ${amount}đ không được duyệt. Số tiền đã hoàn lại ví.`,
           url: '/giupviec/thunhapvathongke.html',
+          data: { type: 'withdrawal_rejected' },
         }).catch((e) => console.warn('[Push] Error:', e.message));
       }
     }

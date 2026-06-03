@@ -189,10 +189,11 @@ export class WalletsService {
 
     // TC-T13-002 FIX: Gửi push notification sau khi rút tiền thành công
     try {
-      await this.pushService.sendPushToUser(userId, {
+      await this.pushService.sendAllChannels(userId, {
         title: 'Yêu cầu rút tiền đã gửi',
         body: `Yêu cầu rút ${amount.toLocaleString('vi-VN')} đ đang chờ Admin duyệt.`,
         url: '/giupviec/thunhapvathongke.html',
+        data: { type: 'withdrawal_pending' },
       });
     } catch (e) {
       console.warn('[Wallet] Push notification failed:', e.message);
