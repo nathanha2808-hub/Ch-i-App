@@ -122,7 +122,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         // Retry when app comes back to foreground
         if (fcmToken != null && !tokenRegistered) {
@@ -132,7 +132,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         if (retryHandler != null) {
             retryHandler.removeCallbacksAndMessages(null);
