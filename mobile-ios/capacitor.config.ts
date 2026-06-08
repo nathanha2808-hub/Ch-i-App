@@ -5,15 +5,11 @@ const config: CapacitorConfig = {
   appName: 'Chị Ơi Tasker',
   webDir: 'www',
 
-  // Load PWA từ remote URL (KHÔNG bundle static files)
-  // Apple Review Note: kết hợp với native plugins (Geolocation, Push, Browser)
-  // để pass guideline 4.2 — không phải pure WebView
+  // Load từ www/ local (bundled) — không cần VPS cho giao diện
+  // API calls vẫn gọi tới app.chioi.vn
   server: {
-    url: 'https://app.chioi.vn/giupviec/trangchutasker.html',
-    cleartext: false,
     allowNavigation: [
       'app.chioi.vn',
-      'chioi.vn',
       'api.chioi.vn',
       '*.chioi.vn',
     ],

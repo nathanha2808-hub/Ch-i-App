@@ -48,11 +48,15 @@
 // ==============================================================
 // Production (Nginx port 80/443): API proxy cùng origin → không cần port
 // Dev local (http-server port 8080): API chạy riêng port 3000
+// Capacitor native: luôn trỏ tới production API
+const _isCapacitor = typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform && Capacitor.isNativePlatform();
 const _port = window.location.port;
-const _isProduction = (!_port || _port === '80' || _port === '443');
-const API_BASE = _isProduction
-  ? `${window.location.protocol}//${window.location.hostname}`
-  : `${window.location.protocol}//${window.location.hostname}:3000`;
+const _isProduction = _isCapacitor || (!_port || _port === '80' || _port === '443');
+const API_BASE = _isCapacitor
+  ? 'https://app.chioi.vn'
+  : (_isProduction
+    ? `${window.location.protocol}//${window.location.hostname}`
+    : `${window.location.protocol}//${window.location.hostname}:3000`);
 
 // ==============================================================
 // 2. TOKEN MANAGEMENT

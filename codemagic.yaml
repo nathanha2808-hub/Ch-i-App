@@ -58,6 +58,11 @@ workflows:
           cd mobile-ios
           npm ci --no-audit --no-fund --prefer-offline
 
+      - name: Bundle frontend vào www/
+        script: |
+          cd mobile-ios
+          node sync-frontend.js
+
       - name: Generate app icon (optional — đã có sẵn trong repo)
         script: |
           cd mobile-ios
@@ -170,10 +175,11 @@ workflows:
           echo "Certs trong keychain:"
           security find-identity -v -p codesigning $HOME/Library/Keychains/login.keychain-db || true
 
-      - name: Install deps + sync
+      - name: Install deps + bundle frontend + sync
         script: |
           cd mobile-ios
           npm ci --no-audit --no-fund --prefer-offline
+          node sync-frontend.js
           npx cap sync ios
           cd ios/App && pod install --repo-update
 
@@ -322,6 +328,11 @@ workflows:
           cd mobile-ios
           npm ci --no-audit --no-fund --prefer-offline
 
+      - name: Bundle frontend vào www/
+        script: |
+          cd mobile-ios
+          node sync-frontend.js
+
       - name: Capacitor sync iOS
         script: |
           cd mobile-ios
@@ -416,6 +427,11 @@ workflows:
         script: |
           cd mobile-ios
           npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Bundle frontend vào www/
+        script: |
+          cd mobile-ios
+          node sync-frontend.js
 
       - name: Đồng bộ Capacitor sang Android
         script: |
