@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'vn.chioi.tasker',
-  appName: 'Chị Ơi Tasker',
+  appName: 'Chị Ơi! - Tasker',
   webDir: 'www',
 
   // Load từ www/ local (bundled) — không cần VPS cho giao diện
